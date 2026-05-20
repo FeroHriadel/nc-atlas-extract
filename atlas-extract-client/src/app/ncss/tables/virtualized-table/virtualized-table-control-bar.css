@@ -1,0 +1,97 @@
+
+
+.virtualized-table-control-bar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  border: 1px solid var(--nc-border-color);
+  background-color: var(--nc-input-bg);
+  border-radius: 0.375rem;
+  margin-bottom: 0.25rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.virtualized-table-control-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.virtualized-table-control-bar-left {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.virtualized-table-control-bar-result-count {
+  font-size: 0.875rem;
+  color: var(--nc-text-color-light);
+}
+
+.virtualized-table-control-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  overflow-x: auto;
+  overflow: visible;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.virtualized-table-control-bar-right::-webkit-scrollbar {
+  display: none;
+}
+
+.virtualized-table-control-bar-filter-button {
+  margin-left: 1.25rem;
+}
+
+.virtualized-table-control-bar-zoom-level {
+  font-size: 0.75rem;
+  color: var(--nc-text-color-light);
+  min-width: 40px;
+  text-align: center;
+}
+
+.virtualized-table-applied-filters-wrap {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  border: 1px solid var(--nc-border-color);
+  background-color: var(--nc-input-bg);
+  margin-bottom: 0.25rem;
+}
+
+.virtualized-table-applied-filters-title {
+  font-size: 0.75rem;
+  color: var(--nc-text-color-light);
+  font-weight: 300;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.virtualized-table-applied-filters-list {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.virtualized-table-applied-filter-operator {
+  margin-left: 0.5rem;
+  font-weight: 700;
+}
+
+@media (max-width: 450px) {
+  .vt-control-bar-zoom-level {
+    display: none;
+  }
+  
+  .virtualized-table-control-bar-right nc-square-button[title="Zoom Out"],
+  .virtualized-table-control-bar-right nc-square-button[title="Zoom In"] {
+    display: none;
+  }
+}

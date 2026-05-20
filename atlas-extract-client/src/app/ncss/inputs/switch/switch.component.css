@@ -1,0 +1,70 @@
+.nc-switch {
+    display: inline-block;
+    position: relative;
+    width: 3rem;
+    height: 1.5rem;
+    border-radius: 9999px;
+    transition: background-color 0.3s ease;
+    border: 1px solid var(--nc-border-color);
+}
+
+.nc-switch-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.nc-switch-checkbox {
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: pointer;
+}
+
+.nc-switch-slider {
+    position: relative;
+    background-color: var(--nc-input-bg);
+    border-radius: 9999px;
+    width: 100%;
+    height: 100%;
+}
+
+.nc-switch-knob {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+    background-color: var(--nc-input-placeholder-color);
+    pointer-events: none;
+    transition: left 0.3s ease;
+}
+
+/* when checkbox is checked move the knob to the right and change background color */
+.nc-switch:has(.nc-switch-checkbox:checked) .nc-switch-slider {
+    background-color: var(--nc-border-color);
+}
+
+.nc-switch:has(.nc-switch-checkbox:checked) .nc-switch-knob {
+    background-color: var(--nc-input-text-color);
+    left: calc(100% - 1.4rem);
+}
+
+.nc-switch:has(.nc-switch-checkbox:focus) .nc-switch-slider {
+    box-shadow: 2px 2px 6px var(--nc-border-color);
+}
+
+.nc-switch-label {
+    display: inline;
+    margin: 0;
+    margin-left: 1rem;
+}
+
+.nc-switch-and-label-wrapper {
+    display: inline-flex;
+    align-items: center;
+}
+

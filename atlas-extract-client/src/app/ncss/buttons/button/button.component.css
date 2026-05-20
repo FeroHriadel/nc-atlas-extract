@@ -1,0 +1,101 @@
+:host {
+  display: block;
+}
+
+/* Variant: "dark" ==> default variant */
+.nc-button {
+    appearance: none;
+    font-size: var(--nc-input-text-size);
+    font-weight: var(--nc-input-text-weight);
+    border-radius: var(--nc-border-radius);
+    cursor: pointer;
+    padding: calc(0.5rem + 1.25px) 1rem;
+    min-height: 2.5rem;
+    background-color: var(--nc-button-dark-bg);
+    color: var(--nc-button-dark-text-color);
+}
+
+.nc-button-medium {
+    min-height: 2.5rem;
+}
+
+.nc-button-small {
+    min-height: 2rem;
+    padding: calc(0.25rem + 1.25px) 0.75rem;
+}
+
+.nc-button-large {
+    min-height: 3rem;
+    padding: calc(0.75rem + 1.25px) 1.5rem;
+}
+
+.nc-button:hover {
+    background-color: var(--nc-button-dark-bg-hover);
+}
+
+.nc-button:focus {
+    background-color: var(--nc-button-dark-bg-focus);
+    outline: 0;
+    box-shadow: var(--nc-outline-shadow);
+}
+
+.nc-button:active {
+    transform: scale(0.99);
+}
+
+.nc-button:disabled {
+    opacity: var(--nc-disabled-opacity);
+}
+
+
+/* Variant: "outline" */
+.nc-button-outline {
+    background-color: transparent;
+    border: 1px solid var(--nc-border-color);
+    color: var(--nc-input-text-color);
+}
+
+.nc-button-outline:hover {
+    background-color: var(--nc-input-bg-hover);
+}
+
+.nc-button-outline:focus {
+    background-color: var(--nc-input-bg-focus);
+    outline: 0;
+    box-shadow: var(--nc-outline-shadow);
+}
+
+
+/* Variant: "red" */
+.nc-button-red {
+    background-color: var(--nc-button-red-bg);
+    color: var(--nc-button-red-text-color);
+}
+
+.nc-button-red:hover {
+    background-color: var(--nc-button-red-bg-hover);
+}
+
+.nc-button-red:focus {
+    background-color: var(--nc-button-red-bg-focus);
+    outline: 0;
+    box-shadow: var(--nc-outline-shadow);
+}
+
+
+/* Variant: "ghost" */
+.nc-button-ghost {
+    background-color: transparent;
+    color: var(--nc-input-text-color);
+}
+
+.nc-button-ghost:hover {
+    background-color: var(--nc-input-bg-hover);
+}
+
+.nc-button-ghost:focus {
+    background-color: var(--nc-input-bg-focus);
+    outline: 0;
+    box-shadow: var(--nc-outline-shadow);
+}
+

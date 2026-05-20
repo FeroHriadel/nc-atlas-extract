@@ -1,0 +1,84 @@
+/* Variant: "dark" & a few global styles */
+.nc-square-button {
+    appearance: none;
+    font-size: var(--nc-input-text-size);
+    font-weight: var(--nc-input-text-weight);
+    border-radius: var(--nc-border-radius);
+    cursor: pointer;
+    padding: 0;
+    background-color: var(--nc-button-dark-bg);
+    color: var(--nc-button-dark-text-color);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nc-square-button:hover {
+    background-color: var(--nc-button-dark-bg-hover);
+}
+
+.nc-square-button:focus {
+    background-color: var(--nc-button-dark-bg-focus);
+    outline: 0;
+    box-shadow: var(--nc-outline-shadow);
+}
+
+.nc-square-button:active {
+    transform: scale(0.99);
+}
+
+.nc-square-button:disabled {
+    opacity: var(--nc-disabled-opacity);
+}
+
+
+/* Variant: "outline" */
+.nc-square-button-outline {
+    background-color: transparent;
+    border: 1px solid var(--nc-border-color);
+    color: var(--nc-input-text-color);
+}
+
+.nc-square-button-outline:hover {
+    background-color: var(--nc-input-bg-hover);
+}
+
+.nc-square-button-outline:focus {
+    background-color: var(--nc-input-bg-focus);
+    outline: 0;
+    box-shadow: var(--nc-outline-shadow);
+}
+
+
+/* Variant: "red" */
+.nc-square-button-red {
+    background-color: var(--nc-button-red-bg);
+    color: var(--nc-button-red-text-color);
+}
+
+.nc-square-button-red:hover {
+    background-color: var(--nc-button-red-bg-hover);
+}
+
+.nc-square-button-red:focus {
+    background-color: var(--nc-button-red-bg-focus);
+    outline: 0;
+    box-shadow: var(--nc-outline-shadow);
+}
+
+
+/* Variant: "ghost" ==> default variant */
+.nc-square-button-ghost {
+    background-color: transparent;
+    color: var(--nc-input-text-color);
+}
+
+.nc-square-button-ghost:hover {
+    background-color: var(--nc-input-bg-hover);
+}
+
+.nc-square-button-ghost:focus {
+    background-color: var(--nc-input-bg-focus);
+    outline: 0;
+    box-shadow: var(--nc-outline-shadow);
+}

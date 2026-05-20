@@ -1,0 +1,8 @@
+<span [class]="'nc-pill ' + size + ' ' + class" [style]="style" [attr.id]="id">
+  @if (closable) {
+    <button class="nc-pill-close" (click)="onClose()">
+      <nc-times-icon [size]="14" class="nc-pill-close-icon"></nc-times-icon>
+    </button>
+  }
+  <ng-content></ng-content>
+</span>

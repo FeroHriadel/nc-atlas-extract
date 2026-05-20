@@ -1,0 +1,45 @@
+<div
+  #headerElement
+  [class]="'virtualized-table-header' + (headerClassName ? ' ' + headerClassName : '')"
+  [ngStyle]="headerStyle"
+  (scroll)="onHeaderScroll($event)"
+  role="rowgroup"
+>
+  <div class="virtualized-table-header-table">
+    <div class="virtualized-table-header-thead">
+      <div class="virtualized-table-header-row" role="row">
+        @for (col of visibleColumns; track col.column; let index = $index) {
+          <div
+            [class]="getThClass(col)"
+            [ngStyle]="getThStyle(col)"
+            (mousedown)="handleMouseDown($event, col.column, col.displayValue, col)"
+            (mouseenter)="handleMouseEnter(col.column)"
+            (mouseleave)="handleMouseLeave()"
+            role="columnheader"
+            [attr.aria-colindex]="index + 1"
+            [attr.aria-sort]="getAriaSort(col)"
+          >
+            <div class="virtualized-table-header-content">
+              <span>{{ col.displayValue }}</span>
+              <span
+                (mousedown)="$event.stopPropagation()"
+                (click)="handleSortClick($event, col.column)"
+                role="button"
+                [attr.aria-label]="'Sort by ' + col.displayValue"
+                tabindex="0"
+                [class]="getSortIconClass(col)"
+                [style.cursor]="'pointer'"
+                [style.opacity]="getSortIconOpacity(col)"
+                (keydown)="handleSortKeyDown($event, col.column)"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+                  <path d="M12 6l-6 12h12z" fill="currentColor"/>
+                </svg>
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

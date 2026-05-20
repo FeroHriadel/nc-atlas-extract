@@ -1,0 +1,84 @@
+<!-- MAIN WRAPPER - WRAPS EVERYTHING -->
+<section
+  [id]="id"
+  [class]="'virtualized-table-wrap ' + (class || '')"
+  [ngStyle]="wrapperStyle"
+  role="region"
+  [attr.aria-label]="ariaLabel || 'Data table'"
+  [attr.aria-describedby]="ariaDescribedBy"
+>
+  <!-- Control Bar -->
+  @if (controls) {
+    <nc-table-control-bar
+      [zoomLevel]="zoomLevel"
+      [minZoom]="minZoom"
+      [maxZoom]="maxZoom"
+      [handleZoomIn]="zoomService.handleZoomIn.bind(zoomService)"
+      [handleZoomOut]="zoomService.handleZoomOut.bind(zoomService)"
+      [columns]="columns"
+      [setColumnsFilter]="filterService.setColumnsFilter.bind(filterService)"
+      [filterState]="filterState"
+      [setFilterConditions]="filterService.setFilterConditions.bind(filterService)"
+      [data]="data"
+      [resetFilters]="filterService.resetFilters.bind(filterService)"
+      [resultCount]="resultCount"
+      [filterPresets]="filterPresets"
+      [controlBarClassName]="controlBarClassName"
+      [controlBarStyle]="controlBarStyle"
+      [isSorting]="isSorting"
+    />
+  }
+
+  <!-- Header and Body wrapper -->
+  <div
+    #wrapperElement
+    class="virtualized-table-wrapper"
+    tabindex="0"
+    (keydown)="handleKeyDown($event)"
+    (click)="focusWrapper()"
+    role="table"
+    [attr.aria-rowcount]="filteredData.length"
+    [attr.aria-colcount]="filteredColumns.length"
+  >
+    <!-- Fixed Header -->
+    <div class="virtualized-table-header-body-wrapper">
+      <div class="virtualized-table-header-container">
+        <nc-virtualized-table-header
+          #headerElement
+          [visibleColumns]="filteredColumns"
+          [getColumnStyle]="getColumnStyle.bind(this)"
+          [zoomLevel]="zoomLevel"
+          [verticalSeparators]="verticalSeparators"
+          [handleHeaderScroll]="renderingHandlers.handleHeaderScroll"
+          [setColumnOrder]="filterService.setColumnOrder.bind(filterService)"
+          [sortColumn]="filterState.sortColumn"
+          [sortDirection]="filterState.sortDirection"
+          [setSortColumn]="filterService.setSortColumn.bind(filterService)"
+          [headerClassName]="headerClassName"
+          [headerStyle]="headerStyle"
+        />
+      </div>
+      <!-- Spacer to account for custom scrollbar -->
+      <div class="virtualized-table-scrollbar-spacer"></div>
+    </div>
+
+    <!-- Table Body -->
+    <nc-table-body
+      #bodyElement
+      [data]="filteredData"
+      [columns]="filteredColumns"
+      [verticalSeparators]="verticalSeparators"
+      [zoomLevel]="zoomLevel"
+      [getColumnStyle]="getColumnStyle.bind(this)"
+      [handleTableMouseDown]="renderingHandlers.handleTableMouseDown"
+      [handleTableMouseLeave]="renderingHandlers.handleTableMouseLeave"
+      [handleWheelEvent]="renderingHandlers.handleWheelEvent"
+      [handleBodyScroll]="renderingHandlers.handleBodyScroll"
+      [horizontalSeparators]="horizontalSeparators"
+      [striped]="striped"
+      [hover]="hover"
+      [renderingService]="renderingService"
+      [updateCounter]="updateCounter()"
+    />
+  </div>
+</section>

@@ -1,0 +1,41 @@
+.logo {
+    filter: grayscale(100%) brightness(1.5);
+    opacity: 0.75;
+    width: 150px;
+}
+
+.title {
+    font-size: 5rem;
+    line-height: 1.1;
+}
+
+@media (max-width: 580px) {
+    .title {
+        font-size: 4rem;
+    }
+}
+
+@media (max-width: 530px) {
+    .logo-and-title {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .title {
+        font-size: 3rem;
+        text-align: center;
+    }
+}
+
+
+
+@media (max-width: 700px) {
+    ::ng-deep .promo-card {
+        flex-direction: row;
+        gap: 16px;
+    }
+
+    .instructions-container {
+        flex-direction: column;
+    }
+}

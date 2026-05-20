@@ -1,0 +1,25 @@
+.nc-close-button {
+    background-color: transparent;
+    border: none;
+    padding: 3px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--nc-red-900);
+    border-radius: var(--nc-border-radius);
+}
+
+.nc-close-button:disabled {
+    cursor: not-allowed;
+    opacity: var(--nc-disabled-opacity);
+}
+
+.nc-close-button:focus {
+    outline: 0;
+    box-shadow: var(--nc-outline-shadow);
+}
+
+.nc-close-button-icon {
+    color: inherit;
+}

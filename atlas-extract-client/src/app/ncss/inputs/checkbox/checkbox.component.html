@@ -1,0 +1,20 @@
+<span [class]="'nc-checkbox-an-label-wrap ' + class + ' ' + (disabled ? 'nc-checkbox-disabled' : '')" [style]="style" [attr.data-value]="isChecked" [attr.name]="name">
+    <span class="nc-checkbox-wrap">
+        <input 
+            type="checkbox" 
+            [id]="id"
+            [disabled]="disabled"
+            [attr.aria-disabled]="disabled"
+            [attr.aria-label]="label || 'checkbox'"
+            (click)="toggleChecked()"
+            [checked]="isChecked"
+            [class]="'nc-checkbox ' + inputClass"
+            [style]="inputStyle"
+        >
+        <div class="nc-fake-checkbox">
+            <span class="nc-checkbox-check-symbol" [class.nc-checkbox-check-symbol-visible]="isChecked">✔</span>
+        </div>
+    </span>
+    
+    @if (label) { <label class="nc-checkbox-label" [for]="id" (click)="toggleChecked()">{{ label }}</label> }
+</span>

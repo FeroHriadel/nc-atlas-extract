@@ -1,0 +1,82 @@
+<div class="virtualized-table-body-wrapper">
+  <!-- Main scrollable container -->
+  <div
+    #bodyElement
+    class="virtualized-table-body"
+    [style.scrollbar-width]="'none'"
+    [style.-ms-overflow-style]="'none'"
+    (mousedown)="onMouseDown($event)"
+    (mouseleave)="onMouseLeave()"
+    (wheel)="onWheel($event)"
+    (scroll)="onBodyScroll($event)"
+  >
+    <!-- Table with virtualized rows -->
+    <div
+      #tableElement
+      class="virtualized-table-body-table"
+      [style.font-size]="zoomLevel + 'rem'"
+      [style.transition]="'font-size 0.2s ease-out'"
+      [style.width]="'100%'"
+    >
+      <!-- Virtual container -->
+      <div 
+        class="virtualized-table-virtual-container"
+        [style.height]="totalSize() + 'px'" 
+        [style.position]="'relative'"
+        [style.width]="'100%'"
+      >
+        <!-- Render only visible rows -->
+        @for (item of virtualItems(); track trackRow($index, item)) {
+          <div
+            [class]="'virtualized-table-row ' + getRowClass(item.index) + (horizontalSeparators ? ' virtualized-table-row-separator' : '')"
+            [style.position]="'absolute'"
+            [style.top]="item.start + 'px'"
+            [style.left]="'0'"
+            [style.min-width]="'100%'"
+            [style.display]="'flex'"
+            (mouseenter)="onRowMouseEnter(item.index)"
+            (mouseleave)="onRowMouseLeave()"
+            role="row"
+            [attr.aria-rowindex]="item.index + 1"
+            [attr.data-index]="item.index"
+          >
+            <!-- Table cells -->
+            @for (col of columns; track col.column; let colIndex = $index) {
+              <div
+                class="virtualized-table-body-cell"
+                [ngStyle]="getCellStyle(col, colIndex === columns.length - 1)"
+                role="cell"
+                [attr.aria-colindex]="colIndex + 1"
+                (dblclick)="handleCellDoubleClick($event, data[item.index][col.column])"
+              >
+                @if (getColumnTemplate(col); as template) {
+                  <!-- Custom template rendering -->
+                  <ng-container *ngTemplateOutlet="template; context: { $implicit: data[item.index], row: data[item.index], column: col.column }"></ng-container>
+                } @else if (isHtmlContent(data[item.index][col.column])) {
+                  <!-- HTML content rendering -->
+                  <div [innerHTML]="sanitizeHtml(data[item.index][col.column])" (mouseup)="handleCellClick($event)"></div>
+                } @else {
+                  <!-- Plain text rendering -->
+                  {{ renderCellValue(data[item.index][col.column]) }}
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Copy notification -->
+  @if (copyNotification) {
+    <div
+      class="copy-notification"
+      [style.position]="'fixed'"
+      [style.left]="copyNotification.x + 'px'"
+      [style.top]="(copyNotification.y - 30) + 'px'"
+      [style.z-index]="'10000'"
+    >
+      {{ copyNotification.text }}
+    </div>
+  }
+</div>

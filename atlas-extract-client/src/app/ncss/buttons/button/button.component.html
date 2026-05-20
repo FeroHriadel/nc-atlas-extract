@@ -1,0 +1,13 @@
+<button 
+    [style]="style"
+    [style.width]="width ? width : ''"
+    [class]="'nc-button ' + class + ' ' + 'nc-button-' + variant + ' ' + 'nc-button-' + size"
+    [id]="id"
+    [disabled]="disabled"
+    [type]="type"
+    (click)="onClick && onClick()"
+    [attr.aria-label]="ariaLabel"
+    [attr.title]="title"
+>
+    <ng-content></ng-content>
+</button>

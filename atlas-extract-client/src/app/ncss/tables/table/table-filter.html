@@ -1,0 +1,89 @@
+<div class="table-filter-wrapper" role="form" aria-label="Table filters">
+  <!-- Clear and Presets -->
+  <h2 class="table-filter-title section-title">DATA FILTER</h2>
+  <h3 class="table-filter-section-title section-subtitle">Filter Options</h3>
+  <p class="table-filter-description text">Add filter conditions to refine your data. Clear Filters or use Filter Presets (if available) below.</p>
+  <section class="table-filter-buttons-section">
+    <nc-button
+      width="160px"
+      class="table-filter-button"
+      (click)="handleClearFilters()"
+    >
+      Clear Filters
+    </nc-button>
+    <nc-select
+      #presetSelect
+      width="160px"
+      class="table-filter-button"
+      [placeholder]="presetPlaceholder"
+      [options]="presetOptions"
+      [onChange]="handlePresetChangeCallback.bind(this)"
+      [disabled]="!filterPresets || filterPresets.length === 0"
+    />
+  </section>
+
+  <!-- Filters -->
+  <h3 class="table-filter-section-title section-subtitle">Filters to Apply</h3>
+  <p class="table-filter-description text">Review and adjust your active filters. Click 'Apply Filters' to save changes.</p>
+  <section>
+    @for (row of filterRows; track row.id; let index = $index) {
+      <div>
+        <div class="table-filter-row">
+          <nc-select
+            [options]="columnsSelectOptions"
+            placeholder="Column"
+            width="200px"
+            [defaultValue]="row.column || undefined"
+            [onChange]="updateRowCallback.bind(this, row.id, 'column')"
+            [forceDirection]="'up'"
+          />
+          <nc-select
+            [options]="getConditionsForColumn(row.column)"
+            placeholder="Condition"
+            width="200px"
+            [defaultValue]="row.condition || undefined"
+            [onChange]="updateRowCallback.bind(this, row.id, 'condition')"
+            [forceDirection]="'up'"
+            [disabled]="!row.column"
+          />
+          <input
+            style="width: 200px"
+            [placeholder]="getPlaceholderForCondition(row.column, row.condition)"
+            [value]="row.value"
+            (input)="handleInputChange($event, row.id)"
+            [disabled]="!row.column || !row.condition"
+          />
+          @if (row.column && row.condition && row.value.trim() !== '') {
+            <nc-select
+              [options]="operatorSelectOptions"
+              placeholder="Operator"
+              width="200px"
+              [defaultValue]="row.operator || undefined"
+              [onChange]="updateRowCallback.bind(this, row.id, 'operator')"
+              [forceDirection]="'up'"
+            />
+          }
+          <nc-close-button
+            class="table-filter-close-button"
+            title="Remove condition"
+            (click)="removeRow(row.id)"
+          />
+        </div>
+        @if (row.operator && index < filterRows.length - 1) {
+          <div class="table-filter-operator-section">
+            <nc-pill>{{ row.operator.toUpperCase() }}</nc-pill>
+          </div>
+        }
+        @if (!row.operator && index < filterRows.length - 1) {
+          <div class="table-filter-spacer"></div>
+        }
+      </div>
+    }
+  </section>
+
+  <!-- Close & Apply -->
+  <section class="table-filter-actions">
+    <nc-button variant="red" (click)="closeModal()">Cancel</nc-button>
+    <nc-button (click)="handleApplyFilters()" [disabled]="!hasValidFilters">Apply Filters</nc-button>
+  </section>
+</div>

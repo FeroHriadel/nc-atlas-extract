@@ -1,0 +1,118 @@
+@if (label) {
+  <label 
+    [attr.for]="id" 
+    class="nc-select-label mb-1"
+    (click)="toggleDropdown()"
+  >
+    {{ label }}
+  </label>
+}
+
+<span 
+  [style]="style"  
+  [class]="`nc-select ${class}`"
+  [class.nc-select-disabled]="disabled" 
+  [attr.name]="name"
+  [attr.id]="id"
+  [attr.aria-label]="ariaLabel"
+  [attr.data-value]="multiple ? (value | json) : value"
+  [style.width]="width || null"
+>
+  <!-- custom trigger-->
+  @if (customTrigger) {
+    <span
+      #customTriggerWrap
+      class="nc-select-custom-trigger-wrap"
+      tabindex="0"
+      role="button"
+      aria-haspopup="listbox"
+      [attr.aria-expanded]="isOpen"
+      [attr.aria-disabled]="disabled || null"
+      [attr.aria-activedescendant]="highlightedIndex >= 0 && isOpen ? 'option-' + highlightedIndex : null"
+      (click)="toggleDropdown()"
+    >
+      <ng-content select="*"></ng-content>
+    </span>
+  }
+  <!-- default trigger -->
+  @else {
+    <span 
+      #defaultTrigger
+      [class]="'nc-select-default-trigger ' + inputClass"
+      [style]="inputStyle"
+      tabindex="0" 
+      role="button" 
+      aria-haspopup="listbox"
+      [attr.aria-expanded]="isOpen"
+      [attr.aria-disabled]="disabled || null"
+      [attr.aria-activedescendant]="highlightedIndex >= 0 && isOpen ? 'option-' + highlightedIndex : null"
+      (click)="toggleDropdown()"
+    >
+      <span class="nc-select-default-trigger-text">
+        <!-- display selected option(s) or placeholder -->
+        @if (getTriggerText()) {
+          {{ getTriggerText() }}
+        } @else {
+          {{ placeholder }}
+        }
+      </span>
+      <nc-chevron-down-icon [size]="16" class="nc-select-chevron"></nc-chevron-down-icon>
+    </span>
+  }
+
+  @if (options?.length && isOpen) {
+    <ul 
+      #optionsContainer
+      class="nc-select-options" 
+      [class.nc-select-options-up]="direction === 'up'"
+      [class.nc-select-options-right]="xAlignment === 'right'"
+      role="listbox"
+      [attr.aria-multiselectable]="multiple || null"
+      [style]="optionsStyle"
+      [style.width]="optionsWidth || null"
+    >
+      @if (searchable) {
+        <li class="nc-select-search-input-wrap">
+          <input 
+            type="text" 
+            class="nc-select-search-option-input" 
+            placeholder="Search..."
+            aria-label="Search options"
+            [value]="searchTerm"
+            (input)="onSearchTermChange($event.target.value)"
+          />
+          @if (canShowClearSearch()) {
+            <button 
+              class="nc-select-clear-search-btn"
+              aria-label="Clear search"
+              (click)="clearSearchTerm()"
+            >
+              <nc-times-icon [size]="12"></nc-times-icon>
+            </button>
+          }
+        </li>
+      }
+      @for (option of shownOptions; track option.value; let i = $index) {
+        <li 
+          class="nc-select-option" 
+          [class.nc-select-option-highlighted]="isHighlighted(i)"
+          role="option"
+          [attr.id]="'option-' + i"
+          [attr.aria-selected]="isSelected(option)"
+          [attr.data-value]="option.value"
+          (click)="handleOptionClick(option)"
+          [attr.title]="option.label"
+        >
+          <span class="nc-select-option-text">{{ option.label }}</span>
+          @if (isSelected(option)) {
+            <nc-check-icon [size]="16" class="nc-select-check"></nc-check-icon>
+          }
+        </li>
+      }
+      @if (shownOptions?.length === 0) {
+        <li class="nc-select-no-options-info">No options found</li>
+      }
+    </ul>
+  }
+</span>
+

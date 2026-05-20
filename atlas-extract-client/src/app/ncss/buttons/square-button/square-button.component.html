@@ -1,0 +1,12 @@
+<button 
+    [class]="'nc-square-button ' + class + ' ' + 'nc-square-button-' + variant"
+    [style]="style"
+    [style.height]="size"
+    [style.min-width]="size"
+    [id]="id"
+    [disabled]="disabled"
+    [type]="type"
+    (click)="onClick && onClick()"
+>
+    <ng-content></ng-content>
+</button>

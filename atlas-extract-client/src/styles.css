@@ -1,0 +1,15 @@
+/* You can add global styles to this file, and also import other style files */
+
+@font-face {
+  font-family: 'LuckiestGuy';
+  src: url('/LuckiestGuy-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@import 'tailwindcss';
+@import './app/ncss/stylesheets/ncss.css';
+
+.luckiest-guy {
+  font-family: 'LuckiestGuy', cursive;
+}

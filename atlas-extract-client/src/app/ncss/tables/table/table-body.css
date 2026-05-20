@@ -1,0 +1,114 @@
+/* Table Body Wrapper */
+.table-body-wrapper {
+  display: flex;
+  flex: 1;
+}
+
+/* Table Body Container - NO MAX-HEIGHT, grows with content */
+.table-body {
+  overflow-x: auto;
+  overflow-y: auto;
+  border-left: 1px solid var(--nc-border-color);
+  border-right: 1px solid var(--nc-border-color);
+  border-bottom: 1px solid var(--nc-border-color);
+  border-bottom-left-radius: 0.375rem;
+  border-bottom-right-radius: 0.375rem;
+  flex: 1;
+  cursor: grab;
+}
+
+.table-body:active {
+  cursor: grabbing;
+}
+
+.table-body:focus {
+  outline: none;
+}
+
+.table-body::-webkit-scrollbar {
+  height: 12px;
+  width: 12px;
+}
+
+.table-body::-webkit-scrollbar-track {
+  background: var(--nc-gray-100);
+}
+
+.table-body::-webkit-scrollbar-thumb {
+  background: var(--nc-gray-400);
+  border-radius: 6px;
+}
+
+.table-body::-webkit-scrollbar-thumb:hover {
+  background: var(--nc-gray-500);
+}
+
+/* Table */
+.table-body-table {
+  width: 100%;
+  display: block;
+}
+
+/* Table Row */
+.table-row {
+  display: flex;
+  min-height: 41px;
+  min-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Row with horizontal separator */
+.table-row-separator {
+  border-bottom: 1px solid var(--nc-border-color);
+}
+
+.table-body-row {
+  position: relative;
+}
+
+/* Table Cell */
+.table-body-cell {
+  padding: 0.5rem 0.75rem;
+  color: var(--nc-text-color-strong);
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Row Backgrounds */
+.table-row-bg-white {
+  background-color: var(--nc-bg-color);
+}
+
+.table-row-bg-striped {
+  background-color: var(--nc-hover-bg-light);
+}
+
+/* Hover Effect */
+.table-body-row.table-row-hovered {
+  background-color: var(--nc-hover-bg-light);
+}
+
+/* Copy Notification */
+.copy-notification {
+  background-color: var(--nc-black-900);
+  color: var(--nc-white-950);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  pointer-events: none;
+  animation: fadeInOut 1s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}

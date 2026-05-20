@@ -1,0 +1,58 @@
+<nav [class]="'nc-topnav ' + class" [style]="style" [id]="id">
+
+    <!-- Left Side (logo) -->
+    <span class="nc-topnav-logo">
+        <ng-content select="[slot=logo]"></ng-content>
+    </span>
+
+    <!-- Right Side (links & custom content) -->
+    <span class="nc-topnav-right-side">
+
+        <!-- Links for big screens -->
+        <ul class="nc-topnav-links">
+            @for (link of links; track link.label; let i = $index) {
+                @if (!link.hasOptions) {
+                    <!-- Regular link -->
+                    <li class="nc-topnav-link">
+                        <a [routerLink]="link.link" tabindex="0">{{ link.label }}</a>
+                    </li> 
+                } 
+                @else {
+                    <!-- Link with options -->
+                    <li class="nc-topnav-link nc-topnav-link-with-options">
+                        <nc-select
+                            [options]="link.options"
+                            [customTrigger]="true"
+                            class="nc-topnav-select"
+                            [onChange]="navigateToLink.bind(this)"
+                            [width]="'fit-content'"
+                        >
+                            <span class="nc-topnav-select-trigger">{{ link.label }}</span>
+                        </nc-select>
+                    </li>
+                }
+            }
+        </ul>
+
+        <!-- Hamburger Icon for Mobile -->
+        <span class="nc-topnav-hamburger">
+            <nc-select
+                [customTrigger]="true"
+                [options]="getHamburgerOptions()"
+                [onChange]="navigateToLink.bind(this)"
+                [width]="'fit-content'"
+                [style]="{transform: 'translateY(0.2rem)'}"
+            >
+                <nc-square-button [style]="{transform: 'translate(1rem, -0.25rem)'}">
+                    <nc-hamburger-icon [size]="20"></nc-hamburger-icon>
+                </nc-square-button>
+            </nc-select>
+        </span>
+
+        <!-- Custom Content -->
+        <span class="nc-topnav-custom-content">
+            <ng-content select="[slot=custom]"></ng-content>
+        </span>
+    </span>
+
+</nav>

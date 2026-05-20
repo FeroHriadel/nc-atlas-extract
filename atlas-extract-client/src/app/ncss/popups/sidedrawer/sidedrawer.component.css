@@ -1,0 +1,133 @@
+.sidedrawer-trigger-wrap {
+  display: inline-block;
+  width: fit-content;
+  cursor: pointer;
+  outline: none;
+}
+
+.sidedrawer-trigger-wrap:focus-visible {
+  outline: 2px solid var(--nc-primary-color, #007bff);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.sidedrawer-trigger-wrap:hover {
+  opacity: 0.8;
+}
+
+/* Screen reader only - for accessibility labels */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.nc-sidedrawer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: var(--nc-options-z-index);
+  display: flex;
+}
+
+.nc-sidedrawer {
+  position: relative;
+  background-color: var(--nc-bg-color);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.nc-sidedrawer-close-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+}
+
+.nc-sidedrawer-content {
+  padding: 16px;
+  padding-top: 48px;
+  flex: 1;
+  overflow: auto;
+  box-sizing: border-box;
+}
+
+/* Side-specific positioning and animations */
+.nc-sidedrawer-right {
+  margin-left: auto;
+  animation: slide-in-right 0.3s ease-out;
+}
+
+.nc-sidedrawer-left {
+  margin-right: auto;
+  animation: slide-in-left 0.3s ease-out;
+}
+
+.nc-sidedrawer-top {
+  margin-bottom: auto;
+  animation: slide-in-top 0.3s ease-out;
+}
+
+.nc-sidedrawer-bottom {
+  margin-top: auto;
+  animation: slide-in-bottom 0.3s ease-out;
+}
+
+/* Animations */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-top {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-bottom {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .nc-sidedrawer-right,
+  .nc-sidedrawer-left,
+  .nc-sidedrawer-top,
+  .nc-sidedrawer-bottom {
+    animation: none;
+  }
+}

@@ -1,0 +1,21 @@
+<span [class]="'nc-switch-and-label-wrapper ' + class + ' ' + (disabled ? 'nc-switch-disabled' : '')"  [style]="style" [attr.data-value]="isChecked" [attr.name]="name">
+    <span class="nc-switch">
+        <div class="nc-switch-slider">
+            <div class="nc-switch-knob"></div>
+        </div>
+        <input 
+            type="checkbox" 
+            role="switch"
+            [id]="id"
+            [disabled]="disabled"
+            [attr.aria-disabled]="disabled"
+            [attr.aria-checked]="isChecked"
+            [attr.aria-label]="label || 'switch'"
+            (click)="toggleChecked()"
+            [checked]="isChecked"
+            class="nc-switch-checkbox"
+        >
+    </span>
+
+    @if (label) { <label class="nc-switch-label" [for]="id" (click)="toggleChecked()">{{ label }}</label> }
+</span>

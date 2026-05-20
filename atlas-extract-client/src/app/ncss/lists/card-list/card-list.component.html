@@ -1,0 +1,60 @@
+<ul class="nc-card-list" [class]="class" [style]="style" [id]="id">
+    <!-- header -->
+    <li class="nc-card-list-header">
+        <span class="nc-card-list-title section-subtitle mb-0" style="font-size: 1.4rem;">{{title}}</span>
+        @if (createButton) {
+            <nc-square-button (click)="onCreate()">
+                <nc-plus-icon></nc-plus-icon>
+            </nc-square-button>
+        }
+    </li>
+
+    <!-- no items text -->
+    @if (items.length === 0) {
+        <li 
+            [class]="'nc-card-list-item nc-card-list-item-no-items-text section-subtitle-light pl-2 ' + itemClass"
+            [style]="itemStyle"
+        >
+            {{ noItemsText }}
+        </li>
+    }
+
+    <!-- items -->
+    @for (item of items; track $index) {
+        <li [class]="'nc-card-list-item flex justify-between align-center ' + (striped && $index % 2 !== 0 ? 'nc-card-list-item-striped' : '')">
+            <nc-card class="mb-3 flex justify-between align-center w-100">
+                <div class="nc-card-list-item-content" (click)="onClick(item)">
+                    @if (item.template) {
+                        <!-- Use item-specific template -->
+                        <ng-container *ngTemplateOutlet="item.template; context: { $implicit: item, index: $index }"></ng-container>
+                    } 
+                    @else {
+                        <!-- Default title/text rendering -->
+                        @if (item.title) {
+                            <span class="nc-card-list-item-title section-title-light">
+                                {{ item.title }}
+                            </span>
+                        }
+                        @if (item.text) {
+                            <span class="nc-card-list-item-text section-subtitle-light">
+                                {{ item.text }}
+                            </span>
+                        }
+                    }
+                </div>
+                <span class="nc-card-list-item-actions">
+                    @if (updateButton) {
+                        <nc-square-button (click)="onUpdate(item)">
+                            <nc-edit-icon></nc-edit-icon>
+                        </nc-square-button>
+                    }
+                    @if (deleteButton) {
+                        <nc-square-button (click)="onDelete(item)">
+                            <nc-delete-icon [size]="20"></nc-delete-icon>
+                        </nc-square-button>
+                    }
+                </span>
+            </nc-card>
+        </li>
+    }
+</ul>

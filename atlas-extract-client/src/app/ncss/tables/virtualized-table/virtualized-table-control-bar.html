@@ -1,0 +1,115 @@
+<!-- Row number (left side) and controls (right side) Container -->
+<div
+  [class]="'virtualized-table-control-bar ' + (controlBarClassName || '')"
+  role="toolbar"
+  aria-label="Table controls"
+  [ngStyle]="controlBarStyle"
+>
+  <!-- Left Side -->
+  <div class="virtualized-table-control-bar-left">
+    <span class="virtualized-table-control-bar-result-count" role="status" aria-live="polite">
+      {{ isSorting ? 'Loading...' : resultCount + (resultCount === 1 ? ' result' : ' results') }}
+    </span>
+  </div>
+
+  <!-- Right Side -->
+  <div
+    class="virtualized-table-control-bar-right"
+    role="group"
+    aria-label="Table actions"
+  >
+    <!-- Filter Modal -->
+    <nc-modal
+      #filterModal
+      [class]="'w-[95%] sm:w-[75%]'"
+      [closeButton]="true"
+      [actionButtons]="false"
+    >
+      <nc-square-button
+        slot="modal-trigger"
+        title="Filter"
+        class="virtualized-table-control-bar-filter-button"
+      >
+        <nc-filter-icon [size]="20"></nc-filter-icon>
+      </nc-square-button>
+      <nc-table-filter
+        slot="modal-content"
+        [columns]="columns"
+        [closeModal]="closeModal.bind(this)"
+        [filterConditions]="filterState.conditions"
+        [setFilterConditions]="setFilterConditions"
+        [data]="data"
+        [filterPresets]="filterPresets"
+      />
+    </nc-modal>
+
+    <!-- Hide/show columns dropdown -->
+    <nc-select
+      [multiple]="true"
+      [customTrigger]="true"
+      [options]="columnOptions"
+      [defaultValue]="preselectedOptions"
+      [onChange]="handleColumnsChange.bind(this)"
+    >
+      <nc-square-button
+        title="Show/Hide Columns"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10 18h5V5h-5v13zm-6 0h5V5H4v13zM16 5v13h5V5h-5z"/>
+        </svg>
+      </nc-square-button>
+    </nc-select>
+
+    <!-- Zoom Controls -->
+    <nc-square-button
+      title="Zoom Out"
+      (click)="handleZoomOut()"
+      [style]="zoomOutDisabled ? { pointerEvents: 'none', opacity: '0.6' } : {}"
+      [disabled]="zoomOutDisabled"
+    >
+      <nc-zoomout-icon [size]="20"></nc-zoomout-icon>
+    </nc-square-button>
+
+    <span class="vt-control-bar-zoom-level text">
+      {{ zoomPercentage }}
+    </span>
+
+    <nc-square-button
+      title="Zoom In"
+      (click)="handleZoomIn()"
+      [style]="zoomInDisabled ? { pointerEvents: 'none', opacity: '0.6' } : {}"
+      [disabled]="zoomInDisabled"
+    >
+      <nc-zoomin-icon [size]="20"></nc-zoomin-icon>
+    </nc-square-button>
+
+    <!-- Refresh -->
+    <nc-square-button
+      title="Refresh data"
+      (click)="resetFilters()"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+      </svg>
+    </nc-square-button>
+  </div>
+</div>
+
+<!-- Applied filters info bar -->
+@if (filterState.conditions.length > 0) {
+  <div class="virtualized-table-applied-filters-wrap">
+    <span class="virtualized-table-applied-filters-title">Active Filters:</span>
+    <div class="virtualized-table-applied-filters-list">
+      @for (filter of filterState.conditions; track filter.id; let index = $index; let isLast = $last) {
+        <nc-pill [closable]="true" [onClose]="removeFilterCondition.bind(this, filter.id)">
+          {{ formatFilterCondition(filter) }}
+          @if (!isLast && filter.operator) {
+            <span class="virtualized-table-applied-filter-operator">
+              {{ filter.operator.toUpperCase() }}
+            </span>
+          }
+        </nc-pill>
+      }
+    </div>
+  </div>
+}

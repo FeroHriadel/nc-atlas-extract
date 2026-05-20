@@ -1,0 +1,40 @@
+<span 
+    [class]="'nc-file-upload ' + class" 
+    [style]="style" 
+    [style.width]="width || null" 
+    (click)="clickFileInput()"
+>
+    <input 
+        #fileInputRef
+        type="file" 
+        [attr.name]="name" 
+        [disabled]="disabled"
+        [attr.aria-disabled]="disabled"
+        [attr.aria-label]="placeholder || 'file upload'"
+        [class]="'nc-file-upload-input ' + inputClass"
+        [style]="inputStyle"
+        [attr.multiple]="multiple ? true : null"
+        [attr.accept]="accept"
+        [id]="id"
+        (change)="onFileUpload($event)"
+    >
+
+    <span 
+        [class]="'nc-file-upload-placeholder ' + placeholderClass" 
+        [style]="placeholderStyle"
+        aria-hidden="true"
+    >
+        {{ getFileInputText() || placeholder }}
+    </span>
+
+    <button 
+        type="button"
+        [class]="'nc-file-upload-clear-button ' + closeButtonClass" 
+        [style]="closeButtonStyle"
+        (click)="clearFileInput($event)"
+        [attr.aria-label]="selectedFiles ? (multiple ? 'Clear selected files' : 'Clear selected file') : 'Clear'"
+        [attr.tabindex]="selectedFiles ? 0 : -1"
+    >
+        <nc-times-icon [size]="16" class="nc-file-upload-icon"></nc-times-icon>
+    </button>
+</span>

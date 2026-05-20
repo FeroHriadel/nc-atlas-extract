@@ -1,0 +1,55 @@
+.nc-topnav {
+    position: fixed;
+    width: 100%;
+    top: 0px;
+    left: 0px;
+    height: 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: var(--nc-border-radius);
+    box-shadow: var(--nc-box-shadow);
+    color: var(--nc-input-text-color);
+    z-index: var(--nc-nav-z-index);
+    background-color: var(--nc-card-bg);
+}
+
+.nc-topnav-logo {
+    margin-left: 1rem;
+}
+
+.nc-topnav-right-side {
+    display: flex;
+    align-items: center;
+}
+
+.nc-topnav-links {
+    display: flex;
+    align-items: center;
+    list-style-type: none;
+}
+
+.nc-topnav-hamburger {
+    display: none;
+}
+
+.nc-topnav-link {
+    margin-right: 1rem;
+    text-decoration: none;
+}
+
+
+
+@media (max-width: 768px) {
+    .nc-topnav-links {
+        display: none;
+    }
+
+    .nc-topnav-hamburger {
+        display: block;
+        margin-left: 1rem;
+        margin-right: 1rem;
+    }
+}
+
+

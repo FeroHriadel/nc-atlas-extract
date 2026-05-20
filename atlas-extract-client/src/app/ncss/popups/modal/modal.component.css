@@ -1,0 +1,43 @@
+/* Dialog centers automatically when using showModal() */
+.nc-modal {
+  position: relative;
+  border: none;
+  padding: 0;
+  max-width: 90vw;
+  max-height: 90vh;
+  min-width: 260px;
+  min-height: 150px;
+  margin: auto;
+  border-radius: var(--nc-border-radius);
+  box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.2);
+  overflow: auto;
+  background-color: var(--nc-bg-color);
+}
+
+.nc-modal::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+.nc-modal-close-button {
+    position: absolute;
+    top: 0;
+    right:0;
+}
+
+.nc-modal-content {
+    padding: 16px;
+    padding-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.nc-modal-action-buttons {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 16px;
+    padding-top: 0;
+}

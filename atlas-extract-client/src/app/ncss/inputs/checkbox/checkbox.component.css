@@ -1,0 +1,71 @@
+.nc-checkbox-an-label-wrap {
+    display: inline-flex;
+    align-items: center;
+}
+
+.nc-checkbox-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.nc-checkbox-wrap {
+    display: inline-block;
+    width: calc(var(--nc-input-height)/2);
+    height: calc(var(--nc-input-height)/2);
+    border-radius: var(--nc-border-radius);
+    position: relative;
+}
+
+.nc-checkbox {
+    width: calc(var(--nc-input-height)/2);
+    height: calc(var(--nc-input-height)/2);
+    border-radius: var(--nc-border-radius);
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    cursor: pointer;
+}
+
+.nc-fake-checkbox {
+    width: calc(var(--nc-input-height)/2);
+    height: calc(var(--nc-input-height)/2);
+    border-radius: var(--nc-border-radius);
+    border: 1px solid var(--nc-border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    background-color: var(--nc-input-bg);
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.nc-checkbox:checked + .nc-fake-checkbox {
+    background-color: var(--nc-button-dark-bg);
+}
+
+.nc-checkbox:focus + .nc-fake-checkbox {
+    box-shadow: var(--nc-outline-shadow);
+}
+
+.nc-checkbox-check-symbol {
+    color: var(--nc-button-dark-text-color);
+    font-size: 1rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.nc-checkbox-check-symbol-visible {
+    opacity: 1;
+}
+
+.nc-checkbox-label {
+    margin-left: 1rem;
+    cursor: pointer;
+}
+

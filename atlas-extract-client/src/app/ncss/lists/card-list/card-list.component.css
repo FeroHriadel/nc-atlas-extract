@@ -1,0 +1,65 @@
+.nc-card-list {
+    width: 100%;
+    list-style: none;
+}
+
+.nc-card-list-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.nc-card-list-item {
+    width: 100%;
+    list-style: none;
+}
+
+.nc-card-list-item ::ng-deep .nc-card {
+    min-height: 3.5rem;
+    transition: background-color 0.3s ease;
+}
+
+.nc-card-list-item-striped ::ng-deep .nc-card {
+    background-color: var(--nc-hover-bg-light) !important;
+}
+
+.nc-card-list-item:hover ::ng-deep .nc-card {
+    background-color: var(--nc-hover-bg-light) !important;
+}
+
+.nc-card-list-item-no-items-text {
+    width: 100%;
+    height: 100%;
+    margin-right: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.nc-card-list-item-content {
+    flex: 1;
+    height: 100%;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 1rem;
+}
+
+.nc-card-list-item-title {
+    line-height: 1.5rem;
+}
+
+.nc-card-list-item-text {
+    line-height: 1.2rem;
+}
+
+.nc-card-list-item-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 1rem;
+    flex-shrink: 0;
+}

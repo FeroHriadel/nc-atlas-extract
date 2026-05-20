@@ -1,0 +1,56 @@
+<app-container>
+
+    <!-- Logo and Title -->
+    <nc-card class="p-4 mb-4">
+        <div class="logo-and-title flex gap-12 align-center">
+            <img [src]="logoUrl" alt="ATLAS Extract Logo" class="logo">
+            <h1 class="title mb-6 translate-y-5 luckiest-guy text">ATLAS Extract</h1>
+        </div>
+    </nc-card>
+
+
+    <!-- Instructions -->
+    <div class="instructions-container w-100 flex gap-4 mb-4">
+        <nc-card class="promo-card p-4 flex-1 flex flex-col align-center gap-4">
+            <span class="circle border flex flex-center w-12 min-w-12 h-12">
+                <nc-target-human-icon [size]="40" color="var(--nc-text-color-light)"></nc-target-human-icon>
+            </span>
+            <span>
+                <h4 class="section-title-light">Purpose</h4>
+                <p class="section-subtitle-light">Extract structured data from guide books (PDFs). But can do other sources too.</p>
+            </span>
+        </nc-card>
+
+        <nc-card class="promo-card p-4 flex-1 flex flex-col align-center gap-4">
+            <span class="circle border flex flex-center w-12 min-w-12 h-12">
+                <nc-upload-icon [size]="30" color="var(--nc-text-color-light)"></nc-upload-icon>
+            </span>
+            <span>
+                <h4 class="section-title-light">1. Upload Source</h4>
+                <p class="section-subtitle-light">Upload a guide book using the `Upload Source` functionality</p>
+            </span>
+        </nc-card>
+
+        <nc-card class="promo-card p-4 flex-1 flex flex-col align-center gap-4">
+            <span class="circle border flex flex-center w-12 min-w-12 h-12">
+                <nc-adjust-icon [size]="30" color="var(--nc-text-color-light)"></nc-adjust-icon>
+            </span>
+            <span>
+                <h4 class="section-title-light">2. Fine tune data extraction</h4>
+                <p class="section-subtitle-light">Explain to the system the structure and how to interpret it</p>
+            </span>
+        </nc-card>
+
+        <nc-card class="promo-card p-4 flex-1 flex flex-col align-center gap-4">
+             <span class="circle border flex flex-center w-12 min-w-12 h-12">
+                <nc-box-open-icon [size]="30" color="var(--nc-text-color-light)"></nc-box-open-icon>
+            </span>
+            <span>
+                <h4 class="section-title-light">3. Extract and save all data</h4>
+                <p class="section-subtitle-light">Extract all data from the uploaded guide book. Save as JSON, process as needed.</p>
+            </span>
+        </nc-card>
+    </div>
+
+
+</app-container>

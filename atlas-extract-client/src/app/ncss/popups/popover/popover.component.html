@@ -1,0 +1,11 @@
+<span #trigger (click)="togglePopover()" class="popover-trigger-wrap">
+  <ng-content select="[slot='popover-trigger']"></ng-content>
+</span>
+
+@if (isOpenState) {
+  <div #popoverContent [id]="id" [class]="'nc-popover ' + popoverClass" [style]="popoverStyle">
+    <nc-card [class]="class" [style]="style">
+      <ng-content select="[slot='popover-content']"></ng-content>
+    </nc-card>
+  </div>
+}

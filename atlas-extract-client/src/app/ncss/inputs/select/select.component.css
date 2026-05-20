@@ -1,0 +1,180 @@
+.nc-select {
+    display: inline-block;
+    position: relative;
+}
+
+.nc-select-disabled {
+    opacity: var(--nc-disabled-opacity);
+    cursor: not-allowed;
+}
+
+.nc-select-custom-trigger-wrap {
+    display: inline-block;
+    cursor: pointer;
+}
+
+.nc-select-custom-trigger-wrap:focus {
+    outline: 0;
+    box-shadow: var(--nc-outline-shadow);
+    border-radius: var(--nc-border-radius);
+}
+
+.nc-select-default-trigger {
+    min-width: var(--nc-select-width);
+    width: 100%;
+    height: var(--nc-input-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--nc-select-bg);
+    border: 1px solid var(--nc-border-color);
+    border-radius: var(--nc-border-radius);
+    color: var(--nc-input-text-color);
+    font-size: var(--nc-input-text-size);
+    font-weight: var(--nc-input-text-weight);
+    padding: var(--nc-input-padding);
+    cursor: pointer;    
+}
+
+.nc-select-default-trigger:hover {
+    color: var(--nc-input-text-color-hover);
+}
+
+.nc-select-default-trigger:focus {
+    box-shadow: var(--nc-outline-shadow);
+    outline: 0;                 
+    color: var(--nc-input-text-color-focus);
+}
+
+.nc-select-default-trigger-text {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nc-select-chevron {
+    flex-shrink: 0;
+    fill: var(--nc-input-text-color);
+    margin-left: 0.5rem;
+}
+
+.nc-select-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 200px;
+    width: 100%;
+    max-height: calc(6 * var(--nc-input-height)); /* Show up to 6 options, then scroll */
+    overflow-y: auto;
+    background-color: var(--nc-select-options-bg);
+    border: 1px solid var(--nc-border-color);
+    box-shadow: var(--nc-box-shadow);
+    border-radius: var(--nc-border-radius);
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+    padding: var(--nc-select-options-padding);
+    z-index: var(--nc-options-z-index);
+}
+
+.nc-select-options-up {
+    top: auto;
+    bottom: 100%;
+    margin-top: 0;
+    margin-bottom: 0.25rem;
+}
+
+.nc-select-options-right {
+    left: auto;
+    right: 0;
+}
+
+.nc-select-option {
+    width: 100%;
+    height: var(--nc-input-height); /* 2.5rem */
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: var(--nc-border-radius);
+    cursor: pointer;
+}
+
+.nc-select-option:hover {
+    background-color: var(--nc-input-bg-hover);
+    color: var(--nc-input-text-color-hover);
+}
+
+.nc-select-option-highlighted {
+    background-color: var(--nc-input-bg-hover);
+    color: var(--nc-input-text-color-hover);
+}
+
+.nc-select-search-input-wrap {
+    position: relative;
+}
+
+.nc-select-search-option-input {
+    width: 100%;
+    height: var(--nc-input-height);
+    text-indent: 0.5rem;
+    padding: 0;
+    color: var(--nc-input-placeholder-color);
+    font-size: var(--nc-input-text-size);
+    font-weight: var(--nc-input-text-weight);
+    border-radius: var(--nc-border-radius);
+}
+
+.nc-select-search-option-input::placeholder {
+    color: var(--nc-input-placeholder-color);
+    font-style: var(--nc-input-placeholder-font-style);
+    font-weight: var(--nc-input-placeholder-font-weight);
+    font-size: var(--nc-input-placeholder-font-size);
+}
+
+.nc-select-search-option-input:focus {
+    outline: 0;
+    box-shadow: var(--nc-input-shadow-focus);
+    color: var(--nc-input-placeholder-color-focus);
+}
+
+.nc-select-clear-search-btn {
+    position: absolute;
+    right: 0.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--nc-border-radius);
+}
+
+.nc-select-clear-search-btn:focus {
+    outline: 0;
+    box-shadow: var(--nc-input-shadow-focus);
+}
+
+.nc-select-option-text {
+    color: var(--nc-input-text-color);
+    font-size: var(--nc-input-text-size);
+    font-weight: var(--nc-input-text-weight);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nc-select-no-options-info {
+    color: var(--nc-input-placeholder-color);
+    font-size: var(--nc-input-placeholder-font-size);
+    text-align: center;
+    padding: 0.5rem;
+}
+
+.nc-select-check {
+    color: var(--nc-select-check-color);
+    flex-shrink: 0;
+}

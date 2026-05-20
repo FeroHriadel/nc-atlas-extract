@@ -1,0 +1,45 @@
+.logo {
+    width: 40px;
+    filter: grayscale(100%) brightness(1.5);
+}
+
+::ng-deep .sidebar .nc-collapsible-trigger {
+    width: 100%;
+}
+
+::ng-deep .sidebar .nc-collapsible-trigger nc-button,
+::ng-deep .sidebar .nc-collapsible-trigger nc-button button {
+    display: block;
+    width: 100%;
+}
+
+::ng-deep.sidebar {
+    position: fixed;
+    top: calc(1rem + 64px + 1rem);
+    left: 1rem;
+    max-width: 260px;
+    height: calc(100vh - 1rem - 64px - 2rem);
+    overflow-y: auto;
+}
+
+@media (max-width: 1000px) {
+    ::ng-deep.sidebar {
+        display: none;
+    }
+}
+
+.app-wrap {
+    margin-top: calc(1rem + 64px);
+    margin-left: calc(260px + 1rem);
+    margin-right: 1rem;
+    padding: 1rem;
+    width: calc(100% - 260px - 1rem);
+}
+
+@media (max-width: 1000px) {
+    .app-wrap {
+        margin-left: 0rem;
+        margin-right: 0rem;
+        width: calc(100% - 0rem);
+    }
+}

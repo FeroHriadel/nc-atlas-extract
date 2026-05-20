@@ -1,0 +1,70 @@
+<div class="table-body-wrapper">
+  <!-- Main scrollable container -->
+  <div
+    #bodyElement
+    class="table-body"
+    [style.scrollbar-width]="'none'"
+    [style.-ms-overflow-style]="'none'"
+    (mousedown)="onMouseDown($event)"
+    (mouseleave)="onMouseLeave()"
+    (wheel)="onWheel($event)"
+    (scroll)="onBodyScroll($event)"
+  >
+    <!-- Table with all rows -->
+    <div
+      #tableElement
+      class="table-body-table"
+      [style.font-size]="zoomLevel + 'rem'"
+      [style.transition]="'font-size 0.2s ease-out'"
+      [style.width]="'100%'"
+    >
+      <!-- Render all rows -->
+      @for (row of data; track $index) {
+        <div
+          [class]="'table-row ' + getRowClass($index) + (horizontalSeparators ? ' table-row-separator' : '')"
+          [style.display]="'flex'"
+          [style.min-width]="'100%'"
+          (mouseenter)="onRowMouseEnter($index)"
+          (mouseleave)="onRowMouseLeave()"
+          role="row"
+          [attr.aria-rowindex]="$index + 1"
+        >
+          <!-- Table cells -->
+          @for (col of columns; track col.column; let colIndex = $index) {
+            <div
+              class="table-body-cell"
+              [ngStyle]="getCellStyle(col, colIndex === columns.length - 1)"
+              role="cell"
+              [attr.aria-colindex]="colIndex + 1"
+              (dblclick)="handleCellDoubleClick($event, row[col.column])"
+            >
+              @if (getColumnTemplate(col); as template) {
+                <!-- Custom template rendering -->
+                <ng-container *ngTemplateOutlet="template; context: { $implicit: row, row: row, column: col.column }"></ng-container>
+              } @else if (isHtmlContent(row[col.column])) {
+                <!-- HTML content rendering -->
+                <div [innerHTML]="sanitizeHtml(row[col.column])" (mouseup)="handleCellClick($event)"></div>
+              } @else {
+                <!-- Plain text rendering -->
+                {{ renderCellValue(row[col.column]) }}
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Copy notification -->
+  @if (copyNotification) {
+    <div
+      class="copy-notification"
+      [style.position]="'fixed'"
+      [style.left]="copyNotification.x + 'px'"
+      [style.top]="(copyNotification.y - 30) + 'px'"
+      [style.z-index]="'10000'"
+    >
+      {{ copyNotification.text }}
+    </div>
+  }
+</div>

@@ -1,0 +1,115 @@
+
+
+.virtualized-table-header {
+  overflow-x: auto;
+  overflow-y: clip;
+  height: 2.5rem;
+}
+
+.virtualized-table-header::-webkit-scrollbar {
+  height: 0;
+}
+
+.virtualized-table-header::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.virtualized-table-header::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+.virtualized-table-header-table {
+  width: 100%;
+  display: block;
+  height: 100%;
+}
+
+.virtualized-table-header-thead {
+  background-color: var(--nc-input-bg-hover);
+  height: 100%;
+  display: block;
+}
+
+.virtualized-table-header-row {
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+
+.virtualized-table-header-th {
+  position: relative;
+  text-align: left;
+  font-size: 0.875rem;
+  word-wrap: break-word;
+  font-weight: 600;
+  user-select: none;
+  cursor: grab;
+  transition: background-color 0.2s;
+  color: var(--nc-text-color-strong);
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0.5rem 0.75rem;
+  margin: 0;
+  border: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.virtualized-table-header-th:active {
+  cursor: grabbing;
+}
+
+.virtualized-table-header-th.virtualized-table-header-dragged {
+  background-color: var(--nc-input-bg);
+  opacity: 0.5;
+}
+
+.virtualized-table-header-th.virtualized-table-header-drag-over {
+  background-color: var(--nc-input-bg);
+}
+
+.virtualized-table-header-th.virtualized-table-header-vertical-separator {
+  border-right: 1px solid var(--nc-border-color);
+}
+
+.virtualized-table-header-content {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.virtualized-table-header-sort-icon {
+  flex-shrink: 0;
+  transition: transform 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.virtualized-table-header-sort-icon svg {
+  display: block;
+}
+
+.virtualized-table-header-sort-icon.virtualized-table-header-sort-desc {
+  transform: rotate(180deg);
+}
+
+.virtualized-table-header-ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  background-color: var(--nc-input-bg);
+  border: 1px solid var(--nc-border-color);
+  border-radius: 0.25rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  font-weight: 600;
+  color: var(--nc-text-color-strong);
+  cursor: grabbing;
+  opacity: 0.9;
+}

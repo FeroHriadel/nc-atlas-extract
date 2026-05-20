@@ -1,0 +1,20 @@
+<span (click)="openModal()" class="modal-trigger-wrap">
+  <ng-content select="[slot='modal-trigger']"></ng-content>
+</span>
+
+<dialog #modal [id]="id" [class]="'nc-modal ' + class" [style]="style" [style.width]="width" [style.height]="height">
+    @if (closeButton) {
+        <nc-close-button (click)="closeModal()" class="nc-modal-close-button"></nc-close-button>
+    }
+
+    <div class="nc-modal-content">
+        <ng-content select="[slot='modal-content']"></ng-content>
+    </div>
+
+    @if (actionButtons) {
+        <div class="nc-modal-action-buttons">
+            <nc-button (click)="closeModal()" variant="outline" width="100px">Close</nc-button>
+            <nc-button width="100px" (click)="confirm()">Ok</nc-button>
+        </div>
+    }
+</dialog>

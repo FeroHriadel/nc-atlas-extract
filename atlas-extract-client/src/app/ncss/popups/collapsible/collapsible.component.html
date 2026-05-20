@@ -1,0 +1,29 @@
+<div [id]="uniqueId" [class]="'nc-collapsible ' + class" [style]="style">
+  <div 
+    #triggerElement
+    [id]="triggerId"
+    class="nc-collapsible-trigger" 
+    role="button"
+    tabindex="0"
+    [attr.aria-expanded]="isOpen"
+    [attr.aria-controls]="contentId"
+    (click)="toggle()"
+    (keydown)="handleKeydown($event)"
+  >
+    <ng-content select="[slot='collapsible-trigger']"></ng-content>
+  </div>
+  
+  <div 
+    [id]="contentId"
+    class="nc-collapsible-content" 
+    role="region"
+    [attr.aria-labelledby]="triggerId"
+    [attr.aria-hidden]="!isOpen"
+    [class.nc-collapsible-content-open]="isOpen"
+    (keydown)="handleContentKeydown($event)"
+  >
+    <div class="nc-collapsible-content-inner">
+      <ng-content select="[slot='collapsible-content']"></ng-content>
+    </div>
+  </div>
+</div>

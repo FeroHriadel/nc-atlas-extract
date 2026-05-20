@@ -1,0 +1,44 @@
+<span 
+  (click)="toggleDrawer()" 
+  (keydown)="handleTriggerKeydown($event)"
+  class="sidedrawer-trigger-wrap"
+  role="button"
+  tabindex="0"
+  [attr.aria-expanded]="isOpenState"
+  [attr.aria-controls]="drawerId"
+>
+  <ng-content select="[slot='sidedrawer-trigger']"></ng-content>
+</span>
+
+@if (isOpenState) {
+  <div 
+    class="nc-sidedrawer-backdrop" 
+    (click)="onBackdropClick($event)"
+    role="presentation"
+    aria-hidden="true"
+  >
+    <div 
+      [id]="drawerId"
+      [class]="'nc-sidedrawer nc-sidedrawer-' + side + ' ' + class" 
+      [style]="style" 
+      [style.width]="side === 'left' || side === 'right' ? width : '100%'" 
+      [style.height]="side === 'top' || side === 'bottom' ? width : '100vh'"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-labelledby]="drawerLabelId"
+      tabindex="-1"
+      (keydown)="handleDrawerKeydown($event)"
+    >
+      <nc-close-button 
+        (click)="close()" 
+        class="nc-sidedrawer-close-button"
+        ariaLabel="Close side drawer"
+      ></nc-close-button>
+      
+      <div class="nc-sidedrawer-content">
+        <div [id]="drawerLabelId" class="sr-only">Side drawer</div>
+        <ng-content select="[slot='sidedrawer-content']"></ng-content>
+      </div>
+    </div>
+  </div>
+}

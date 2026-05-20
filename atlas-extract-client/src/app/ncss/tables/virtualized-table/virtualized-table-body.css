@@ -1,0 +1,131 @@
+/* Table Body Wrapper */
+.virtualized-table-body-wrapper {
+  display: flex;
+  flex: 1;
+}
+
+/* Table Body Container */
+.virtualized-table-body {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 600px;
+  border-left: 1px solid var(--nc-border-color);
+  border-right: 1px solid var(--nc-border-color);
+  border-bottom: 1px solid var(--nc-border-color);
+  border-bottom-left-radius: 0.375rem;
+  border-bottom-right-radius: 0.375rem;
+  flex: 1;
+  cursor: grab;
+}
+
+.virtualized-table-body:active {
+  cursor: grabbing;
+}
+
+.virtualized-table-body:focus {
+  outline: none;
+}
+
+.virtualized-table-body::-webkit-scrollbar {
+  height: 12px;
+  width: 12px;
+}
+
+.virtualized-table-body::-webkit-scrollbar-track {
+  background: var(--nc-gray-100);
+}
+
+.virtualized-table-body::-webkit-scrollbar-thumb {
+  background: var(--nc-gray-400);
+  border-radius: 6px;
+}
+
+.virtualized-table-body::-webkit-scrollbar-thumb:hover {
+  background: var(--nc-gray-500);
+}
+
+/* Table */
+.virtualized-table-body-table {
+  width: 100%;
+  display: block;
+}
+
+/* Virtual Container */
+.virtualized-table-virtual-container {
+  width: 100%;
+  display: block;
+}
+
+/* Table Row */
+.virtualized-table-row {
+  display: flex;
+  min-height: 41px;
+  min-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Row with horizontal separator */
+.virtualized-table-row-separator {
+  border-bottom: 1px solid var(--nc-border-color);
+}
+
+.virtualized-table-body-row {
+  position: relative;
+}
+
+/* Table Cell */
+.virtualized-table-body-cell {
+  padding: 0.5rem 0.75rem;
+  color: var(--nc-text-color-strong);
+  box-sizing: border-box;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: normal;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Row Backgrounds */
+.virtualized-table-row-bg-white {
+  background-color: var(--nc-bg-color);
+}
+
+.virtualized-table-row-bg-striped {
+  background-color: var(--nc-hover-bg-light);
+}
+
+/* Hover Effect */
+.virtualized-table-body-row.virtualized-table-row-hovered {
+  background-color: var(--nc-hover-bg-light);
+}
+
+/* Vertical Separator Lines */
+.virtualized-table-vertical-separator-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background-color: var(--nc-border-color);
+  z-index: 4;
+}
+
+/* Copy Notification */
+.copy-notification {
+  background-color: var(--nc-black-900);
+  color: var(--nc-white-950);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+  pointer-events: none;
+  animation: fadeInOut 1s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { opacity: 0; }
+}

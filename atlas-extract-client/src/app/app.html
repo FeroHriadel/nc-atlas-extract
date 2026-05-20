@@ -1,0 +1,34 @@
+<!-- top-nav -->
+<nc-topnav
+  [links]="navLinks"
+  [style]="{top: '1rem', left: '1rem', width: 'calc(100% - 2rem)', border: '1px solid var(--nc-border-color)'}"
+>
+  <div slot="logo" class="flex gap-1 flex-center">
+    <a routerLink="/" class="pointer flex flex-center gap-4">
+      <img [src]="logoUrl" alt="Logo" class="logo" />
+    </a>
+  </div>
+</nc-topnav>
+
+<!-- sidebar -->
+<nc-card class="sidebar p-4">
+  <h4 class="section-title-light mb-2">Sources</h4>
+  <label class="mb-3">Books, articles, and other materials uploaded for data extraction</label>
+  <ul>
+    <li>
+      <a class="block" routerLink="/sources/upload">
+        <nc-button variant="dark" class="w-100 mb-1">Upload Source</nc-button>
+      </a>
+    </li>
+    <li>
+      <a class="block" routerLink="/sources/list">
+        <nc-button variant="outline" class="w-100 mb-1">Source List</nc-button>
+      </a>
+    </li>
+  </ul>
+</nc-card>
+
+<!-- main content -->
+<div class="app-wrap">
+  <router-outlet></router-outlet>
+</div>

@@ -1,0 +1,14 @@
+:host {
+    display: contents;
+}
+
+.nc-card {
+    border-radius: var(--nc-border-radius);
+    box-shadow: var(--nc-box-shadow);
+    border: 1px solid var(--nc-border-color);
+    background-color: var(--nc-card-bg);
+}
+
+.nc-card:hover {
+    box-shadow: var(--nc-box-shadow-strong);
+}
