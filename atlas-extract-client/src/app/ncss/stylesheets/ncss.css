@@ -172,6 +172,7 @@ a {
     position: relative;
     border-radius: var(--nc-border-radius);
     padding: 2px;
+    width: fit-content;
 }
 
 a:focus, button:focus {

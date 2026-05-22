@@ -20,6 +20,12 @@ export class SourcesService {
     private sources = new BehaviorSubject<Source[]>([]);
     public sources$ = this.sources.asObservable();
 
+
+    constructor() {
+        this.getSources();
+    }
+
+    
     getSources(): void {
         this.http.get<{sources: Source[]}>(`${this.apiUrl}/sources`).subscribe({
             next: data => this.sources.next(data.sources),

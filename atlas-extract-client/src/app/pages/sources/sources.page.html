@@ -1,9 +1,25 @@
 <app-container>
-    <h1>Sources</h1>
 
-    @if (sources$ | async; as sources) {
-        @for (source of sources; track source.id) {
-            <pre>{{ source | json }}</pre>
-        }
-    }
+    <nc-card class="p-4">
+        <h1 class="page-title text-left">Sources</h1>
+        <p class="page-subtitle text-left mb-12">View, upload new, edit or delete sources</p>
+
+        <a routerLink="/sources/upload" [style]="{display: 'block', width: 'fit-content'}">
+            <nc-button class="mb-2">
+            <span class="flex flex-center">
+                <nc-plus-icon [size]="20" class="mr-1"></nc-plus-icon>
+                Add Source
+            </span>
+        </nc-button>
+        </a>
+        <nc-table
+            [data]="(sources$ | async) ?? []"
+            [columnsConfig]="columnsConfig"
+        ></nc-table>
+    </nc-card>
+
+    <ng-template #dateTemplate let-row>
+        {{ row.createdAt | date:'dd MMM yyyy, HH:mm' }}
+    </ng-template>
+
 </app-container>
