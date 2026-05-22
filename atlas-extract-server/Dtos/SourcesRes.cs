@@ -4,5 +4,5 @@ namespace App.Dtos;
 
 public class SourcesResDto
 {
-    public List<string> Sources { get; set; } = [];
+    public List<Source> Sources { get; set; } = [];
 }

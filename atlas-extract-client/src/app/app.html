@@ -9,6 +9,12 @@
       <img [src]="logoUrl" alt="Logo" class="logo" />
     </a>
   </div>
+
+  <span slot="custom" class="mr-2">
+    <nc-square-button (click)="toggleTheme()">
+      <nc-pallete-icon></nc-pallete-icon>
+    </nc-square-button>
+  </span>
 </nc-topnav>
 
 <!-- sidebar -->
