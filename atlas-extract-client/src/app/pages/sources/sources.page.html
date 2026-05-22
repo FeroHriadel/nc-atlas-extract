@@ -1,3 +1,9 @@
 <app-container>
     <h1>Sources</h1>
+
+    @if (sources$ | async; as sources) {
+        @for (source of sources; track source.id) {
+            <pre>{{ source | json }}</pre>
+        }
+    }
 </app-container>
