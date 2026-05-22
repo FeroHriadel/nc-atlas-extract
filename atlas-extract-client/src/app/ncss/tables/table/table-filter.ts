@@ -43,6 +43,12 @@ export class TableFilter implements OnChanges {
     {value: 'ends_with', label: 'ends with'},
     {value: 'is_between', label: 'is between'},
   ];
+
+  dateConditionSelectOptions: SelectOption[] = [
+    {value: 'date_on', label: 'on'},
+    {value: 'date_after', label: 'after'},
+    {value: 'date_before', label: 'before'},
+  ];
   operatorSelectOptions: SelectOption[] = [
     {value: 'and', label: 'AND'},
     {value: 'or', label: 'OR'},
@@ -100,26 +106,28 @@ export class TableFilter implements OnChanges {
     );
   }
 
-  inferColumnType(columnName: string): 'number' | 'string' | 'boolean' | 'array' | 'object' | 'html' | 'unknown' {
+  inferColumnType(columnName: string): 'number' | 'string' | 'boolean' | 'array' | 'object' | 'html' | 'date' | 'unknown' {
     if (!this.data || this.data.length === 0) return 'unknown';
-    
+
     const sampleValue = this.data.find(row => row[columnName] != null)?.[columnName];
     if (sampleValue === undefined || sampleValue === null) return 'unknown';
-    
+
     if (typeof sampleValue === 'number') return 'number';
     if (typeof sampleValue === 'boolean') return 'boolean';
+    if (sampleValue instanceof Date) return 'date';
     if (Array.isArray(sampleValue)) return 'array';
     if (typeof sampleValue === 'object') return 'object';
+    if (typeof sampleValue === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(sampleValue)) return 'date';
     if (typeof sampleValue === 'string') return 'string';
-    
+
     return 'unknown';
   }
 
   getConditionsForColumn(columnName: string | null): SelectOption[] {
     if (!columnName) return this.conditionSelectOptions;
-    
+
     const columnType = this.inferColumnType(columnName);
-    
+
     switch (columnType) {
       case 'number':
         return this.conditionSelectOptions.filter(opt =>
@@ -142,6 +150,8 @@ export class TableFilter implements OnChanges {
         return this.conditionSelectOptions.filter(opt =>
           ['contains', 'not_contains'].includes(opt.value)
         );
+      case 'date':
+        return this.dateConditionSelectOptions;
       default:
         return this.conditionSelectOptions;
     }
@@ -149,16 +159,18 @@ export class TableFilter implements OnChanges {
 
   getPlaceholderForCondition(columnName: string | null, condition: string | null): string {
     if (!columnName || !condition) return 'Enter value';
-    
+
     const columnType = this.inferColumnType(columnName);
-    
+
     if (condition === 'is_between') {
       return columnType === 'number'
         ? 'Enter comma separated numbers: e.g., 20, 55'
         : 'Enter comma separated values: e.g., value1, value2';
     }
-    
+
     switch (columnType) {
+      case 'date':
+        return 'yyyy/mm/dd';
       case 'number':
         return 'Enter a number';
       case 'boolean':
@@ -178,6 +190,12 @@ export class TableFilter implements OnChanges {
     const columnType = this.inferColumnType(columnName);
     
     if (['array', 'object', 'html'].includes(columnType)) return true;
+
+    if (columnType === 'date') {
+      const isValid = /^\d{4}\/\d{2}\/\d{2}$/.test(value.trim()) && !isNaN(Date.parse(value.trim().replace(/\//g, '-')));
+      if (!isValid) console.warn(`Column '${columnName}' is a date. Please enter a date in yyyy/mm/dd format (e.g., 2026/05/22).`);
+      return isValid;
+    }
     
     if (columnType === 'number') {
       if (condition === 'is_between') {

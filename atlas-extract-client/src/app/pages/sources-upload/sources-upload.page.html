@@ -1,0 +1,83 @@
+<app-container>
+
+    <!-- title -->
+    <nc-card class="p-4 mb-4">
+        <h1 class="page-title text-left">Add Source</h1>
+        <p class="page-subtitle text-left">Upload a new source</p>
+    </nc-card>
+
+    <div class="form-and-upload-wrap flex gap-4">
+        <!-- progress -->
+        <nc-card class="p-4 flex-4">
+            <span>
+            <h3 class="section-title-light mb-2">Upload Progress</h3>
+            @if (uploadStage === "none") {
+                <p class="text">
+                    {{uploadStages["none"]}}
+                </p>
+            }
+            @if (uploadStage === "type selected") {
+                <p class="text">
+                    {{uploadStages["type selected"]}}
+                </p>
+            }
+            </span>
+        </nc-card>
+
+        <!-- source details form -->
+        <nc-card class="p-4 flex-2">
+            <form 
+                [id]="formId" 
+                class="flex flex-col" 
+                (submit)="onPdfSubmit($event)"
+                [style]="submitting ? {opacity: '0.25', pointerEvents: 'none'} : {}"
+            >
+                <h3 class="section-title-light mb-4">Source Details</h3>
+                <!-- source type selection -->
+                <span>
+                    <label for="type" class="mb-1">Type (required)</label>
+                    <select id="type" name="type" class="mb-4 w-100" (change)="onTypeChange($event)">
+                        <option value="" disabled selected>Select source type</option>
+                        <option value="pdf">PDF Document</option>
+                        <option value="doc" disabled>Word Document</option>
+                        <option value="txt" disabled>Text File</option>
+                        <option value="web" disabled>Web Page</option>
+                        <option value="image" disabled>Image</option>
+                    </select>
+                </span>
+
+                <!-- pdf -->
+                @if (sourceType === 'pdf') {
+                    <span>
+                        <label for="friendlyName" class="mb-1">Friendly Name (required)</label>
+                        <input id="friendlyName" name="friendlyName" type="text" placeholder="Short descriptive name" class="mb-4 w-100" />
+                    </span>
+                    <span>
+                        <label for="title" class="mb-1">Title</label>
+                        <input id="title" name="title" type="text" placeholder="Document title" class="mb-4 w-100" />
+                    </span>
+                    <span>
+                        <label for="author" class="mb-1">Author</label>
+                        <input id="author" name="author" type="text" placeholder="Document author" class="mb-4 w-100" />
+                    </span>
+
+                    <span>
+                        <label for="ISBN" class="mb-1">ISBN</label>
+                        <input id="ISBN" name="ISBN" type="text" placeholder="Document ISBN" class="mb-4 w-100" />
+                    </span>
+                    <span>
+                        <label for="description" class="mb-1">Description</label>
+                        <textarea id="description" name="description" placeholder="Brief description of the document" class="mb-4 w-100"></textarea>
+                    </span>
+                    <span>
+                        <label for="file" class="mb-1">Source PDF (required)</label>
+                        <nc-file-upload id="file" name="file" accept="application/pdf" class="mb-4 w-100" />
+                    </span>
+                    <nc-button type="submit" class="w-100">Upload Source</nc-button>
+                }
+            </form>
+        </nc-card>
+    </div>
+
+
+</app-container>

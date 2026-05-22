@@ -1,0 +1,5 @@
+@media (max-width: 768px) {
+    .form-and-upload-wrap {
+        flex-direction: column;
+    }
+}

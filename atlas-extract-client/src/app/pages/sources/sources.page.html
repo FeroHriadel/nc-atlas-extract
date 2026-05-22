@@ -1,25 +1,29 @@
 <app-container>
 
-    <nc-card class="p-4">
+    <!-- title -->
+    <nc-card class="p-4 mb-4">
         <h1 class="page-title text-left">Sources</h1>
-        <p class="page-subtitle text-left mb-12">View, upload new, edit or delete sources</p>
+        <p class="page-subtitle text-left">List of uploaded sources</p>
+    </nc-card>
 
+    <nc-card class="p-4">
+        <h3 class="section-title-light mb-4">All uploaded sources</h3>
+
+        <!-- add source button -->
         <a routerLink="/sources/upload" [style]="{display: 'block', width: 'fit-content'}">
             <nc-button class="mb-2">
-            <span class="flex flex-center">
-                <nc-plus-icon [size]="20" class="mr-1"></nc-plus-icon>
-                Add Source
-            </span>
-        </nc-button>
+                <span class="flex flex-center">
+                    <nc-plus-icon [size]="20" class="mr-1"></nc-plus-icon>
+                    Add Source
+                </span>
+            </nc-button>
         </a>
+
+        <!-- sources table -->
         <nc-table
             [data]="(sources$ | async) ?? []"
             [columnsConfig]="columnsConfig"
         ></nc-table>
     </nc-card>
-
-    <ng-template #dateTemplate let-row>
-        {{ row.createdAt | date:'dd MMM yyyy, HH:mm' }}
-    </ng-template>
 
 </app-container>

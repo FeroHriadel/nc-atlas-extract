@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, AfterViewInit, ViewChild, TemplateRef } from "@angular/core";
-import { AsyncPipe, DatePipe, JsonPipe } from "@angular/common";
+import { AsyncPipe, DatePipe } from "@angular/common";
 import { AppContainer } from "../../components/app-container/app-container.component";
 import { Card } from "../../ncss/cards/card/card.component";
 import { SourcesService } from "../../services/sources.service";
@@ -38,7 +38,7 @@ export class SourcesPage implements OnInit, AfterViewInit {
             {column: 'author', displayValue: 'Author', width: '200px'},
             {column: 'type', displayValue: 'Type', width: '100px'},
             {column: 'createdBy', displayValue: 'Created By', width: '150px'},
-            {column: 'createdAt', displayValue: 'Created At', template: this.dateTemplate, width: '200px'},
+            {column: 'createdAt', displayValue: 'Created At' , width: '200px'}
         ];
     }
 

@@ -101,7 +101,24 @@ export class TableBody implements OnInit, OnDestroy, AfterViewInit {
     return classes.join(' ');
   }
 
+  private isDateLike(value: unknown): boolean {
+    if (value instanceof Date) return true;
+    if (typeof value === 'string') return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(value) && !isNaN(Date.parse(value));
+    return false;
+  }
+
+  private formatDateValue(value: unknown): string {
+    const d = value instanceof Date ? value : new Date(value as string);
+    if (isNaN(d.getTime())) return String(value);
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const day = d.getDate().toString().padStart(2, '0');
+    const hrs = d.getHours().toString().padStart(2, '0');
+    const mins = d.getMinutes().toString().padStart(2, '0');
+    return `${d.getFullYear()} ${months[d.getMonth()]} ${day} ${hrs}:${mins}`;
+  }
+
   renderCellValue(cellValue: unknown): string {
+    if (this.isDateLike(cellValue)) return this.formatDateValue(cellValue);
     if (typeof cellValue !== 'string') return JSON.stringify(cellValue);
     return String(cellValue);
   }
@@ -124,6 +141,7 @@ export class TableBody implements OnInit, OnDestroy, AfterViewInit {
   }
 
   extractTextFromCell(cellValue: unknown): string {
+    if (this.isDateLike(cellValue)) return this.formatDateValue(cellValue);
     if (typeof cellValue === 'string') return cellValue;
     if (typeof cellValue === 'number') return String(cellValue);
     if (typeof cellValue === 'boolean') return String(cellValue);

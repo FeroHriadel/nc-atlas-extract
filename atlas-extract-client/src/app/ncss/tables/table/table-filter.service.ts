@@ -23,7 +23,7 @@ export interface Column {
   template?: TemplateRef<any>;
 }
 
-type ColumnType = 'number' | 'string' | 'boolean' | 'array' | 'object' | 'html' | 'unknown';
+type ColumnType = 'number' | 'string' | 'boolean' | 'array' | 'object' | 'html' | 'date' | 'unknown';
 
 @Injectable()
 export class TableFilterService {
@@ -184,9 +184,29 @@ export class TableFilterService {
   }
 
   // Helper methods
+  private isISODateString(value: string): boolean {
+    return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(value) && !isNaN(Date.parse(value));
+  }
+
+  private parseToDate(value: unknown): Date | null {
+    if (value instanceof Date) return isNaN(value.getTime()) ? null : value;
+    if (typeof value === 'string') { const d = new Date(value); return isNaN(d.getTime()) ? null : d; }
+    return null;
+  }
+
+  private parseDateInput(input: string): Date | null {
+    const parts = input.trim().split('/');
+    if (parts.length !== 3) return null;
+    const [year, month, day] = parts.map(p => parseInt(p, 10));
+    if (isNaN(year) || isNaN(month) || isNaN(day)) return null;
+    const d = new Date(year, month - 1, day);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
   private normalizeValue(value: unknown): string {
     if (value === null) return 'null';
     if (value === undefined) return 'undefined';
+    if (value instanceof Date) return value.toISOString();
     if (typeof value === 'string') return value;
     if (typeof value === 'number') return String(value);
     if (typeof value === 'boolean') return String(value);
@@ -233,6 +253,19 @@ export class TableFilterService {
         if (isNaN(cellNum) || isNaN(min) || isNaN(max)) return false;
         return cellNum >= min && cellNum <= max;
       }
+      case 'date_on':
+      case 'date_after':
+      case 'date_before': {
+        const cellDate = this.parseToDate(cellValue);
+        if (!cellDate) return false;
+        const filterDate = this.parseDateInput(condition.value);
+        if (!filterDate) return false;
+        const cellDay = new Date(cellDate.getFullYear(), cellDate.getMonth(), cellDate.getDate()).getTime();
+        const filterDay = filterDate.getTime();
+        if (condition.condition === 'date_on') return cellDay === filterDay;
+        if (condition.condition === 'date_after') return cellDay > filterDay;
+        return cellDay < filterDay;
+      }
       default:
         return true;
     }
@@ -265,10 +298,12 @@ export class TableFilterService {
     return result;
   }
 
-  private getValueType(value: unknown): 'number' | 'string' | 'null' | 'boolean' | 'array' | 'object' {
+  private getValueType(value: unknown): 'number' | 'string' | 'null' | 'boolean' | 'array' | 'object' | 'date' {
     if (value === null || value === undefined) return 'null';
     if (typeof value === 'number') return 'number';
     if (typeof value === 'boolean') return 'boolean';
+    if (value instanceof Date) return 'date';
+    if (typeof value === 'string' && this.isISODateString(value)) return 'date';
     if (typeof value === 'string') return 'string';
     if (Array.isArray(value)) return 'array';
     if (typeof value === 'object') return 'object';
@@ -292,6 +327,14 @@ export class TableFilterService {
         return (a as number) - (b as number);
       case 'boolean':
         return a === b ? 0 : a ? 1 : -1;
+      case 'date': {
+        const dateA = this.parseToDate(a);
+        const dateB = this.parseToDate(b);
+        if (!dateA && !dateB) return 0;
+        if (!dateA) return 1;
+        if (!dateB) return -1;
+        return dateA.getTime() - dateB.getTime();
+      }
       case 'string':
         return (a as string).localeCompare(b as string);
       case 'array':
@@ -309,16 +352,18 @@ export class TableFilterService {
   inferColumnType(columnName: string): ColumnType {
     const data = this.dataSignal();
     if (!data || data.length === 0) return 'unknown';
-    
+
     const sampleValue = data.find(row => row[columnName] != null)?.[columnName];
     if (sampleValue === undefined || sampleValue === null) return 'unknown';
-    
+
     if (typeof sampleValue === 'number') return 'number';
     if (typeof sampleValue === 'boolean') return 'boolean';
+    if (sampleValue instanceof Date) return 'date';
     if (Array.isArray(sampleValue)) return 'array';
     if (typeof sampleValue === 'object') return 'object';
+    if (typeof sampleValue === 'string' && this.isISODateString(sampleValue)) return 'date';
     if (typeof sampleValue === 'string') return 'string';
-    
+
     return 'unknown';
   }
 }
