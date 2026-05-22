@@ -25,12 +25,12 @@ export class SourcesService {
         this.getSources();
     }
 
-    
+
     getSources(): void {
         this.http.get<{sources: Source[]}>(`${this.apiUrl}/sources`).subscribe({
             next: data => this.sources.next(data.sources),
             error: (er) => {
-                console.log(er);
+                console.error('Error fetching sources:', er);
                 this.toast.error({text: 'Failed to load sources.'});
             }
         });

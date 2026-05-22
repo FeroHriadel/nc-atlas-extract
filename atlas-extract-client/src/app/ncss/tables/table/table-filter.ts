@@ -62,6 +62,12 @@ export class TableFilter implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['columns']) {
+      this.columnsSelectOptions = this.columns.map(col => ({
+        value: col.column,
+        label: col.displayValue
+      }));
+    }
     if (changes['filterConditions'] && !changes['filterConditions'].firstChange) {
       if (this.filterConditions && this.filterConditions.length > 0) {
         this.filterRows = [...this.filterConditions];
