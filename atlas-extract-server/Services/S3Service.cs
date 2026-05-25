@@ -51,4 +51,36 @@ public class S3Service(IAmazonS3 s3) : IS3Service
             ObjectKey = objectKey
         };
     }
+
+
+
+    // GENERATE PRESIGNED URL FOR A SINGLE UPLOAD PART
+    public Task<string> GetPresignedUploadUrl(string uploadId, string objectKey, int partNumber)
+    {
+        var request = new GetPreSignedUrlRequest
+        {
+            BucketName = BucketName,
+            Key = objectKey,
+            Verb = HttpVerb.PUT,
+            Expires = DateTime.UtcNow.AddMinutes(10),
+            UploadId = uploadId,
+            PartNumber = partNumber
+        };
+        return Task.FromResult(s3.GetPreSignedURL(request));
+    }
+
+
+
+    // COMPLETE MULTIPART UPLOAD — ASSEMBLES ALL PARTS INTO FINAL S3 OBJECT
+    public async Task CompleteMultipartUpload(string uploadId, string objectKey, List<UploadPartDto> parts)
+    {
+        var request = new CompleteMultipartUploadRequest
+        {
+            BucketName = BucketName,
+            Key = objectKey,
+            UploadId = uploadId,
+            PartETags = [.. parts.Select(p => new PartETag(p.PartNumber, p.ETag))]
+        };
+        await s3.CompleteMultipartUploadAsync(request);
+    }
 }

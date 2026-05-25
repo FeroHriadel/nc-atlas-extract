@@ -21,6 +21,7 @@ export class SourcesBucket extends Construct {
                     allowedMethods: [s3.HttpMethods.PUT, s3.HttpMethods.POST, s3.HttpMethods.GET],
                     allowedOrigins: ['*'],
                     allowedHeaders: ['*'],
+                    exposedHeaders: ['ETag'],
                 },
             ],
         });

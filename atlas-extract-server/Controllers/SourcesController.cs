@@ -87,6 +87,46 @@ public class SourcesController(
 
 
 
+    // GET PRESIGNED URL FOR UPLOAD PART => GET /api/sources/presigned-url?uploadId=...&objectKey=...&partNumber=...
+    [HttpGet("presigned-url")]
+    public async Task<IActionResult> GetPresignedUrl([FromQuery] string uploadId, [FromQuery] string objectKey, [FromQuery] int partNumber)
+    {
+        if (string.IsNullOrEmpty(uploadId) || string.IsNullOrEmpty(objectKey) || partNumber < 1)
+            return BadRequest(new ErrorRes { StatusCode = 400, Message = "uploadId, objectKey and partNumber (>= 1) are required." });
+
+        try
+        {
+            var url = await s3Service.GetPresignedUploadUrl(uploadId, objectKey, partNumber);
+            return Ok(new { url });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ErrorRes { StatusCode = 500, Message = ex.Message });
+        }
+    }
+
+
+
+    // COMPLETE MULTIPART UPLOAD => POST /api/sources/complete-upload
+    [HttpPost("complete-upload")]
+    public async Task<IActionResult> CompleteMultipartUpload([FromBody] CompleteMultipartUploadReq req)
+    {
+        if (string.IsNullOrEmpty(req.UploadId) || string.IsNullOrEmpty(req.ObjectKey) || req.Parts == null || req.Parts.Count == 0)
+            return BadRequest(new ErrorRes { StatusCode = 400, Message = "uploadId, objectKey and at least one part are required." });
+
+        try
+        {
+            await s3Service.CompleteMultipartUpload(req.UploadId, req.ObjectKey, req.Parts);
+            return Ok(new { message = "Upload complete.", objectKey = req.ObjectKey });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ErrorRes { StatusCode = 500, Message = ex.Message });
+        }
+    }
+
+
+
     // LIST DYNAMODB SOURCES RECORDS => GET /api/sources
     [HttpGet]
     public async Task<IActionResult> ListDynamoDbSources()

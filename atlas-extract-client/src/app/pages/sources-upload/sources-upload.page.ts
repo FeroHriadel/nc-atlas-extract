@@ -7,6 +7,7 @@ import { FormService } from '../../ncss/services/form.service';
 import { ToastService } from '../../ncss/services/toast.service';
 import { CheckIcon } from '../../ncss/icons';
 import { UploadService } from '../../services/upload.service';
+import { SourcesService } from '../../services/sources.service';
 import { AsyncPipe, NgClass } from '@angular/common';
 
 
@@ -24,6 +25,7 @@ import { AsyncPipe, NgClass } from '@angular/common';
 export class SourcesUploadPage implements OnInit {
     private formService = inject(FormService);
     private toastService = inject(ToastService);
+    private sourcesService = inject(SourcesService);
     public uploadService = inject(UploadService);
     public formId: string = 'source-upload-form';
     public sourceType: string = "";
@@ -58,14 +60,33 @@ export class SourcesUploadPage implements OnInit {
         return isValid;
     }
 
-    public onPdfSubmit(e: Event): void {
+    public async onPdfSubmit(e: Event): Promise<void> {
         e.preventDefault();
         if (this.submitting) return;
         const formValues = this.formService.getFormValues(this.formId);
         if (!this.checkPdfForm(formValues)) return;
         this.submitting = true;
         const file: File = (formValues['file'] as File[])[0];
-        this.uploadService.initUpload(file);
+
+        try {
+            const { uploadId, objectKey } = await this.uploadService.initUpload(file);
+            const parts = await this.uploadService.uploadParts(file, uploadId, objectKey);
+            await this.uploadService.completeUpload(uploadId, objectKey, parts);
+            await this.sourcesService.createSource({
+                friendlyName: formValues['friendlyName'] as string,
+                title:        formValues['title']        as string || '',
+                author:       formValues['author']       as string || '',
+                description:  formValues['description']  as string || '',
+                isbn:         formValues['ISBN']         as string || '',
+                type:         this.sourceType,
+                url:          '',
+                objectKey,
+            });
+        } catch (err) {
+            // errors are toasted inside the service — just unblock the form
+        } finally {
+            this.submitting = false;
+        }
     }
 
 }
