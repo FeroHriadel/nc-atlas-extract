@@ -15,7 +15,7 @@ public class SourcesController(
 {
 
 
-    // CREATE DYNAMODB SOURCE RECORD
+    // CREATE DYNAMODB SOURCE RECORD => POST /api/sources
     [HttpPost]
     public async Task<IActionResult> CreateDynamoDbSource([FromBody] SourceCreateReq req)
     {
@@ -61,7 +61,33 @@ public class SourcesController(
 
 
 
-    // LIST DYNAMODB SOURCES RECORDS
+    // INIT S3 MULTIPART UPLOAD => POST /api/sources/init-upload
+    [HttpPost("init-upload")]
+    public async Task<IActionResult> InitMultipartUpload([FromBody] InitMultipartUploadReq req)
+    {
+        var requiredFields = new[]
+        {
+            new RequiredField { Name = "fileName", Type = "string" },
+            new RequiredField { Name = "contentType", Type = "string" }
+        };
+        var errors = requestCheckService.CheckRequest(req, requiredFields);
+        if (errors.Any())
+            return BadRequest(new ErrorRes { StatusCode = 400, Message = string.Join(", ", errors) });
+
+        try
+        {
+            var result = await s3Service.InitMultipartUpload(req.FileName, req.ContentType);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ErrorRes { StatusCode = 500, Message = ex.Message });
+        }
+    }
+
+
+
+    // LIST DYNAMODB SOURCES RECORDS => GET /api/sources
     [HttpGet]
     public async Task<IActionResult> ListDynamoDbSources()
     {

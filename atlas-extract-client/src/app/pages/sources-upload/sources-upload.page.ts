@@ -1,10 +1,14 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Card } from '../../ncss/cards/card/card.component';
 import { Button } from '../../ncss/buttons/button/button.component';
 import { AppContainer } from '../../components/app-container/app-container.component';
 import { FileUpload } from '../../ncss/inputs/file-upload/file-upload.component';
 import { FormService } from '../../ncss/services/form.service';
 import { ToastService } from '../../ncss/services/toast.service';
+import { CheckIcon } from '../../ncss/icons';
+import { UploadService } from '../../services/upload.service';
+import { AsyncPipe, NgClass } from '@angular/common';
+
 
 
 @Component({
@@ -12,29 +16,29 @@ import { ToastService } from '../../ncss/services/toast.service';
   templateUrl: './sources-upload.page.html',
   styleUrls: ['./sources-upload.page.css'],
   standalone: true,
-  imports: [AppContainer, Card, Button, FileUpload]
+  imports: [AppContainer, Card, Button, FileUpload, CheckIcon, AsyncPipe, NgClass]
 })
 
 
 
-export class SourcesUploadPage {
+export class SourcesUploadPage implements OnInit {
     private formService = inject(FormService);
     private toastService = inject(ToastService);
+    public uploadService = inject(UploadService);
     public formId: string = 'source-upload-form';
     public sourceType: string = "";
     public submitting: boolean = false;
-    public uploadStage: string = "none";
 
-    public uploadStages: {[key: string]: string} = {
-        "none": "No upload in progress. Please select a source type to start.",
-        "type selected": "Source type selected. Please fill out the form and submit to start upload.",
-    };
+
+    ngOnInit(): void {
+
+    }
+
 
     public onTypeChange(event: Event): void {
         const selectElement = event.target as HTMLSelectElement;
         const selectedType = selectElement.value;
         this.sourceType = selectedType;
-        this.uploadStage = "type selected";
     }
 
     public checkPdfForm(formValues: {[key: string]: any}): boolean {
@@ -44,7 +48,7 @@ export class SourcesUploadPage {
             errors.push('Friendly Name is required');
             isValid = false;
         }
-        if (!formValues['file']) {
+        if (!formValues['file'] || (formValues['file'] as File[]).length === 0) {
             errors.push('PDF file is required');
             isValid = false;
         }
@@ -60,7 +64,8 @@ export class SourcesUploadPage {
         const formValues = this.formService.getFormValues(this.formId);
         if (!this.checkPdfForm(formValues)) return;
         this.submitting = true;
-        console.log('Form values:', formValues);
+        const file: File = (formValues['file'] as File[])[0];
+        this.uploadService.initUpload(file);
     }
 
 }

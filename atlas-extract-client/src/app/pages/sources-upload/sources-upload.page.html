@@ -6,23 +6,36 @@
         <p class="page-subtitle text-left">Upload a new source</p>
     </nc-card>
 
+
     <div class="form-and-upload-wrap flex gap-4">
+
+
         <!-- progress -->
         <nc-card class="p-4 flex-4">
-            <span>
             <h3 class="section-title-light mb-2">Upload Progress</h3>
-            @if (uploadStage === "none") {
-                <p class="text">
-                    {{uploadStages["none"]}}
-                </p>
+            <div class="text flex align-center gap-2 mb-1">
+                @if (sourceType !== '') {
+                    <nc-check-icon [size]="20"></nc-check-icon>
+                }
+                <span>Please select a source type</span>
+            </div>
+
+            @if (sourceType !== '') {
+                <div class="text flex align-center gap-2 mb-1">
+                    @if (submitting) {<nc-check-icon [size]="20"></nc-check-icon>}
+                    <span>
+                        Please fill out the source details and submit the form
+                    </span>
+                </div>
             }
-            @if (uploadStage === "type selected") {
-                <p class="text">
-                    {{uploadStages["type selected"]}}
-                </p>
+            @for (message of uploadService.messages | async; track message) {
+                <div class="text flex align-center gap-2 mb-1">
+                    <nc-check-icon [size]="20"></nc-check-icon>
+                    <span>{{message}}</span>
+                </div>
             }
-            </span>
         </nc-card>
+
 
         <!-- source details form -->
         <nc-card class="p-4 flex-2">
@@ -30,7 +43,10 @@
                 [id]="formId" 
                 class="flex flex-col" 
                 (submit)="onPdfSubmit($event)"
-                [style]="submitting ? {opacity: '0.25', pointerEvents: 'none'} : {}"
+                [style]="{
+                    'pointer-events': submitting ? 'none' : 'auto', 
+                    'opacity': submitting ? '0.6' : '1'
+                }"
             >
                 <h3 class="section-title-light mb-4">Source Details</h3>
                 <!-- source type selection -->

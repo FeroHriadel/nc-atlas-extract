@@ -22,9 +22,9 @@ export class FormService {
 
 
   // Get form values
-  public getFormValues(formId: string): { [key: string]: string | string[] | boolean } {
+  public getFormValues(formId: string): { [key: string]: string | string[] | boolean | File[] } {
     const elements = this.getFormElements(formId);
-    const formValues: { [key: string]: string | string[] | boolean } = {};
+    const formValues: { [key: string]: string | string[] | boolean | File[] } = {};
 
     elements.forEach((element) => {
       const name = element.getAttribute('name');
@@ -76,6 +76,10 @@ export class FormService {
           if (htmlElement.checked) {
             formValues[name] = htmlElement.value;
           }
+        }
+        // Handle file inputs
+        else if (htmlElement instanceof HTMLInputElement && htmlElement.type === 'file') {
+          formValues[name] = htmlElement.files ? Array.from(htmlElement.files) : [];
         }
         // Handle all other native form elements
         else {
