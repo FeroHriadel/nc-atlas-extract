@@ -83,4 +83,18 @@ public class S3Service(IAmazonS3 s3) : IS3Service
         };
         await s3.CompleteMultipartUploadAsync(request);
     }
+
+
+
+    // ABORT MULTIPART UPLOAD — DISCARDS ALL UPLOADED PARTS AND FREES S3 STORAGE
+    public async Task AbortMultipartUpload(string uploadId, string objectKey)
+    {
+        var request = new AbortMultipartUploadRequest
+        {
+            BucketName = BucketName,
+            Key = objectKey,
+            UploadId = uploadId
+        };
+        await s3.AbortMultipartUploadAsync(request);
+    }
 }

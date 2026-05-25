@@ -127,6 +127,26 @@ public class SourcesController(
 
 
 
+    // ABORT MULTIPART UPLOAD => DELETE /api/sources/abort-upload?uploadId=...&objectKey=...
+    [HttpDelete("abort-upload")]
+    public async Task<IActionResult> AbortMultipartUpload([FromQuery] string uploadId, [FromQuery] string objectKey)
+    {
+        if (string.IsNullOrEmpty(uploadId) || string.IsNullOrEmpty(objectKey))
+            return BadRequest(new ErrorRes { StatusCode = 400, Message = "uploadId and objectKey are required." });
+
+        try
+        {
+            await s3Service.AbortMultipartUpload(uploadId, objectKey);
+            return Ok(new { message = "Upload aborted." });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ErrorRes { StatusCode = 500, Message = ex.Message });
+        }
+    }
+
+
+
     // LIST DYNAMODB SOURCES RECORDS => GET /api/sources
     [HttpGet]
     public async Task<IActionResult> ListDynamoDbSources()

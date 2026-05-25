@@ -11,8 +11,8 @@
 ::ng-deep .topnav::after {
     content: "";
     width: 100%;
-    height: 1rem;
-    background: var(--nc-bg-color);
+    height: 1px;
+    box-shadow: 0 1px 1rem var(--nc-bg-color);
     position: fixed;
     top: calc(1rem + 64px);
     left: 0;

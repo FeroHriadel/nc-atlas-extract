@@ -34,6 +34,9 @@
                     <span>{{message}}</span>
                 </div>
             }
+            @if (submitting) {
+                <nc-button variant="red" class="mt-4" (click)="onAbort()">Abort</nc-button>
+            }
         </nc-card>
 
 

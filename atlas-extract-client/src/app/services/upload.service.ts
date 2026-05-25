@@ -31,6 +31,10 @@ export class UploadService {
     public uploadProgress = new BehaviorSubject<{ uploaded: number; total: number }>({ uploaded: 0, total: 0 });
     public messages = new BehaviorSubject<string[]>([]);
 
+    // Track the active upload so abort can be called from anywhere (e.g. on navigation)
+    public activeUploadId: string | null = null;
+    public activeObjectKey: string | null = null;
+
 
 
     public async initUpload(file: File): Promise<InitUploadRes> {
@@ -47,6 +51,8 @@ export class UploadService {
             const res = await firstValueFrom(
                 this.http.post<InitUploadRes>(`${this.apiUrl}/sources/init-upload`, req)
             );
+            this.activeUploadId = res.uploadId;
+            this.activeObjectKey = res.objectKey;
             this.messages.next([...this.messages.value, "Upload initialized. Uploading file parts..."]);
             return res;
         } catch (err) {
@@ -124,7 +130,33 @@ export class UploadService {
             throw err;
         } finally {
             this.isUploading.next(false);
+            this.activeUploadId = null;
+            this.activeObjectKey = null;
+            // Note: messages are intentionally kept so the user can read "Upload complete!"
         }
+    }
+
+
+
+    public async abortUpload(uploadId: string, objectKey: string): Promise<void> {
+        try {
+            const params = new URLSearchParams({ uploadId, objectKey });
+            await firstValueFrom(
+                this.http.delete(`${this.apiUrl}/sources/abort-upload?${params}`)
+            );
+        } catch {
+            // best-effort — swallow silently; S3 lifecycle rules will clean up stale uploads
+        } finally {
+            this.reset();
+        }
+    }
+
+    public reset(): void {
+        this.isUploading.next(false);
+        this.uploadProgress.next({ uploaded: 0, total: 0 });
+        this.messages.next([]);
+        this.activeUploadId = null;
+        this.activeObjectKey = null;
     }
 
 

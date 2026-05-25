@@ -43,9 +43,12 @@
   background: var(--nc-gray-500);
 }
 
-/* Table */
+/* Table — min-width: 100% keeps it filling the container when content is narrow;
+   width: max-content lets it grow beyond the viewport when columns overflow,
+   so row backgrounds and separators cover the full scroll width. */
 .table-body-table {
-  width: 100%;
+  min-width: 100%;
+  width: max-content;
   display: block;
 }
 
