@@ -28,7 +28,7 @@ export class SourcesUploadPage implements OnInit, OnDestroy {
     private sourcesService = inject(SourcesService);
     public uploadService = inject(UploadService);
     public formId: string = 'source-upload-form';
-    public sourceType: string = "";
+    public sourceType: string = "pdf";
     public submitting: boolean = false;
 
 

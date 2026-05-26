@@ -39,12 +39,43 @@ export class SourcesService {
 
     async createSource(req: CreateSourceReq): Promise<Source> {
         try {
-            const res = await firstValueFrom(
+            const res = await firstValueFrom( //firstValueFrom converts Observable to Promise and resolves with the first emitted value
                 this.http.post<{ source: Source }>(`${this.apiUrl}/sources`, req)
             );
             return res.source;
         } catch (err) {
             this.toast.error({ text: 'Failed to save source record.' });
+            throw err;
+        }
+    }
+
+    async updateSource(id: string, req: Partial<CreateSourceReq>): Promise<Source> {
+        const previous = this.sources.getValue(); // get current sources list snapshot
+        const original = previous.find(s => s.id === id)!;
+        const merged = { ...original, ...req };   // full object the backend requires
+        this.sources.next(previous.map(s => s.id === id ? merged : s)); //optimistically update the source in the list
+        try {
+            const res = await firstValueFrom(
+                this.http.put<{ source: Source }>(`${this.apiUrl}/sources/${id}`, merged)
+            );
+            return res.source;
+        } catch (err) {
+            this.sources.next(previous); // revert optimistic update on failure
+            this.toast.error({ text: 'Failed to update source record.' });
+            throw err;
+        }
+    }
+
+    async deleteSource(id: string): Promise<void> {
+        const previous = this.sources.getValue();
+        this.sources.next(previous.filter(s => s.id !== id));
+        try {
+            await firstValueFrom(
+                this.http.delete(`${this.apiUrl}/sources/${id}`)
+            );
+        } catch (err) {
+            this.sources.next(previous);
+            this.toast.error({ text: 'Failed to delete source.' });
             throw err;
         }
     }

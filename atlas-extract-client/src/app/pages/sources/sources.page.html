@@ -24,6 +24,77 @@
             [data]="(sources$ | async) ?? []"
             [columnsConfig]="columnsConfig"
         ></nc-table>
+
+
+        <!-- update source modal -->
+        <nc-modal
+            #updateSourceModal
+            class="w-1/2 max-w-[400px] min-w-[280px]"
+            [onClose]="onUpdateSourceModalClose.bind(this)"
+            [onConfirm]="onSourceEdit.bind(this)"
+        >
+            <form
+                slot="modal-content"
+                [id]="editFormId"
+                class="flex flex-col"
+                [style]="{
+                    'pointer-events': editFormSubmitting ? 'none' : 'auto', 
+                    'opacity': editFormSubmitting ? '0.6' : '1'
+                }"
+            >
+                <h3 class="section-title-light mb-4">Source Details</h3>
+                <!-- source type selection -->
+                <span>
+                    <label for="type" class="mb-1">Type (required)</label>
+                    <select id="type" name="type" class="mb-4 w-100" [(ngModel)]="sourceType" (change)="onTypeChange($event)">
+                        <option value="" disabled>Select source type</option>
+                        <option value="pdf" selected>PDF Document</option>
+                        <option value="doc" disabled>Word Document</option>
+                        <option value="txt" disabled>Text File</option>
+                        <option value="web" disabled>Web Page</option>
+                        <option value="image" disabled>Image</option>
+                    </select>
+                </span>
+
+                <!-- pdf -->
+                @if (sourceType === 'pdf') {
+                    <span>
+                        <label for="friendlyName" class="mb-1">Friendly Name (required)</label>
+                        <input id="friendlyName" name="friendlyName" type="text" placeholder="Short descriptive name" class="mb-4 w-100" [defaultValue]="sourceToEdit?.friendlyName ?? ''" />
+                    </span>
+                    <span>
+                        <label for="title" class="mb-1">Title</label>
+                        <input id="title" name="title" type="text" placeholder="Document title" class="mb-4 w-100" [defaultValue]="sourceToEdit?.title ?? ''" />
+                    </span>
+                    <span>
+                        <label for="author" class="mb-1">Author</label>
+                        <input id="author" name="author" type="text" placeholder="Document author" class="mb-4 w-100" [defaultValue]="sourceToEdit?.author ?? ''" />
+                    </span>
+
+                    <span>
+                        <label for="ISBN" class="mb-1">ISBN</label>
+                        <input id="ISBN" name="ISBN" type="text" placeholder="Document ISBN" class="mb-4 w-100" [defaultValue]="sourceToEdit?.isbn ?? ''" />
+                    </span>
+                    <span>
+                        <label for="description" class="mb-1">Description</label>
+                        <textarea id="description" name="description" placeholder="Brief description of the document" class="mb-4 w-100" [defaultValue]="sourceToEdit?.description ?? ''"></textarea>
+                    </span>
+                }
+            </form>
+        </nc-modal>
+
+
+        <!-- TEMPLATES -->
+        <!-- actions column template (table row with Edit and Delete buttons) -->
+        <ng-template #actionsTemplate let-row>
+            <div class="flex flex-center gap-1">
+                <nc-button (click)="openUpdateSourceModal(row)" size="small">Update</nc-button>
+                <nc-button variant="red" (click)="deleteSource(row.id)" size="small">Delete</nc-button>
+            </div>
+        </ng-template>
+
+
+
     </nc-card>
 
 </app-container>
