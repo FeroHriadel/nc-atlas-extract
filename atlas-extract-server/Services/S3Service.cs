@@ -30,6 +30,18 @@ public class S3Service(IAmazonS3 s3) : IS3Service
     }
 
 
+    // DELETE S3 OBJECT BY KEY
+    public async Task DeleteSource(string objectKey)
+    {
+        var request = new DeleteObjectRequest
+        {
+            BucketName = BucketName,
+            Key = objectKey
+        };
+        await s3.DeleteObjectAsync(request);
+    }
+
+
 
     // INITIATE MULTIPART UPLOAD AND RETURN UPLOAD ID + OBJECT KEY
     public async Task<InitMultipartUploadRes> InitMultipartUpload(string fileName, string contentType)

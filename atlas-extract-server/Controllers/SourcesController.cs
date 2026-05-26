@@ -15,6 +15,7 @@ public class SourcesController(
 {
 
 
+    //// DYNAMODB SOURCES ENDPOINTS //////////////////////
     // CREATE DYNAMODB SOURCE RECORD => POST /api/sources
     [HttpPost]
     public async Task<IActionResult> CreateDynamoDbSource([FromBody] SourceCreateReq req)
@@ -60,7 +61,92 @@ public class SourcesController(
     }
 
 
+    // GET DYNAMODB SOURCE BY ID => GET /api/sources/{id}
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetDynamoDbSourceById(string id)
+    {
+        try
+        {
+            var source = await sourcesTableService.GetSourceById(id);
+            return Ok(new SourceRes { Source = source });
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound(new ErrorRes { StatusCode = 404, Message = $"Source {id} not found." });
+        }
+        catch (Exception ex)        {
+            return StatusCode(500, new ErrorRes { StatusCode = 500, Message = ex.Message });
+        }
+    }
 
+
+    // UPDATE DYNAMODB SOURCE => PUT /api/sources/{id}
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateDynamoDbSource(string id, [FromBody] Source req)
+    {
+        // check payload
+        var requiredFields = new[]
+        {
+            new RequiredField { Name = "friendlyName", Type = "string" },
+            new RequiredField { Name = "type", Type = "string" },
+            new RequiredField { Name = "objectKey", Type = "string" }
+        };
+        var errors = requestCheckService.CheckRequest(req, requiredFields);
+        if (errors.Any())
+            return BadRequest(new ErrorRes { StatusCode = 400, Message = string.Join(", ", errors) });
+
+        try
+        {
+            var source = await sourcesTableService.GetSourceById(id);
+
+            // update source properties
+            source.FriendlyName = req.FriendlyName;
+            source.Title = req.Title;
+            source.Author = req.Author;
+            source.Description = req.Description;
+            source.Type = req.Type;
+            source.Url = req.Url;
+            source.ISBN = req.ISBN;
+            source.ObjectKey = req.ObjectKey;
+            source.UpdatedAt = DateTime.UtcNow;
+
+            await sourcesTableService.UpdateSource(source);
+            return Ok(new SourceRes { Source = source });
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound(new ErrorRes { StatusCode = 404, Message = $"Source {id} not found." });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ErrorRes { StatusCode = 500, Message = ex.Message });
+        }
+    }
+
+
+    // DELETE DYNAMODB SOURCE => DELETE /api/sources/{id}
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteDynamoDbSource(string id)
+    {
+        try
+        {
+            var source = await sourcesTableService.GetSourceById(id); // throws KeyNotFoundException if not found
+            await sourcesTableService.DeleteSource(id);
+            await s3Service.DeleteSource(source.ObjectKey); // also delete S3 object
+            return Ok(new { message = $"Source {id} deleted." });
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound(new ErrorRes { StatusCode = 404, Message = $"Source {id} not found." });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ErrorRes { StatusCode = 500, Message = ex.Message });
+        }
+    }
+
+
+    //// S3 MULTIPART UPLOAD ENDPOINTS /////////////////////////
     // INIT S3 MULTIPART UPLOAD => POST /api/sources/init-upload
     [HttpPost("init-upload")]
     public async Task<IActionResult> InitMultipartUpload([FromBody] InitMultipartUploadReq req)

@@ -64,6 +64,40 @@ public class SourcesTableService(IAmazonDynamoDB dynamo) : ISourcesTableService
     }
 
 
+    // UPDATE SOURCE
+    public async Task UpdateSource(Source source)
+    {
+        var item = new Dictionary<string, AttributeValue>
+        {
+            ["id"]           = new() { S = source.Id },
+            ["friendlyName"] = new() { S = source.FriendlyName },
+            ["title"]        = new() { S = source.Title },
+            ["author"]       = new() { S = source.Author },
+            ["description"]  = new() { S = source.Description },
+            ["type"]         = new() { S = source.Type },
+            ["url"]          = new() { S = source.Url },
+            ["ISBN"]         = new() { S = source.ISBN },
+            ["objectKey"]    = new() { S = source.ObjectKey },
+            ["createdBy"]    = new() { S = source.CreatedBy },
+            ["createdAt"]    = new() { S = source.CreatedAt.ToString("o") },
+            ["updatedAt"]    = new() { S = source.UpdatedAt.ToString("o") },
+        };
+
+        await dynamo.PutItemAsync(new PutItemRequest { TableName = TableName, Item = item }); // throws if error occurs
+    }
+
+
+    // DELETE SOURCE BY ID
+    public async Task DeleteSource(string id)
+    {
+        await dynamo.DeleteItemAsync(new DeleteItemRequest
+        {
+            TableName = TableName,
+            Key = new Dictionary<string, AttributeValue> { ["id"] = new() { S = id } }
+        });
+    }
+
+
 
     // MAPPING FROM DYNAMODB ITEM TO SOURCE DTO
     private static Source MapToSource(Dictionary<string, AttributeValue> item) => new()
