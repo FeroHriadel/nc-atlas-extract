@@ -1,7 +1,7 @@
 <app-container>
 
     <!-- title -->
-    <nc-card class="p-4 mb-4">
+    <nc-card class="p-4 mb-6">
         <h1 class="page-title text-left">Sources</h1>
         <p class="page-subtitle text-left">List of uploaded sources</p>
     </nc-card>
@@ -29,7 +29,7 @@
         <!-- update source modal -->
         <nc-modal
             #updateSourceModal
-            class="w-1/2 max-w-[400px] min-w-[280px]"
+            class="w-1/2 max-w-[300px]"
             [onClose]="onUpdateSourceModalClose.bind(this)"
             [onConfirm]="onSourceEdit.bind(this)"
         >

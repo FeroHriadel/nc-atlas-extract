@@ -1,6 +1,6 @@
 <app-container>
     <!-- title -->
-    <nc-card class="p-4 mb-4">
+    <nc-card class="p-4 mb-6">
         <h1 class="page-title text-left">Extraction Adjustment</h1>
         <p class="page-subtitle text-left">Fine-tune data extraction then start the process to extract data from the source.</p>
     </nc-card>
@@ -11,109 +11,132 @@
     }
 
     @if (source?.type === 'pdf' && sourceUrl) {
+            <nc-card>
+                <div class="sample-pages-and-preview-wrap p-4 flex w-100 gap-6 mb-4">
 
-        <div class="flex w-100 gap-4 mb-4">
-            <!-- choose pages -->
-            <nc-card class="p-4 flex-1">
-                <h2 class="section-title-light">Fine-tune Extraction</h2>
-                <p class="section-subtitle-light mb-4">Choose a few consecutive pages to get a sample data extraction</p>
-                <form class="flex flex-col">
-                    <input
-                        #startPageInput
-                        id="startPage"
-                        type="number"
-                        min="1"
-                        [max]="totalPages"
-                        class="border rounded px-2 py-1 text-sm mb-4"
-                        placeholder="Start page"
-                        style="text-indent: 0.5rem;"
-                    />
+                    <!-- Document preview-->
+                    <nc-card class="p-4 flex-2" [style]="{'background-color': 'var(--nc-bg-color)'}">
+                        <h2 class="section-title-light">Document Preview</h2>
+                        <p class="section-subtitle mb-6">Preview the document to find the relevant sections for extraction.</p>
+        
+                        <!-- PDF controls -->
+                        <div
+                            class="pdf-controls flex items-center gap-4 p-2 mb-4 border shadow mt-2" 
+                            style=" border-radius: var(--nc-border-radius); background-color: var(--nc-bg-color); color: var(--nc-text-color-light);"
+                        >
+                            <!-- page indicator — left -->
+                            <div class="flex-1 flex items-center">
+                                <span class="text-sm whitespace-nowrap">Page {{ currentPage }} of {{ totalPages }}</span>
+                            </div>
+            
+                            <!-- go to page — center -->
+                            <div class="flex-1 flex items-center justify-center gap-1">
+                                <label class="pdf-goto-label text-sm mr-1 whitespace-nowrap" style="color: inherit;">Go to:</label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    [max]="totalPages"
+                                    [value]="currentPage"
+                                    (change)="goToPage($event)"
+                                    class="border rounded px-2 py-1 text-sm text-center"
+                                    style="width: 100px;"
+                                />
+                            </div>
+            
+                            <!-- zoom — right -->
+                            <div class="pdf-zoom-controls flex-1 flex items-center justify-end gap-1">
+                                <nc-square-button
+                                    variant="outline"
+                                    ariaLabel="Zoom out"
+                                    [disabled]="zoom <= 0.5"
+                                    (click)="zoomOut()"
+                                >−</nc-square-button>
+                                <span class="text-sm w-12 text-center">{{ (zoom * 100).toFixed(0) }}%</span>
+                                <nc-square-button
+                                    variant="outline"
+                                    ariaLabel="Zoom in"
+                                    [disabled]="zoom >= 3"
+                                    (click)="zoomIn()"
+                                >+</nc-square-button>
+                            </div>
+                        </div>
+            
+                        <!-- PDF viewer -->
+                        <pdf-viewer
+                            [src]="sourceUrl"
+                            [render-text]="true"
+                            [original-size]="false"
+                            [(page)]="currentPage"
+                            [zoom]="zoom"
+                            (after-load-complete)="onPdfLoaded($event)"
+                            style="width: 100%; height: 600px; border-radius: var(--nc-border-radius);"
+                            class="border"
+                        ></pdf-viewer>
+                    </nc-card>
 
-                    <input
-                        #endPageInput
-                        id="endPage"
-                        type="number"
-                        min="1"
-                        [max]="totalPages"
-                        class="border rounded px-2 py-1 text-sm mb-4"
-                        placeholder="End page"
-                        style="text-indent: 0.5rem;"
-                    />
+                    <!-- sample pages -->
+                    <div class="sample-pages-wrap flex-1">
+                        <h2 class="section-title-light">Extract Sample Pages</h2>
+                        <p class="section-subtitle-light mb-4">Choose a few consecutive pages to get a sample data extraction</p>
 
-                    <nc-button
-                        [style]="{borderRadius: '999px'}"
-                        width="260px"
-                        (click)="runSampleExtraction(startPageInput.value, endPageInput.value)"
-                    >
-                        Run Sample Extraction
-                    </nc-button>
-                </form>
+                        <!-- choose pages -->
+                        <form class="flex flex-col">
+                            <input
+                                #startPageInput
+                                id="startPage"
+                                type="number"
+                                min="1"
+                                [max]="totalPages"
+                                class="border px-2 py-1 text-sm mb-4 w-100"
+                                placeholder="Start page"
+                                style="text-indent: 0.5rem;"
+                                [defaultValue]="1"
+                            />
+
+                            <input
+                                #endPageInput
+                                id="endPage"
+                                type="number"
+                                min="1"
+                                [max]="totalPages"
+                                class="border px-2 py-1 text-sm mb-4 w-100"
+                                placeholder="End page"
+                                style="text-indent: 0.5rem;"
+                                [defaultValue]="3"
+                            />
+
+                            <nc-button
+                                class="w-100 mb-4"
+                                (click)="getSampleText(startPageInput.value, endPageInput.value)"
+                            >
+                                Process Sample Pages
+                            </nc-button>
+                        </form>
+
+                        <!-- sample text output -->
+                        @if (sampleText) {
+                            <div 
+                                class="sample-text-output mt-4 p-4 border" 
+                                style="border-radius: var(--nc-border-radius); background-color: var(--nc-bg-color); color: var(--nc-text-color-light); max-height: 530px; overflow-y: auto; box-shadow: var(--nc-box-shadow);"
+                            >
+                                <h3 class="section-title-light mb-2">Sample Text Output</h3>
+                                <p class="section-subtitle-light">Extractor sees the document like this. Review the text and help it understand the structure</p>
+                                <pre class="text-sm whitespace-pre-wrap">{{ sampleText }}</pre>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Describe structure -->
+                @if (sampleText) {
+                    <div class="p-4 w-100">
+                        <h2 class="section-title-light">Describe text structure</h2>
+                        <p class="section-subtitle-light mb-4">Help the extractor understand the structure of the text by reviewing and describing it.</p>
+                        <nc-button class="w-100">Start Full Extraction</nc-button>
+                    </div>
+                }
             </nc-card>
+            
 
-            <nc-card class="p-4 flex-1">
-                <h2 class="section-title-light">Extraction prompts</h2>
-                <p class="section-subtitle-light mb-4">This is how the exractor sees the text. Help it understand the structure of your document</p>
-            </nc-card>
-        </div>
-
-        <!-- PDF viewer & controls-->
-        <nc-card class="p-4">
-            <h2 class="section-title-light">Document Preview</h2>
-            <p class="section-subtitle mb-6">Preview the document to find the relevant sections for extraction.</p>
-
-            <!-- PDF controls -->
-             <div
-                class="pdf-controls flex items-center gap-4 p-2 mb-2 border shadow mt-2 ml-2 mr-5" 
-                style=" border-radius: var(--nc-border-radius); background-color: var(--nc-bg-color); color: var(--nc-text-color-light);"
-            >
-                <!-- page indicator — left -->
-                <div class="flex-1 flex items-center">
-                    <span class="text-sm whitespace-nowrap">Page {{ currentPage }} of {{ totalPages }}</span>
-                </div>
-
-                <!-- go to page — center -->
-                <div class="flex-1 flex items-center justify-center gap-1">
-                    <label class="pdf-goto-label text-sm mr-1 whitespace-nowrap" style="color: inherit;">Go to:</label>
-                    <input
-                        type="number"
-                        min="1"
-                        [max]="totalPages"
-                        [value]="currentPage"
-                        (change)="goToPage($event)"
-                        class="border rounded px-2 py-1 text-sm text-center"
-                        style="width: 100px;"
-                    />
-                </div>
-
-                <!-- zoom — right -->
-                <div class="pdf-zoom-controls flex-1 flex items-center justify-end gap-1">
-                    <nc-square-button
-                        variant="outline"
-                        ariaLabel="Zoom out"
-                        [disabled]="zoom <= 0.5"
-                        (click)="zoomOut()"
-                    >−</nc-square-button>
-                    <span class="text-sm w-12 text-center">{{ (zoom * 100).toFixed(0) }}%</span>
-                    <nc-square-button
-                        variant="outline"
-                        ariaLabel="Zoom in"
-                        [disabled]="zoom >= 3"
-                        (click)="zoomIn()"
-                    >+</nc-square-button>
-                </div>
-            </div>
-
-
-            <!-- PDF viewer -->
-            <pdf-viewer
-                [src]="sourceUrl"
-                [render-text]="true"
-                [original-size]="false"
-                [(page)]="currentPage"
-                [zoom]="zoom"
-                (after-load-complete)="onPdfLoaded($event)"
-                style="width: 100%; height: 600px; border-radius: var(--nc-border-radius);"
-            ></pdf-viewer>
-        </nc-card>
     }
 </app-container>

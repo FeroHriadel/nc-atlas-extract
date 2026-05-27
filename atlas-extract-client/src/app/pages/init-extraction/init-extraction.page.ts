@@ -64,6 +64,7 @@ export class InitExtractionPage implements OnInit {
   public currentPage = 1;
   public totalPages = 0;
   public zoom = 1;
+  public sampleText = '';
 
 
   ngOnInit(): void { this.init(); }
@@ -91,7 +92,7 @@ export class InitExtractionPage implements OnInit {
   public zoomIn(): void  { this.zoom = Math.min(3, +(this.zoom + 0.25).toFixed(2)); }
   public zoomOut(): void { this.zoom = Math.max(0.25, +(this.zoom - 0.25).toFixed(2)); }
 
-  public async runSampleExtraction(startVal: string, endVal: string): Promise<void> {
+  public async getSampleText(startVal: string, endVal: string): Promise<void> {
     const start = parseInt(startVal);
     const end   = parseInt(endVal);
 
@@ -115,7 +116,7 @@ export class InitExtractionPage implements OnInit {
       result += `\n--- Page ${pageNum} ---\n${text}`;
     }
 
-    console.log(result);
+    this.sampleText = result;
   }
 
   private loadSource(id: string): void {

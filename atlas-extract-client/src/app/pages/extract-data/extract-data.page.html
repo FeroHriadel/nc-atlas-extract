@@ -1,13 +1,13 @@
 <app-container>
 
     <!-- title -->
-    <nc-card class="p-4 mb-4">
+    <nc-card class="p-4 mb-6">
         <h1 class="page-title text-left">Extract Data</h1>
         <p class="page-subtitle text-left">Choose a source to extract data from</p>
     </nc-card>
 
     @for (source of (sources$ | async); track source.id) {
-        <nc-card class="w-100 p-4 mb-4 flex justify-between align-center">
+        <nc-card class="w-100 p-4 mb-4 flex justify-between align-center text">
             <h4 class="text-left">{{ source.friendlyName }}</h4>
             <a [routerLink]="['/extract-data', source.id]">
                 <nc-button size="small">Extract Data</nc-button>

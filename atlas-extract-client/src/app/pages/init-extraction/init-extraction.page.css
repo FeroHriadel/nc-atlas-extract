@@ -1,3 +1,9 @@
+@media (max-width: 1100px) {
+    .sample-pages-and-preview-wrap {
+        flex-direction: column;
+    }
+}
+
 @media (max-width: 550px) {
     .pdf-zoom-controls {
         display: none;

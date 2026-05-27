@@ -35,7 +35,7 @@
 
 ::ng-deep.sidebar {
     position: fixed;
-    top: calc(1rem + 64px + 1rem);
+    top: calc(1rem + 64px + 1.5rem);
     left: 1rem;
     max-width: 260px;
     height: calc(100vh - 1rem - 64px - 2rem);
@@ -49,11 +49,11 @@
 }
 
 .app-wrap {
-    margin-top: calc(1rem + 64px);
-    margin-left: calc(260px + 1rem);
+    margin-top: calc(1.5rem + 64px);
+    margin-left: calc(260px + 1.5rem);
     margin-right: 1rem;
     padding: 1rem;
-    width: calc(100% - 260px - 1rem);
+    width: calc(100% - 260px - 1.5rem);
 }
 
 @media (max-width: 1000px) {
