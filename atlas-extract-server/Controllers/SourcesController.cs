@@ -146,6 +146,7 @@ public class SourcesController(
     }
 
 
+
     //// S3 MULTIPART UPLOAD ENDPOINTS /////////////////////////
     // INIT S3 MULTIPART UPLOAD => POST /api/sources/init-upload
     [HttpPost("init-upload")]
@@ -241,6 +242,27 @@ public class SourcesController(
         {
             var sources = await sourcesTableService.GetSources() ?? [];
             return Ok(new SourcesResDto { Sources = sources });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new ErrorRes { StatusCode = 500, Message = ex.Message });
+        }
+    }
+
+
+    // GET PRESIGNED URL FOR DOWNLOADING AN OBJECT => GET /api/sources/download-url/{id}
+    [HttpGet("download-url/{id}")] 
+    public async Task<IActionResult> GetDownloadUrl(string id)
+    {
+        try
+        {
+            var source = await sourcesTableService.GetSourceById(id);
+            var url = await s3Service.GetPresignedDownloadUrl(source.ObjectKey);
+            return Ok(new { url });
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound(new ErrorRes { StatusCode = 404, Message = $"Source {id} not found." });
         }
         catch (Exception ex)
         {

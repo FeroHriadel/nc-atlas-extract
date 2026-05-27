@@ -37,6 +37,14 @@ export class SourcesService {
         });
     }
 
+    findSourceById(id: string): Source | undefined {
+        const source = this.sources.getValue().find(s => s.id === id);
+        if (!source) {
+            this.toast.error({ text: 'Source not found.' });
+        }
+        return source;
+    }
+
     async createSource(req: CreateSourceReq): Promise<Source> {
         try {
             const res = await firstValueFrom( //firstValueFrom converts Observable to Promise and resolves with the first emitted value
@@ -76,6 +84,19 @@ export class SourcesService {
         } catch (err) {
             this.sources.next(previous);
             this.toast.error({ text: 'Failed to delete source.' });
+            throw err;
+        }
+    }
+
+
+    async getSourceUrl(id: string): Promise<string> {
+        try {
+            const res = await firstValueFrom(
+                this.http.get<{ url: string }>(`${this.apiUrl}/sources/download-url/${id}`)
+            );
+            return res.url;
+        } catch (err) {
+            this.toast.error({ text: 'Failed to get download URL.' });
             throw err;
         }
     }

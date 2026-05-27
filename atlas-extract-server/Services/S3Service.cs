@@ -109,4 +109,18 @@ public class S3Service(IAmazonS3 s3) : IS3Service
         };
         await s3.AbortMultipartUploadAsync(request);
     }
+
+
+    // GENERATE PRESIGNED URL FOR DOWNLOADING AN OBJECT
+    public Task<string> GetPresignedDownloadUrl(string objectKey)
+    {
+        var request = new GetPreSignedUrlRequest
+        {
+            BucketName = BucketName,
+            Key = objectKey,
+            Verb = HttpVerb.GET,
+            Expires = DateTime.UtcNow.AddMinutes(60)
+        };
+        return Task.FromResult(s3.GetPreSignedURL(request));
+    }
 }

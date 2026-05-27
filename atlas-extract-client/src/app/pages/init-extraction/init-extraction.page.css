@@ -1,0 +1,11 @@
+@media (max-width: 550px) {
+    .pdf-zoom-controls {
+        display: none;
+    }
+}
+
+@media (max-width: 400px) {
+    .pdf-goto-label {
+        display: none;
+    }
+}

@@ -21,7 +21,7 @@
 <nc-card class="sidebar p-4">
   <h4 class="section-title-light mb-1">Sources</h4>
   <label class="mb-4">Books, articles, and other materials uploaded for data extraction</label>
-  <ul>
+  <ul class="mb-4">
     <li>
       <a class="block" routerLink="/sources/upload" [style]="{width: '100%'}">
         <nc-button variant="dark" class="w-100 mb-1">Upload Source</nc-button>
@@ -30,6 +30,21 @@
     <li>
       <a class="block" routerLink="/sources" [style]="{width: '100%'}">
         <nc-button variant="outline" class="w-100 mb-1">Source List</nc-button>
+      </a>
+    </li>
+  </ul>
+
+  <h4 class="section-title-light mb-1">Extracted Data</h4>
+  <label class="mb-4">Data extracted from sources</label>
+  <ul class="mb-4">
+    <li>
+      <a class="block" routerLink="/extract-data" [style]="{width: '100%'}">
+        <nc-button variant="dark" class="w-100 mb-1">Extract Data</nc-button>
+      </a>
+    </li>
+    <li>
+      <a class="block" routerLink="/extracted-data" [style]="{width: '100%'}">
+        <nc-button variant="outline" class="w-100 mb-1">Extracted Data</nc-button>
       </a>
     </li>
   </ul>

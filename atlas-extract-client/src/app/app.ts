@@ -25,6 +25,7 @@ export class App {
   public logoUrl: string = 'logo.png';
   public navLinks: NavLink[] = [
     { label: 'Sources', link: '/sources' },
+    { label: 'Extract Data', link: '/extract-data' }
   ];
 
   toggleTheme(): void {
