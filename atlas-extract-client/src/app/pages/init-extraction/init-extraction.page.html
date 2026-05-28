@@ -107,52 +107,117 @@
         <!-- Extract + Sample Output + Describe -->
         <nc-card class="p-4">
 
-            <!-- top row: Extract Sample Pages | Sample Text Output -->
-            <div class="extraction-columns flex gap-6 mb-6">
+            <!-- Extract Sample Pages | Sample Text Output -->
+            <div class="extraction-section mb-6">
 
-                <!-- Extract Sample Pages -->
-                <div style="max-width: 260px; min-width: 200px;">
-                    <h2 class="section-title-light">Extract Sample Pages</h2>
-                    <p class="section-subtitle-light mb-4">Choose a few consecutive pages to get a sample data extraction</p>
+                <!-- left column wrapper — becomes display:contents on small screens so children join the grid -->
+                <div class="extraction-left-col">
 
-                    <form class="flex flex-col">
-                        <input
-                            #startPageInput
-                            id="startPage"
-                            type="number"
-                            min="1"
-                            [max]="totalPages"
-                            class="border px-2 py-1 text-sm mb-4 w-100"
-                            placeholder="Start page"
-                            style="text-indent: 0.5rem;"
-                            [defaultValue]="1"
-                        />
+                    <!-- Extract Sample Pages -->
+                    <div class="extract-pages-section">
+                        <h2 class="section-title-light">Extract Sample Pages</h2>
+                        <p class="section-subtitle-light mb-4">Choose a few consecutive pages and then fill out the form below.</p>
 
-                        <input
-                            #endPageInput
-                            id="endPage"
-                            type="number"
-                            min="1"
-                            [max]="totalPages"
-                            class="border px-2 py-1 text-sm mb-4 w-100"
-                            placeholder="End page"
-                            style="text-indent: 0.5rem;"
-                            [defaultValue]="3"
-                        />
+                        <form class="page-range-form flex flex-col">
+                            <label for="startPage" class="mb-1">Start Page</label>
+                            <input
+                                #startPageInput
+                                id="startPage"
+                                type="number"
+                                min="1"
+                                [max]="totalPages"
+                                class="border px-2 py-1 text-sm mb-4 w-100"
+                                placeholder="Start page"
+                                style="text-indent: 0.5rem;"
+                                [defaultValue]="1"
+                            />
 
-                        <nc-button
-                            class="w-100 mb-4"
-                            (click)="getSampleText(startPageInput.value, endPageInput.value)"
-                        >
-                            Get Text Sample
-                        </nc-button>
-                    </form>
+                            <label for="endPage" class="mb-1">End Page</label>
+                            <input
+                                #endPageInput
+                                id="endPage"
+                                type="number"
+                                min="1"
+                                [max]="totalPages"
+                                class="border px-2 py-1 text-sm mb-4 w-100"
+                                placeholder="End page"
+                                style="text-indent: 0.5rem;"
+                                [defaultValue]="3"
+                            />
+
+                            <nc-button
+                                class="w-100 mb-4"
+                                (click)="getSampleText(startPageInput.value, endPageInput.value)"
+                            >
+                                Get Text Sample
+                            </nc-button>
+                        </form>
+                    </div>
+
+                    <!-- Describe text structure -->
+                    @if (sampleText) {
+                        <div class="describe-structure-section">
+                            <h2 class="section-title-light">Describe text structure</h2>
+                            <p class="section-subtitle-light mb-4">Help the extractor understand the structure of the text by reviewing and describing it.</p>
+                            <form
+                                [id]="sampleExtractionFormId"
+                                class="description-form flex flex-col"
+                            >
+                                <span>
+                                    <label for="sourceLanguage" class="mb-1">Source Language</label>
+                                    <input
+                                        name="sourceLanguage"
+                                        id="sourceLanguage"
+                                        placeholder="What language is the text in?"
+                                        class="mb-4 w-100"
+                                    />
+                                </span>
+                                <span>
+                                    <label for="bookTopic" class="mb-1">Book Topic</label>
+                                    <textarea
+                                        name="bookTopic"
+                                        id="bookTopic"
+                                        placeholder="What is the book about?"
+                                        class="mb-4 w-100"
+                                    ></textarea>
+                                </span>
+                                <span>
+                                    <label for="structureDescription" class="mb-1">Structure Description</label>
+                                    <textarea
+                                        name="structureDescription"
+                                        id="structureDescription"
+                                        placeholder="Describe the structure of the text (e.g.: There's a title - ususally 2-3 word name of a town. Then there's a text describing sights in that town - usually just a few sentences - rarely more pages...)"
+                                        class="mb-4 w-100"
+                                    ></textarea>
+                                </span>
+                                <span>
+                                    <label for="ignore" class="mb-1">Ignore</label>
+                                    <textarea
+                                        name="ignore"
+                                        id="ignore"
+                                        placeholder="What should the extractor ignore? E.g.: The first 3-4 words on top of each page is a header - igonre that. There's sometimes an offtopic text - usually just one sentence - that is image caption - ignore that. "
+                                        class="mb-4 w-100"
+                                    ></textarea>
+                                </span>
+                                <span>
+                                    <label for="descriptionLength" class="mb-1">Description Length</label>
+                                    <input
+                                        name="descriptionLength"
+                                        id="descriptionLength"
+                                        placeholder="Description length"
+                                        [defaultValue]="'Description max. 2-3 sentences'"
+                                        class="mb-4 w-100"
+                                    />
+                                </span>
+                            </form>
+                        </div>
+                    }
                 </div>
 
                 <!-- Sample Text Output -->
                 <div
-                    class="flex-1 p-4 border"
-                    style="border-radius: var(--nc-border-radius); background-color: var(--nc-bg-color); color: var(--nc-text-color-light); max-height: 530px; overflow-y: auto; box-shadow: var(--nc-box-shadow);"
+                    class="sample-text-output p-4 border"
+                    style="border-radius: var(--nc-border-radius); background-color: var(--nc-bg-color); color: var(--nc-text-color-light); box-shadow: var(--nc-box-shadow);"
                 >
                     <h3 class="section-title-light mb-2">Sample Text Output</h3>
                     <p class="section-subtitle-light mb-4">Extractor sees the document like this. Review the text and help it understand the structure</p>
@@ -161,17 +226,6 @@
                     }
                 </div>
             </div>
-
-            <!-- bottom row: Describe Text Structure -->
-            @if (sampleText) {
-                <div>
-                    <h2 class="section-title-light">Describe text structure</h2>
-                    <p class="section-subtitle-light mb-4">Help the extractor understand the structure of the text by reviewing and describing it.</p>
-                    <nc-button class="w-100">Start Full Extraction</nc-button>
-                </div>
-            }
-
         </nc-card>
-
     }
 </app-container>

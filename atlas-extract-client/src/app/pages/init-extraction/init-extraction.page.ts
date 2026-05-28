@@ -79,6 +79,7 @@ export class InitExtractionPage implements OnInit {
   public pdfPreviewOpen = true;
   public sampleText = '';
   public outline: TocItem[] = [];
+  public sampleExtractionFormId = 'sample-extraction-form';
 
 
   ngOnInit(): void { this.init(); }
