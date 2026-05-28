@@ -9,9 +9,9 @@ namespace App.Services;
 
 
 
-public class S3Service(IAmazonS3 s3) : IS3Service
+public class S3Service(IAmazonS3 s3, IConfiguration config) : IS3Service
 {
-    private const string BucketName = "nc-atlas-extract-sources";
+    private readonly string BucketName = config["S3:BucketName"] ?? throw new InvalidOperationException("S3:BucketName is not configured.");
     private const string SourcesPrefix = "sources/";
 
 

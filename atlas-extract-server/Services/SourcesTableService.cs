@@ -9,10 +9,9 @@ namespace App.Services;
 
 
 
-public class SourcesTableService(IAmazonDynamoDB dynamo) : ISourcesTableService
+public class SourcesTableService(IAmazonDynamoDB dynamo, IConfiguration config) : ISourcesTableService
 {
-    // TABLE NAME
-    private const string TableName = "nc-atlas-extract-sources";
+    private readonly string TableName = config["DynamoDB:SourcesTableName"] ?? throw new InvalidOperationException("DynamoDB:SourcesTableName is not configured.");
 
 
 
