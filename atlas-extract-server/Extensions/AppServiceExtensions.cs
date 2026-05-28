@@ -20,9 +20,10 @@ public static class AppServiceExtensions
         services.AddScoped<IS3Service, S3Service>();
         services.AddScoped<ISourcesTableService, SourcesTableService>();
         services.AddScoped<IRequestCheckService, RequestCheckService>();
-        services.AddControllers()
+        services.AddScoped<IExtractionService, ExtractService>();
+        services.AddControllers() // so it responds with camelCase json instead of PascalCase
             .AddJsonOptions(o => o.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase);
-        services.Configure<ApiBehaviorOptions>(options =>
+        services.Configure<ApiBehaviorOptions>(options => // respond with {error: string} on model validation errors
         {
             options.InvalidModelStateResponseFactory = context =>
             {

@@ -5,7 +5,10 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 
+
 const env = process.env.ENVIRONEMNT;
+
+
 
 export class SourcesTable extends Construct {
     public table: dynamodb.Table;
