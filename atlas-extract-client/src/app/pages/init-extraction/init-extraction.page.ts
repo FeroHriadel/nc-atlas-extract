@@ -6,7 +6,19 @@ import { SourcesService } from '../../services/sources.service';
 import { ActivatedRoute } from '@angular/router';
 import { filter, take } from 'rxjs/operators';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
-import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist';
+import { getDocument, GlobalWorkerOptions, PDFDocumentProxy } from 'pdfjs-dist';
+
+interface RawOutlineItem {
+  title: string;
+  dest: any[] | string | null;
+  items: RawOutlineItem[];
+}
+
+export interface TocItem {
+  title: string;
+  page: number;
+  depth: number;
+}
 import { SquareButton } from '../../ncss/buttons/square-button/square-button.component';
 import { Button } from '../../ncss/buttons/button/button.component';
 import { ToastService } from '../../ncss/services/toast.service';
@@ -64,7 +76,9 @@ export class InitExtractionPage implements OnInit {
   public currentPage = 1;
   public totalPages = 0;
   public zoom = 1;
+  public pdfPreviewOpen = true;
   public sampleText = '';
+  public outline: TocItem[] = [];
 
 
   ngOnInit(): void { this.init(); }
@@ -80,8 +94,39 @@ export class InitExtractionPage implements OnInit {
     return this.route.snapshot.paramMap.get('id');
   }
 
-  public onPdfLoaded(pdf: { numPages: number }): void {
+  public onPdfLoaded(pdf: PDFDocumentProxy): void {
     this.totalPages = pdf.numPages;
+    this.loadOutline(pdf);
+  }
+
+  private async loadOutline(pdf: PDFDocumentProxy): Promise<void> {
+    const raw: RawOutlineItem[] | null = await pdf.getOutline();
+    this.outline = raw?.length ? await this.flattenOutline(pdf, raw, 0) : [];
+    this.cdr.detectChanges();
+  }
+
+  private async flattenOutline(pdf: PDFDocumentProxy, items: RawOutlineItem[], depth: number): Promise<TocItem[]> {
+    const result: TocItem[] = [];
+    for (const item of items) {
+      const page = await this.resolveDest(pdf, item.dest);
+      result.push({ title: item.title, page, depth });
+      if (item.items?.length) {
+        result.push(...await this.flattenOutline(pdf, item.items, depth + 1));
+      }
+    }
+    return result;
+  }
+
+  private async resolveDest(pdf: PDFDocumentProxy, dest: any[] | string | null): Promise<number> {
+    if (!dest) return 1;
+    try {
+      const arr = typeof dest === 'string' ? await pdf.getDestination(dest) : dest;
+      if (!arr) return 1;
+      const pageIndex = await pdf.getPageIndex(arr[0]);
+      return pageIndex + 1;
+    } catch {
+      return 1;
+    }
   }
 
   public goToPage(event: Event): void {
@@ -117,6 +162,7 @@ export class InitExtractionPage implements OnInit {
     }
 
     this.sampleText = result;
+    this.cdr.detectChanges();
   }
 
   private loadSource(id: string): void {

@@ -29,7 +29,8 @@
         <!-- update source modal -->
         <nc-modal
             #updateSourceModal
-            class="w-1/2 max-w-[300px]"
+            class="w-100"
+            [style]="{maxWidth: '400px', minWidth: '260px', width: '100%'}"
             [onClose]="onUpdateSourceModalClose.bind(this)"
             [onConfirm]="onSourceEdit.bind(this)"
         >
@@ -42,7 +43,8 @@
                     'opacity': editFormSubmitting ? '0.6' : '1'
                 }"
             >
-                <h3 class="section-title-light mb-4">Source Details</h3>
+                <h3 class="section-title-light">Source Details</h3>
+                <p class="section-subtitle-light mb-6">Edit the details of the selected source</p>
                 <!-- source type selection -->
                 <span>
                     <label for="type" class="mb-1">Type (required)</label>
