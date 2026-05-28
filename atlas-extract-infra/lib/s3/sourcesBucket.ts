@@ -1,6 +1,13 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as dotenv from 'dotenv';
+dotenv.config();
+
+
+const env = process.env.ENVIRONEMNT;
+
+
 
 export class SourcesBucket extends Construct {
     public bucket: s3.Bucket;
@@ -15,7 +22,7 @@ export class SourcesBucket extends Construct {
             removalPolicy: cdk.RemovalPolicy.DESTROY,
             autoDeleteObjects: true,
             blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
-            bucketName: 'nc-atlas-extract-sources',
+            bucketName: `${env}-nc-atlas-extract-sources`,
             cors: [
                 {
                     allowedMethods: [s3.HttpMethods.PUT, s3.HttpMethods.POST, s3.HttpMethods.GET],
