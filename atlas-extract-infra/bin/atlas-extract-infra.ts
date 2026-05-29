@@ -6,7 +6,11 @@ dotenv.config();
 
 
 
+const env = process.env.ENVIRONEMNT || 'dev';
+
+
+
 const app = new cdk.App();
-new AtlasExtractInfraStack(app, 'AtlasExtractInfraStack', {
+new AtlasExtractInfraStack(app, `AtlasExtractInfraStack-${env}`, {
   env: { account: process.env.AWS_ACCOUNT_ID, region: process.env.AWS_REGION },
 });

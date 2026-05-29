@@ -8,7 +8,8 @@ import { ToastService } from '../../ncss/services/toast.service';
 import { CheckIcon } from '../../ncss/icons';
 import { UploadService } from '../../services/upload.service';
 import { SourcesService } from '../../services/sources.service';
-import { AsyncPipe, NgClass } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 
 
@@ -17,7 +18,7 @@ import { AsyncPipe, NgClass } from '@angular/common';
   templateUrl: './sources-upload.page.html',
   styleUrls: ['./sources-upload.page.css'],
   standalone: true,
-  imports: [AppContainer, Card, Button, FileUpload, CheckIcon, AsyncPipe, NgClass]
+  imports: [AppContainer, Card, Button, FileUpload, CheckIcon, AsyncPipe, RouterLink]
 })
 
 
