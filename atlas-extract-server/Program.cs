@@ -4,6 +4,11 @@ using App.Middleware;
 
 // app builder
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddJsonFile(
+    $"appsettings.{builder.Environment.EnvironmentName}.local.json",
+    optional: true,
+    reloadOnChange: true
+);
 builder.Services.AddAppServices(builder.Configuration);
 var app = builder.Build();
 

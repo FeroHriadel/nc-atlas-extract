@@ -10,10 +10,11 @@ namespace App.Services;
 
 
 
-public class ExtractService : IExtractionService
+public class ExtractService(IConfiguration configuration) : IExtractionService
 {
 
-    private readonly string apiKey = Environment.GetEnvironmentVariable("ApiKey");
+    private readonly string apiKey = configuration["Anthropic:ApiKey"]
+        ?? throw new InvalidOperationException("Anthropic:ApiKey is not configured.");
     private readonly string generalInstructions = """
         YOUR ROLE:
         You are an assistant who summarizes info from text about sights and places of interest in a json.

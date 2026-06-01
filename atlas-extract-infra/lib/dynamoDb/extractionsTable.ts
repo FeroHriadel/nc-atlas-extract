@@ -10,9 +10,8 @@ const env = process.env.ENVIRONEMNT;
 
 
 
-export class SourcesTable extends Construct {
-    public sourcesTable: dynamodb.Table;
-    public extractionsTable: dynamodb.Table;
+export class ExtractionsTable extends Construct {
+    public table: dynamodb.Table;
 
     constructor(scope: Construct, id: string) {
         super(scope, id);
@@ -20,8 +19,8 @@ export class SourcesTable extends Construct {
     }
 
     private createTable() {
-        this.sourcesTable = new dynamodb.Table(this, 'SourcesTable', {
-            tableName: `${env}-nc-atlas-extract-sources`,
+        this.table = new dynamodb.Table(this, 'ExtractionsTable', {
+            tableName: `${env}-nc-atlas-extract-extractions`,
             partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
             removalPolicy: cdk.RemovalPolicy.DESTROY,
             billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,

@@ -5,8 +5,13 @@ import { Source } from '../../types/Source';
 import { SourcesService } from '../../services/sources.service';
 import { ActivatedRoute } from '@angular/router';
 import { filter, take } from 'rxjs/operators';
+import { merge } from 'rxjs';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { getDocument, GlobalWorkerOptions, PDFDocumentProxy } from 'pdfjs-dist';
+import { ExtractionService } from '../../services/extraction.service';
+import { AsyncPipe, JsonPipe } from '@angular/common';
+import { FormService } from '../../ncss/services/form.service';
+
 
 interface RawOutlineItem {
   title: string;
@@ -21,7 +26,9 @@ export interface TocItem {
 }
 import { SquareButton } from '../../ncss/buttons/square-button/square-button.component';
 import { Button } from '../../ncss/buttons/button/button.component';
+import { WarningIcon } from '../../ncss/icons/warning.icon';
 import { ToastService } from '../../ncss/services/toast.service';
+import { ExtractSampleReq } from '../../types/ExtractSampleReq';
 GlobalWorkerOptions.workerSrc = 'assets/pdf.worker.mjs';
 
 
@@ -58,7 +65,7 @@ HOW TO ADD PDF VIEWER (ng2-pdf-viewer v10 + pdfjs-dist v4):
 
 @Component({
   selector: 'app-init-extraction',
-  imports: [AppContainer, Card, PdfViewerModule, SquareButton, Button],
+  imports: [AppContainer, Card, PdfViewerModule, SquareButton, Button, AsyncPipe, JsonPipe, WarningIcon],
   templateUrl: './init-extraction.page.html',
   styleUrl: './init-extraction.page.css',
 })
@@ -70,6 +77,8 @@ export class InitExtractionPage implements OnInit {
   private route = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
   private toast = inject(ToastService);
+  public extractionService = inject(ExtractionService);
+  private formService = inject(FormService);
   public source: Source | null = null;
   public sourceNotFound = false;
   public sourceUrl: string | null = null;
@@ -80,6 +89,8 @@ export class InitExtractionPage implements OnInit {
   public sampleText = '';
   public outline: TocItem[] = [];
   public sampleExtractionFormId = 'sample-extraction-form';
+  public submitting = false;
+
 
 
   ngOnInit(): void { this.init(); }
@@ -181,7 +192,48 @@ export class InitExtractionPage implements OnInit {
     });
   }
 
-  
+  private checkPayload(payload: ExtractSampleReq): string | null {
+    const errors: string[] = [];
+    let hasError = false;
+    if (!payload.text) errors.push('Sample text is empty. Please extract sample text from the PDF first.');
+    if (!payload.sourceLanguage) errors.push('Source language is required.');
+    if (!payload.sourceTopic) errors.push('Source topic is required.');
+    if (!payload.structureDescription) errors.push('Structure description is required.');
+    if (errors.length) hasError = true;
+    const message = errors.join(' ');
+    return hasError ? message : null;
+  }
 
+  public extractSample(e: Event): void {
+    e.preventDefault();
+    // check form
+    const formValues = this.formService.getFormValues(this.sampleExtractionFormId);
+    const payload: ExtractSampleReq = {
+      text: this.sampleText,
+      startPage: parseInt(formValues['startPage'] as string) || 1,
+      endPage: parseInt(formValues['endPage'] as string) || this.totalPages,
+      sourceId: this.source!.id,
+      sourceLanguage: formValues['sourceLanguage'] as string,
+      sourceTopic: formValues['sourceTopic'] as string,
+      structureDescription: formValues['structureDescription'] as string,
+      ignore: formValues['ignore'] as string,
+      descriptionLength: formValues['descriptionLength'] as string,
+      additionalInstructions: formValues['additionalInstructions'] as string,
+    };
+    const error = this.checkPayload(payload);
+    if (error) {
+      this.submitting = false;
+      this.toast.error({ text: error });
+      return;
+    }
+    // get sample extraction
+    this.submitting = true;
+    this.extractionService.extractSample(payload);
+
+    // wait for either result or error, then set submitting to false
+    merge(this.extractionService.extractSampleErr$, this.extractionService.extractSampleRes$)
+      .pipe(filter(value => !!value), take(1))
+      .subscribe(() => this.submitting = false);
+  };
 
 }

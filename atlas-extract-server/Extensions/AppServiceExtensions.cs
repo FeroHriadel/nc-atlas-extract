@@ -1,5 +1,6 @@
 using Amazon.DynamoDBv2;
 using Amazon.S3;
+using Amazon.SQS;
 using App.Dtos;
 using App.Interfaces;
 using App.Middleware;
@@ -17,8 +18,12 @@ public static class AppServiceExtensions
     {
         services.AddAWSService<IAmazonS3>(); // AWSService gets credentials from ~/.aws/credentials locally, IAM role in production
         services.AddAWSService<IAmazonDynamoDB>();
+        services.AddAWSService<IAmazonSQS>();
         services.AddScoped<IS3Service, S3Service>();
         services.AddScoped<ISourcesTableService, SourcesTableService>();
+        services.AddScoped<IExtractionsTableService, ExtractionsTableService>();
+        services.AddScoped<IQueueService, QueueService>();
+        services.AddScoped<IPdfTextService, PdfTextService>();
         services.AddScoped<IRequestCheckService, RequestCheckService>();
         services.AddScoped<IExtractionService, ExtractService>();
         services.AddControllers() // so it responds with camelCase json instead of PascalCase

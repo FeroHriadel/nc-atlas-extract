@@ -123,4 +123,16 @@ public class S3Service(IAmazonS3 s3, IConfiguration config) : IS3Service
         };
         return Task.FromResult(s3.GetPreSignedURL(request));
     }
+
+
+    // GET S3 OBJECT AS A STREAM (e.g. to read a PDF for text extraction)
+    public async Task<Stream> GetObjectStreamAsync(string objectKey)
+    {
+        var response = await s3.GetObjectAsync(new GetObjectRequest
+        {
+            BucketName = BucketName,
+            Key = objectKey
+        });
+        return response.ResponseStream;
+    }
 }

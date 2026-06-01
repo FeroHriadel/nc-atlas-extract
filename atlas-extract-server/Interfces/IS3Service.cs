@@ -11,4 +11,5 @@ public interface IS3Service
     Task CompleteMultipartUpload(string uploadId, string objectKey, List<UploadPartDto> parts);
     Task AbortMultipartUpload(string uploadId, string objectKey);
     Task<string> GetPresignedDownloadUrl(string objectKey);
+    Task<Stream> GetObjectStreamAsync(string objectKey);
 }
