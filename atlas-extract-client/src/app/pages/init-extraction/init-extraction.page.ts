@@ -5,7 +5,6 @@ import { Source } from '../../types/Source';
 import { SourcesService } from '../../services/sources.service';
 import { ActivatedRoute } from '@angular/router';
 import { filter, take } from 'rxjs/operators';
-import { BehaviorSubject, merge } from 'rxjs';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { getDocument, GlobalWorkerOptions, PDFDocumentProxy } from 'pdfjs-dist';
 import { ExtractionService } from '../../services/extraction.service';
@@ -89,8 +88,11 @@ export class InitExtractionPage implements OnInit {
   public sampleText: string = '';
   public outline: TocItem[] = [];
   public sampleExtractionFormId = 'sample-extraction-form';
+  public initExtractionFormdId = 'init-extraction-form';
   private readonly descriptionStorageKey = 'sampleDescription';
   public submitting = false;
+  public pdfLoading = false;
+  public sampleTextLoading = false;
   private descriptionLoaded = false;
 
   ngOnInit(): void { this.init(); }
@@ -108,6 +110,7 @@ export class InitExtractionPage implements OnInit {
   }
 
   public onPdfLoaded(pdf: PDFDocumentProxy): void {
+    this.pdfLoading = false;
     this.totalPages = pdf.numPages;
     this.loadOutline(pdf);
   }
@@ -158,10 +161,18 @@ export class InitExtractionPage implements OnInit {
       this.toast.error({ text: 'Please enter a valid page range.' });
       return;
     }
+    if (this.totalPages && end > this.totalPages) {
+      this.toast.error({ text: `Page range exceeds the document length (${this.totalPages} pages).` });
+      return;
+    }
     if (end - start + 1 > 50) {
       this.toast.error({ text: 'Page range cannot exceed 50 pages.' });
       return;
     }
+
+    this.sampleTextLoading = true;
+    this.sampleText = '';
+    this.cdr.detectChanges();
 
     const pdf = await getDocument(this.sourceUrl!).promise;
     let result = '';
@@ -175,11 +186,15 @@ export class InitExtractionPage implements OnInit {
     }
 
     this.sampleText = result;
+    this.sampleTextLoading = false;
     this.cdr.detectChanges();
     if (!this.descriptionLoaded) {
       this.loadDescription();
       this.descriptionLoaded = true;
     }
+    setTimeout(() => {
+      document.getElementById('describe-structure-section')?.scrollIntoView({ behavior: 'smooth' });
+    }, 50);
   }
 
   private loadSource(id: string): void {
@@ -190,7 +205,7 @@ export class InitExtractionPage implements OnInit {
       this.source = sources.find(s => s.id === id) ?? null;
       if (this.source?.type === 'pdf') {
         this.sourcesService.getSourceUrl(this.source.id)
-          .then(url => { this.sourceUrl = url; this.cdr.detectChanges(); })
+          .then(url => { this.sourceUrl = url; this.pdfLoading = true; this.cdr.detectChanges(); })
           .catch(() => { this.sourceUrl = null; this.cdr.detectChanges(); });
       }
       if (!this.source) this.sourceNotFound = true;
@@ -235,10 +250,17 @@ export class InitExtractionPage implements OnInit {
     this.submitting = true;
     this.extractionService.extractSample(payload);
 
-    // wait for either result or error, then set submitting to false
-    merge(this.extractionService.extractSampleErr$, this.extractionService.extractSampleRes$)
-      .pipe(filter(value => !!value), take(1))
-      .subscribe(() => this.submitting = false);
+    this.extractionService.extractSampleRes$
+      .pipe(filter(v => !!v), take(1))
+      .subscribe(() => {
+        this.submitting = false;
+        this.cdr.detectChanges();
+        setTimeout(() => document.getElementById('sample-extraction-output')?.scrollIntoView({ behavior: 'smooth' }), 50);
+      });
+
+    this.extractionService.extractSampleErr$
+      .pipe(filter(v => !!v), take(1))
+      .subscribe(() => { this.submitting = false; });
   };
 
   public saveDescription() {

@@ -89,16 +89,24 @@
                 }
 
                 <!-- PDF viewer -->
-                <pdf-viewer
-                    [src]="sourceUrl"
-                    [render-text]="true"
-                    [original-size]="false"
-                    [(page)]="currentPage"
-                    [zoom]="zoom"
-                    (after-load-complete)="onPdfLoaded($event)"
-                    style="flex: 1; height: 600px; border-radius: var(--nc-border-radius); background-color: var(--nc-bg-color);"
-                    class="border"
-                ></pdf-viewer>
+                <div style="flex: 1; position: relative;">
+                    @if (pdfLoading) {
+                        <div class="flex items-center justify-center border"
+                            style="position: absolute; inset: 0; z-index: 10; border-radius: var(--nc-border-radius); background-color: var(--nc-bg-color);">
+                            <p class="text-sm" style="color: var(--nc-text-color-light);">Loading... (this might take a bit)</p>
+                        </div>
+                    }
+                    <pdf-viewer
+                        [src]="sourceUrl"
+                        [render-text]="true"
+                        [original-size]="false"
+                        [(page)]="currentPage"
+                        [zoom]="zoom"
+                        (after-load-complete)="onPdfLoaded($event)"
+                        style="display: block; width: 100%; height: 600px; border-radius: var(--nc-border-radius); background-color: var(--nc-bg-color);"
+                        class="border"
+                    ></pdf-viewer>
+                </div>
 
             </div>
             }
@@ -157,7 +165,7 @@
 
                     <!-- Describe text structure -->
                     @if (sampleText) {
-                        <div class="describe-structure-section">
+                        <div id="describe-structure-section" class="describe-structure-section">
                             <h2 class="section-title-light">Describe text structure</h2>
                             <p class="section-subtitle-light mb-4">Help the extractor understand the structure of the text by reviewing and describing it.</p>
                             <form
@@ -227,7 +235,7 @@
                                     variant="dark"
                                     class="w-100"
                                 >
-                                    Get Sample Extraction
+                                    {{ submitting ? 'Loading... (this might take a bit)' : 'Get Sample Extraction' }}
                                 </nc-button>
                                 <nc-button
                                     type="button"
@@ -257,15 +265,19 @@
                 >
                     <h3 class="section-title-light mb-2">Sample Text Output</h3>
                     <p class="section-subtitle-light mb-4">Extractor sees the document like this. Review the text and help it understand the structure</p>
-                    @if (sampleText) {
+                    @if (sampleTextLoading) {
+                        <p class="text-sm">Loading... (this might take a bit)</p>
+                    }
+                    @if (sampleText && !sampleTextLoading) {
                         <pre class="text-sm whitespace-pre-wrap">{{ sampleText }}</pre>
                     }
                 </div>
             </div>
             
             <!-- Sample Extraction Output -->
-            @if (extractionService.extractSampleRes$ | async ) {    
+            @if ((extractionService.extractSampleRes$ | async) && sampleText) {
                 <div
+                    id="sample-extraction-output"
                     class="sample-extraction-output p-4 border mb-4"
                     style="border-radius: var(--nc-border-radius); background-color: var(--nc-bg-color); color: var(--nc-text-color-light); box-shadow: var(--nc-box-shadow);"
                 >
@@ -277,13 +289,13 @@
                 </div>
             }
 
-            @if (extractionService.extractSampleRes$ | async) {
+            @if ((extractionService.extractSampleRes$ | async) && sampleText) {
                 <nc-card class="p-4 mb-4">
                     <h2 class="section-title-light mb-2">Start extraction</h2>
                     <p class="section-subtitle-light mb-4">If you are satisfied with the result, choose page ranges you'd like to extract from and click 'Start Extraction'</p>
                     <!-- warning box -->
                     <div
-                        class="flex items-start gap-3 p-3 mb-4 border"
+                        class="flex items-center gap-3 p-3 mb-4 border"
                         style="border-radius: var(--nc-border-radius); background-color: #fff7ed; border-color: #fdba74; color: #9a3412;"
                     >
                         <nc-warning-icon [size]="18" color="#f97316" [style]="{'flex-shrink': '0', 'margin-top': '2px'}" />
@@ -295,14 +307,16 @@
                     </div>
 
                     <!-- page ranges & init extraction-->
-                    <label for="pageRanges" class="mb-1">Page Ranges</label>
-                    <textarea
-                        id="pageRanges"
-                        name="pageRanges"
-                        placeholder="e.g. 4-55, 83-91, 120-134"
-                        class="mb-4 w-100"
-                    ></textarea>
-                    <nc-button class="w-100">Start Extraction</nc-button>
+                    <form class="w-100" [id]="initExtractionFormdId">
+                        <label for="pageRanges" class="mb-1">Page Ranges</label>
+                        <textarea
+                            id="pageRanges"
+                            name="pageRanges"
+                            placeholder="e.g. 4-55, 83-91, 120-134"
+                            class="mb-4 w-100"
+                        ></textarea>
+                        <nc-button class="w-100">Start Extraction</nc-button>
+                    </form>
                 </nc-card>
 
             }
