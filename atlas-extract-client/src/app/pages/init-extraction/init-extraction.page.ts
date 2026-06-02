@@ -5,7 +5,7 @@ import { Source } from '../../types/Source';
 import { SourcesService } from '../../services/sources.service';
 import { ActivatedRoute } from '@angular/router';
 import { filter, take } from 'rxjs/operators';
-import { merge } from 'rxjs';
+import { BehaviorSubject, merge } from 'rxjs';
 import { PdfViewerModule } from 'ng2-pdf-viewer';
 import { getDocument, GlobalWorkerOptions, PDFDocumentProxy } from 'pdfjs-dist';
 import { ExtractionService } from '../../services/extraction.service';
@@ -86,17 +86,18 @@ export class InitExtractionPage implements OnInit {
   public totalPages = 0;
   public zoom = 1;
   public pdfPreviewOpen = true;
-  public sampleText = '';
+  public sampleText: string = '';
   public outline: TocItem[] = [];
   public sampleExtractionFormId = 'sample-extraction-form';
+  private readonly descriptionStorageKey = 'sampleDescription';
   public submitting = false;
-
-
+  private descriptionLoaded = false;
 
   ngOnInit(): void { this.init(); }
 
 
   private init(): void {
+    // load source
     const id = this.getSourceIdFromRoute();
     if (!id) return;
     this.loadSource(id);
@@ -175,6 +176,10 @@ export class InitExtractionPage implements OnInit {
 
     this.sampleText = result;
     this.cdr.detectChanges();
+    if (!this.descriptionLoaded) {
+      this.loadDescription();
+      this.descriptionLoaded = true;
+    }
   }
 
   private loadSource(id: string): void {
@@ -236,4 +241,22 @@ export class InitExtractionPage implements OnInit {
       .subscribe(() => this.submitting = false);
   };
 
+  public saveDescription() {
+    const formValues = this.formService.getFormValues(this.sampleExtractionFormId);
+    const stringified = JSON.stringify(formValues);
+    localStorage.setItem(this.descriptionStorageKey, stringified);
+    this.toast.toast({ text: 'Description saved' });
+  }
+
+  private loadDescription() {
+    const stringified = localStorage.getItem(this.descriptionStorageKey);
+    if (!stringified) return;
+    const values = JSON.parse(stringified);
+    this.formService.setFormValues(this.sampleExtractionFormId, values);
+  }
+
+  public clearDescription() {
+    localStorage.removeItem(this.descriptionStorageKey);
+    this.formService.clearFormValues(this.sampleExtractionFormId);
+  }
 }

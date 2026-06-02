@@ -12,7 +12,7 @@
 
     @if (source?.type === 'pdf' && sourceUrl) {
 
-        <!-- Document Preview — standalone -->
+        <!-- Document Preview  -->
         <nc-card class="p-4 mb-6">
             <div class="flex items-start justify-between mb-6">
                 <div>
@@ -104,7 +104,7 @@
             }
         </nc-card>
 
-        <!-- Extract + Sample Output + Describe -->
+        <!-- Description + Sample Text Output -->
         <nc-card class="p-4">
 
             <!-- Extract Sample Pages | Sample Text Output -->
@@ -224,10 +224,26 @@
 
                                 <nc-button
                                     type="submit"
-                                    variant="outline"
+                                    variant="dark"
                                     class="w-100"
                                 >
                                     Get Sample Extraction
+                                </nc-button>
+                                <nc-button
+                                    type="button"
+                                    variant="outline"
+                                    class="w-100 mt-1"
+                                    (click)="saveDescription()"
+                                >
+                                    Save Description
+                                </nc-button>
+                                <nc-button
+                                    type="button"
+                                    variant="outline"
+                                    class="w-100 mt-1"
+                                    (click)="clearDescription()"
+                                >
+                                    Clear Description
                                 </nc-button>
                             </form>
                         </div>
@@ -250,7 +266,7 @@
             <!-- Sample Extraction Output -->
             @if (extractionService.extractSampleRes$ | async ) {    
                 <div
-                    class="sample-extraction-output p-4 border"
+                    class="sample-extraction-output p-4 border mb-4"
                     style="border-radius: var(--nc-border-radius); background-color: var(--nc-bg-color); color: var(--nc-text-color-light); box-shadow: var(--nc-box-shadow);"
                 >
                     <h3 class="section-title-light mb-2">Sample Extraction Output</h3>
@@ -258,7 +274,11 @@
                     <pre class="text-sm whitespace-pre-wrap mb-4">
                         {{ extractionService.extractSampleRes$ | async | json }}
                     </pre>
+                </div>
+            }
 
+            @if (extractionService.extractSampleRes$ | async) {
+                <nc-card class="p-4 mb-4">
                     <h2 class="section-title-light mb-2">Start extraction</h2>
                     <p class="section-subtitle-light mb-4">If you are satisfied with the result, choose page ranges you'd like to extract from and click 'Start Extraction'</p>
                     <!-- warning box -->
@@ -274,7 +294,7 @@
                         </p>
                     </div>
 
-                    <!-- page ranges -->
+                    <!-- page ranges & init extraction-->
                     <label for="pageRanges" class="mb-1">Page Ranges</label>
                     <textarea
                         id="pageRanges"
@@ -282,9 +302,9 @@
                         placeholder="e.g. 4-55, 83-91, 120-134"
                         class="mb-4 w-100"
                     ></textarea>
-
                     <nc-button class="w-100">Start Extraction</nc-button>
-                </div>
+                </nc-card>
+
             }
         </nc-card>
     }
