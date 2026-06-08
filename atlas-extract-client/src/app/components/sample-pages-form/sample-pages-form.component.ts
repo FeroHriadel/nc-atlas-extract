@@ -15,6 +15,7 @@ export class SamplePagesFormComponent {
   @Input() totalPages = 0;
   @Output() sampleTextChange = new EventEmitter<string>();
   @Output() sampleTextLoadingChange = new EventEmitter<boolean>();
+  @Output() skip = new EventEmitter<void>();
 
   public async getSampleText(startVal: string, endVal: string): Promise<void> {
     const start = parseInt(startVal);

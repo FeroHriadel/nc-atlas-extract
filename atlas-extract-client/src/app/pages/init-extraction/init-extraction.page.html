@@ -28,10 +28,11 @@
                             [totalPages]="totalPages"
                             (sampleTextChange)="onSampleTextChange($event)"
                             (sampleTextLoadingChange)="onSampleTextLoadingChange($event)"
+                            (skip)="onSkip()"
                         />
                     </div>
 
-                    @if (sampleText) {
+                    @if (sampleText || skipped) {
                         <div id="describe-structure-section" class="describe-structure-section">
                             <app-describe-structure-form
                                 [sampleText]="sampleText"
@@ -52,7 +53,9 @@
 
             @if ((extractionService.extractSampleRes$ | async) && sampleText) {
                 <app-sample-extraction-output />
-                <app-init-extraction-form [sourceId]="source!.id" />
+            }
+            @if (((extractionService.extractSampleRes$ | async) && sampleText) || skipped) {
+                <app-init-extraction-form [sourceId]="source!.id" [totalPages]="totalPages" />
             }
         </nc-card>
     }

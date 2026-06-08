@@ -1,5 +1,5 @@
 export interface ExtractStartReq {
-    pages: {startPage: number; endPage: number}[];
+    pageRanges: {startPage: number; endPage: number}[];
     friendlyName: string;
     sourceId: string;
     sourceLanguage: string;

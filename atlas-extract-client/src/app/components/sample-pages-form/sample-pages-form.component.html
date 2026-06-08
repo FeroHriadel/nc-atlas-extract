@@ -28,7 +28,10 @@
         [defaultValue]="3"
     />
 
-    <nc-button class="w-100 mb-4" (click)="getSampleText(startPageInput.value, endPageInput.value)">
+    <nc-button class="w-100 mb-2" (click)="getSampleText(startPageInput.value, endPageInput.value)">
         Get Text Sample
+    </nc-button>
+    <nc-button type="button" variant="red" class="w-100 mb-4" (click)="skip.emit()">
+        Skip
     </nc-button>
 </form>

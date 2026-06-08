@@ -1,0 +1,21 @@
+<app-container>
+    <!-- title -->
+    <nc-card class="p-4 mb-6">
+        <h1 class="page-title text-left">Extraction Progress</h1>
+        <p class="page-subtitle text-left">Monitor the progress of your data extraction process.</p>
+    </nc-card>
+
+    <nc-card class="p-4">
+        <h2 class="section-title-light">{{extractionFriendlyName || 'In Progress...'}}</h2>
+        <p class="section-subtitle-light mb-4">Extraction progress for: {{extractionId}}</p>
+        <nc-table
+            [data]="tableData"
+            [columnsConfig]="columnsConfig"
+            [controls]="false"
+        >
+
+        </nc-table>
+    </nc-card>
+
+
+</app-container>

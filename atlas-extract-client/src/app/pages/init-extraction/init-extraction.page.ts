@@ -36,6 +36,7 @@ export class InitExtractionPage implements OnInit {
   public totalPages = 0;
   public sampleText = '';
   public sampleTextLoading = false;
+  public skipped = false;
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -64,5 +65,9 @@ export class InitExtractionPage implements OnInit {
   public onSampleTextLoadingChange(loading: boolean): void {
     this.sampleTextLoading = loading;
     this.cdr.detectChanges();
+  }
+
+  public onSkip(): void {
+    this.skipped = true;
   }
 }

@@ -31,6 +31,7 @@ const GENERAL_INSTRUCTIONS = `
         "error": string,
         "message": string
     }
+    "title" - may use other than English name.
     "description" - unless specified otherwise, the should be a concise summary of the most important information about the place - 1-3 sentences. Output is in English.
     "category" - a keyword that describes the nature of a place, e.g.: cemetery, town, settlement, mountain, reservoir, park, etc.
     "tags" - a list of keywords that provides more info about a place, e.g.: "WWII", "medieval", "nature", "hiking", "family-friendly", etc.
@@ -38,10 +39,14 @@ const GENERAL_INSTRUCTIONS = `
     "message" - if you can't complete the task, provide a brief instruction on how to fix the issue in this field. Otherwise, leave it empty.
 
     DO'S:
-    Always respond in a json format, and follow the structure described above. No additional text in the response. Always provide a "category" and at least one "tag".
+    Always respond in a json format, and follow the structure described above. No additional text in the response. Always provide a "category" and at least one "tag". No more than 3 tags.
+    Summary.description must be in English, regardless of the input language.
+    Summary.category must be in English, regardless of the input language.
+    Summary.tags must be in English, regardless of the input language.
 
     DONT'S:
     Never hallucinate. If unsure about a piece of info - skip.
+    Don't respond in language other than English.
 `.trim();
 
 
@@ -166,7 +171,7 @@ async function callClaude(userPrompt: string): Promise<ClaudeResult> {
         },
         body: JSON.stringify({
             model: 'claude-sonnet-4-6',
-            max_tokens: 4096,
+            max_tokens: 16000,
             system: GENERAL_INSTRUCTIONS,
             messages: [{ role: 'user', content: userPrompt }],
         }),
@@ -176,7 +181,10 @@ async function callClaude(userPrompt: string): Promise<ClaudeResult> {
         throw new Error(`Anthropic API error: ${response.status} ${await response.text()}`);
     }
 
-    const data = await response.json() as { content: { text: string }[] };
+    const data = await response.json() as { content: { text: string }[]; stop_reason: string };
+    if (data.stop_reason === 'max_tokens') {
+        throw new Error('Anthropic API response was truncated (stop_reason: max_tokens) — batch may be too dense for the current max_tokens limit');
+    }
     const aiText = stripCodeFence(data.content[0].text);
     return JSON.parse(aiText) as ClaudeResult;
 }

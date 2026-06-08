@@ -1,4 +1,4 @@
-import { Component, Input as NgInput, ViewChild, ElementRef, AfterViewInit, OnInit, OnDestroy, OnChanges, effect } from '@angular/core';
+import { Component, Input as NgInput, ViewChild, ElementRef, AfterViewInit, OnInit, OnDestroy, OnChanges, ChangeDetectorRef, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TableControlBar } from './table-control-bar';
 import { TableHeader } from './table-header';
@@ -71,7 +71,8 @@ export class Table implements OnInit, AfterViewInit, OnDestroy, OnChanges {
 
   constructor(
     public filterService: TableFilterService,
-    public zoomService: TableZoomService
+    public zoomService: TableZoomService,
+    private cdr: ChangeDetectorRef
   ) {
     // Watch for zoom level changes
     effect(() => {
@@ -124,6 +125,7 @@ export class Table implements OnInit, AfterViewInit, OnDestroy, OnChanges {
       this.bodyElementRef.bodyRef,
       this.headerElementRef.headerRef
     );
+    this.cdr.detectChanges();
   }
 
   ngOnDestroy(): void {

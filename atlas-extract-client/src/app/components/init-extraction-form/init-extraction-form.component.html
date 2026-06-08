@@ -15,7 +15,7 @@
         </p>
     </div>
 
-    <form class="w-100" [id]="formId">
+    <form class="w-100" [id]="formId" (submit)="onInitExtraction($event)">
         <label for="friendlyName" class="mb-1">Friendly Name</label>
         <input 
             id="friendlyName"
@@ -30,6 +30,12 @@
             placeholder="e.g. 4-55, 83-91, 120-134"
             class="mb-4 w-100"
         ></textarea>
-        <nc-button class="w-100">Start Extraction</nc-button>
+        <nc-button 
+            class="w-100" 
+            [disabled]="(extractionService.extractionStartLoading$ | async) ?? false"
+            type="submit"
+        >
+            Start Extraction
+        </nc-button>
     </form>
 </nc-card>
