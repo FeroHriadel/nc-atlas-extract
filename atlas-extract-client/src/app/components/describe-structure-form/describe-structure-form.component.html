@@ -1,0 +1,75 @@
+<h2 class="section-title-light">Describe text structure</h2>
+<p class="section-subtitle-light mb-4">Help the extractor understand the structure of the text by reviewing and describing it.</p>
+
+<form
+    [id]="formId"
+    class="description-form flex flex-col"
+    (submit)="extractSample($event)"
+    [style]="submitting ? {opacity: '0.4', pointerEvents: 'none'} : {}"
+>
+    <span>
+        <label for="sourceLanguage" class="mb-1">Source Language</label>
+        <input
+            name="sourceLanguage"
+            id="sourceLanguage"
+            placeholder="What language is the text in?"
+            class="mb-4 w-100"
+        />
+    </span>
+    <span>
+        <label for="sourceTopic" class="mb-1">Source Topic</label>
+        <textarea
+            name="sourceTopic"
+            id="sourceTopic"
+            placeholder="What is the document about?"
+            class="mb-4 w-100"
+        ></textarea>
+    </span>
+    <span>
+        <label for="structureDescription" class="mb-1">Structure Description</label>
+        <textarea
+            name="structureDescription"
+            id="structureDescription"
+            placeholder="Describe the structure of the text (e.g.: There's a title - usually a 1-3 word name of a town. Then there's a text describing sights in that town - usually just a few sentences - rarely more pages...)"
+            class="mb-4 w-100"
+        ></textarea>
+    </span>
+    <span>
+        <label for="ignore" class="mb-1">Ignore</label>
+        <textarea
+            name="ignore"
+            id="ignore"
+            placeholder="What should the extractor ignore? E.g.: The first 3-4 words on top of each page is a header - ignore that. There's sometimes an offtopic text - usually just one sentence - that is image caption - ignore that."
+            class="mb-4 w-100"
+        ></textarea>
+    </span>
+    <span>
+        <label for="descriptionLength" class="mb-1">Description Length</label>
+        <input
+            name="descriptionLength"
+            id="descriptionLength"
+            placeholder="Description length"
+            [defaultValue]="'Description max. 2-3 sentences'"
+            class="mb-4 w-100"
+        />
+    </span>
+    <span>
+        <label for="additionalInstructions" class="mb-1">Additional Instructions</label>
+        <textarea
+            name="additionalInstructions"
+            id="additionalInstructions"
+            placeholder="Provide any additional instructions for the extractor here."
+            class="w-100"
+        ></textarea>
+    </span>
+
+    <nc-button type="submit" variant="dark" class="w-100">
+        {{ submitting ? 'Loading... (this might take a bit)' : 'Get Sample Extraction' }}
+    </nc-button>
+    <nc-button type="button" variant="outline" class="w-100 mt-1" (click)="saveDescription()">
+        Save Description
+    </nc-button>
+    <nc-button type="button" variant="outline" class="w-100 mt-1" (click)="clearDescription()">
+        Clear Description
+    </nc-button>
+</form>

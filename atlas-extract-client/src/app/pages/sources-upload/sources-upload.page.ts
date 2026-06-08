@@ -31,6 +31,7 @@ export class SourcesUploadPage implements OnInit, OnDestroy {
     public formId: string = 'source-upload-form';
     public sourceType: string = "pdf";
     public submitting: boolean = false;
+    public uploadComplete: boolean = false;
 
 
     ngOnInit(): void {
@@ -83,6 +84,7 @@ export class SourcesUploadPage implements OnInit, OnDestroy {
         }
 
         this.submitting = false;
+        this.uploadComplete = false;
         this.formService.clearFormValues(this.formId);
     }
 
@@ -92,6 +94,7 @@ export class SourcesUploadPage implements OnInit, OnDestroy {
         const formValues = this.formService.getFormValues(this.formId);
         if (!this.checkPdfForm(formValues)) return;
         this.submitting = true;
+        this.uploadComplete = false;
         const file: File = (formValues['file'] as File[])[0];
 
         let uploadId: string | null = null;
@@ -111,6 +114,8 @@ export class SourcesUploadPage implements OnInit, OnDestroy {
                 url:          '',
                 objectKey,
             });
+            this.uploadComplete = true;
+            setTimeout(() => this.uploadService.messages.next([]), 2000);
         } catch (err) {
             // Abort the multipart upload so S3 doesn't hold partial parts
             if (uploadId && objectKey) {

@@ -1,0 +1,35 @@
+<nc-card class="p-4 mb-4">
+    <h2 class="section-title-light mb-2">Start extraction</h2>
+    <p class="section-subtitle-light mb-4">If you are satisfied with the result, choose page ranges you'd like to extract from and click 'Start Extraction'</p>
+
+    <!-- warning box -->
+    <div
+        class="flex items-center gap-3 p-3 mb-4 border"
+        style="border-radius: var(--nc-border-radius); background-color: #fff7ed; border-color: #fdba74; color: #9a3412;"
+    >
+        <nc-warning-icon [size]="18" color="#f97316" [style]="{'flex-shrink': '0', 'margin-top': '2px'}" />
+        <p class="text-sm">
+            Extracting all pages at once is <strong>expensive</strong> and leads to <strong>poor results</strong> —
+            the AI processes large amounts of irrelevant text and loses accuracy.
+            Pick only the page ranges that contain the content you want to extract.
+        </p>
+    </div>
+
+    <form class="w-100" [id]="formId">
+        <label for="friendlyName" class="mb-1">Friendly Name</label>
+        <input 
+            id="friendlyName"
+            name="friendlyName"
+            placeholder="Short name to easily identify this extraction by"
+            class="mb-4 w-100"
+        />
+        <label for="pageRanges" class="mb-1">Page Ranges</label>
+        <textarea
+            id="pageRanges"
+            name="pageRanges"
+            placeholder="e.g. 4-55, 83-91, 120-134"
+            class="mb-4 w-100"
+        ></textarea>
+        <nc-button class="w-100">Start Extraction</nc-button>
+    </form>
+</nc-card>

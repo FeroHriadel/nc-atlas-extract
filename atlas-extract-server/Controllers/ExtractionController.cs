@@ -64,6 +64,7 @@ public class ExtractionController(
         var requiredFields = new[]
         {
             new RequiredField { Name = "sourceId", Type = "string" },
+            new RequiredField { Name = "friendlyName", Type = "string" },
             new RequiredField { Name = "sourceLanguage", Type = "string" },
             new RequiredField { Name = "sourceTopic", Type = "string" },
             new RequiredField { Name = "structureDescription", Type = "string" },
@@ -92,6 +93,7 @@ public class ExtractionController(
             var extraction = new Extraction
             {
                 Id                   = extractionId,
+                FriendlyName         = req.FriendlyName,
                 SourceId             = req.SourceId,
                 SourceS3Key          = source.ObjectKey,
                 SourceLanguage       = req.SourceLanguage,

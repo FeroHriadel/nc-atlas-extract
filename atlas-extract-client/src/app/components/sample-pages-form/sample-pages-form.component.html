@@ -1,0 +1,34 @@
+<h2 class="section-title-light">Extract Sample Pages</h2>
+<p class="section-subtitle-light mb-4">Choose a few consecutive pages with the content you'd like to extract and then fill out the form below.</p>
+
+<form class="page-range-form flex flex-col">
+    <label for="startPage" class="mb-1">Start Page</label>
+    <input
+        #startPageInput
+        id="startPage"
+        type="number"
+        min="1"
+        [max]="totalPages"
+        class="border px-2 py-1 text-sm mb-4 w-100"
+        placeholder="Start page"
+        style="text-indent: 0.5rem;"
+        [defaultValue]="1"
+    />
+
+    <label for="endPage" class="mb-1">End Page</label>
+    <input
+        #endPageInput
+        id="endPage"
+        type="number"
+        min="1"
+        [max]="totalPages"
+        class="border px-2 py-1 text-sm mb-4 w-100"
+        placeholder="End page"
+        style="text-indent: 0.5rem;"
+        [defaultValue]="3"
+    />
+
+    <nc-button class="w-100 mb-4" (click)="getSampleText(startPageInput.value, endPageInput.value)">
+        Get Text Sample
+    </nc-button>
+</form>

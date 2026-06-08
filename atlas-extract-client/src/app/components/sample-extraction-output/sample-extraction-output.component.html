@@ -1,0 +1,11 @@
+<div
+    id="sample-extraction-output"
+    class="p-4 border mb-4"
+    style="border-radius: var(--nc-border-radius); background-color: var(--nc-bg-color); color: var(--nc-text-color-light); box-shadow: var(--nc-box-shadow);"
+>
+    <h3 class="section-title-light mb-2">Sample Extraction Output</h3>
+    <p class="section-subtitle-light mb-4">This is what the extractor extracts based on the sample text and your description. Review it to see if it matches your expectations.</p>
+    <pre class="text-sm whitespace-pre-wrap mb-4">
+        {{ extractionService.extractSampleRes$ | async | json }}
+    </pre>
+</div>

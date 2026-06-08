@@ -1,0 +1,13 @@
+<div
+    class="p-4 border"
+    style="border-radius: var(--nc-border-radius); background-color: var(--nc-bg-color); color: var(--nc-text-color-light); box-shadow: var(--nc-box-shadow); height: 100%;"
+>
+    <h3 class="section-title-light mb-2">Sample Text Output</h3>
+    <p class="section-subtitle-light mb-4">Extractor sees the document like this. Review the text and help it understand the structure</p>
+    @if (loading) {
+        <p class="text-sm">Loading... (this might take a bit)</p>
+    }
+    @if (sampleText && !loading) {
+        <pre class="text-sm whitespace-pre-wrap">{{ sampleText }}</pre>
+    }
+</div>

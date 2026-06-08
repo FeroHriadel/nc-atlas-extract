@@ -5,6 +5,7 @@ namespace App.Dtos;
 public class Extraction
 {
     public required string Id { get; set; }
+    public required string FriendlyName { get; set; }
     public required PageRange[] Pages { get; set; }
     public required string SourceId { get; set; }
     public required string SourceLanguage { get; set; }

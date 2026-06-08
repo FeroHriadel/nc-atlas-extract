@@ -34,10 +34,15 @@
                     <span>{{message}}</span>
                 </div>
             }
-            @if (submitting) {
-                <nc-button variant="red" class="mt-4 mr-1"  (click)="onAbort()">Abort</nc-button>
+            @if (submitting && !uploadComplete) {
+                <nc-button variant="red" class="mt-4 mr-1" (click)="onAbort()">Abort</nc-button>
             }
-            @if (!submitting) {
+            @if (uploadComplete) {
+                <a routerLink="/sources">
+                    <nc-button variant="dark" class="mt-4 mr-1">Go to Sources</nc-button>
+                </a>
+            }
+            @if (!submitting && !uploadComplete) {
                 <a routerLink="/sources">
                     <nc-button class="mt-4 mr-1">Back to Sources</nc-button>
                 </a>

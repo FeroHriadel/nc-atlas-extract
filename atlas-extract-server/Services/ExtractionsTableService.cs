@@ -45,6 +45,7 @@ public class ExtractionsTableService(IAmazonDynamoDB dynamo, IConfiguration conf
     {
         ["id"]                   = new() { S = e.Id },
         ["sourceId"]             = new() { S = e.SourceId },
+        ["friendlyName"]         = new() { S = e.FriendlyName },
         ["sourceLanguage"]       = new() { S = e.SourceLanguage },
         ["sourceTopic"]          = new() { S = e.SourceTopic },
         ["structureDescription"] = new() { S = e.StructureDescription },
@@ -89,6 +90,7 @@ public class ExtractionsTableService(IAmazonDynamoDB dynamo, IConfiguration conf
     private static Extraction MapToExtraction(Dictionary<string, AttributeValue> item) => new()
     {
         Id                   = item["id"].S,
+        FriendlyName         = item["friendlyName"].S,
         SourceId             = item["sourceId"].S,
         SourceLanguage       = item["sourceLanguage"].S,
         SourceTopic          = item["sourceTopic"].S,
