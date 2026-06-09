@@ -7,5 +7,4 @@ namespace App.Interfaces;
 public interface IExtractionService
 {
     Task<ExtractRes> Extract(ExtractReq req);
-    Task<Extraction> GetExtraction(string extractionId);
 }

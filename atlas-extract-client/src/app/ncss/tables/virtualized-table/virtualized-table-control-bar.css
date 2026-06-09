@@ -5,19 +5,15 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   padding: 0.5rem;
   border: 1px solid var(--nc-border-color);
   background-color: var(--nc-input-bg);
   border-radius: 0.375rem;
   margin-bottom: 0.25rem;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
 }
 
-.virtualized-table-control-bar::-webkit-scrollbar {
-  display: none;
-}
 
 .virtualized-table-control-bar-left {
   display: flex;

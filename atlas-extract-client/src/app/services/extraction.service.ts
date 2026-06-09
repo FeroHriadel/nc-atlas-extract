@@ -37,6 +37,11 @@ export class ExtractionService {
     private extraction: BehaviorSubject<Extraction | null> = new BehaviorSubject<Extraction | null>(null);
     public extraction$ = this.extraction.asObservable()
 
+    private extractionListLoading: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    public extractionListLoading$ = this.extractionListLoading.asObservable();
+    private extractionList: BehaviorSubject<Extraction[] | null> = new BehaviorSubject<Extraction[] | null>(null);
+    public extractionList$ = this.extractionList.asObservable();
+
 
 
 
@@ -97,7 +102,23 @@ export class ExtractionService {
                     this.extractionLoading.next(false);
                 }
             });
+    }
 
+    public getExtractionList(): void {
+        this.extractionListLoading.next(true);
+        this.http.get<Extraction[]>(`${this.apiUrl}/extraction/extractions`)
+            .subscribe({
+                next: (res: Extraction[]) => {
+                    this.extractionList.next(res);
+                },
+                error: (err) => {
+                    this.toastService.error({text: 'Failed to get extraction list', duration: 3000});
+                    console.error('Error getting extraction list:', err);
+                },
+                complete: () => {
+                    this.extractionListLoading.next(false);
+                }
+            });
     }
 
     

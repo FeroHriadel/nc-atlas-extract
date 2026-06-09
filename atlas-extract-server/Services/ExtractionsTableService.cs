@@ -40,6 +40,18 @@ public class ExtractionsTableService(IAmazonDynamoDB dynamo, IConfiguration conf
     }
 
 
+    public async Task<Extraction[]> GetExtractionsAsync()
+    {
+        var response = await dynamo.ScanAsync(new ScanRequest
+        {
+            TableName = TableName,
+        });
+        if (response.Items == null || response.Items.Count == 0) throw new KeyNotFoundException($"No extractions found");
+        // return all extractions sorted by CreatedAt desc
+        return response.Items.Select(MapToExtraction).OrderByDescending(e => e.CreatedAt).ToArray();
+    }
+
+
 
     private static Dictionary<string, AttributeValue> ToItem(Extraction e) => new()
     {

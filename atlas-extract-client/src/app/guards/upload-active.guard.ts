@@ -7,18 +7,13 @@ import { UploadService } from '../services/upload.service';
 export const uploadActiveGuard: CanDeactivateFn<unknown> = async () => {
     const uploadService = inject(UploadService);
 
-    if (!uploadService.isUploading.getValue()) return true;
+    if (!uploadService.isUploadingNow) return true;
 
     const confirmed = confirm(
         'An upload is in progress. Navigating away will abort it. Leave anyway?'
     );
 
-    if (confirmed && uploadService.activeUploadId && uploadService.activeObjectKey) {
-        await uploadService.abortUpload(
-            uploadService.activeUploadId,
-            uploadService.activeObjectKey
-        );
-    }
+    if (confirmed) await uploadService.tryAbort();
 
     return confirmed;
 };

@@ -1,29 +1,24 @@
 import { Component, inject, OnInit } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Card } from "../../ncss/cards/card/card.component";
 import { AppContainer } from "../../components/app-container/app-container.component";
-import { SourcesService } from '../../services/sources.service';
-import { AsyncPipe } from '@angular/common';
-
-import { RouterLink } from '@angular/router';
 import { Button } from "../../ncss/buttons/button/button.component";
+import { SourcesService } from '../../services/sources.service';
 
 
 
 @Component({
-  selector: 'app-extracted-data',
+  selector: 'app-extract-data',
   imports: [Card, AppContainer, AsyncPipe, RouterLink, Button],
   templateUrl: './extract-data.page.html',
   styleUrl: './extract-data.page.css',
 })
-
-
-
 export class ExtractDataPage implements OnInit {
-  private sourcesService = inject(SourcesService);
-  public sources$ = this.sourcesService.sources$;
+  private readonly sourcesService = inject(SourcesService);
+  protected sources$ = this.sourcesService.sources$;
 
   ngOnInit(): void {
     this.sourcesService.getSources();
   }
-
 }

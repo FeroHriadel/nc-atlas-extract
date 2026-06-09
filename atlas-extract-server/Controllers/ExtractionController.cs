@@ -138,7 +138,7 @@ public class ExtractionController(
 
     // GET EXTRACTION BY ID (for FE polling) => GET /api/extraction/{id}
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetExtraction(string id)
+    public async Task<IActionResult> GetExtractionAsync(string id)
     {
         try
         {
@@ -153,6 +153,28 @@ public class ExtractionController(
         {
             logger.LogError(ex, "Error fetching extraction {ExtractionId}", id);
             return StatusCode(500, new ErrorRes { StatusCode = 500, Message = "An error occurred while fetching the extraction." });
+        }
+    }
+
+
+
+    // GET ALL EXTRACTIONS => GET /api/extractions
+    [HttpGet("extractions")]
+    public async Task<IActionResult> GetExtractions()
+    {
+        try
+        {
+            var extractions = await extractionsTableService.GetExtractionsAsync();
+            return Ok(extractions);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound(new ErrorRes { StatusCode = 404, Message = $"No extractions found." });
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error fetching extractions");
+            return StatusCode(500, new ErrorRes { StatusCode = 500, Message = "An error occurred while fetching extractions." });
         }
     }
 }

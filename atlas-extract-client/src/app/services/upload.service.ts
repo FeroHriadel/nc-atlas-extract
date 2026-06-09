@@ -22,28 +22,34 @@ export interface UploadPart {
 
 
 export class UploadService {
-    private http = inject(HttpClient);
-    private toastService = inject(ToastService);
-    private apiUrl = environment.apiUrl;
+    private readonly http = inject(HttpClient);
+    private readonly toastService = inject(ToastService);
+    private readonly apiUrl = environment.apiUrl;
     private readonly CHUNK_SIZE = 5 * 1024 * 1024; // 5MB — S3 minimum part size
 
-    public isUploading = new BehaviorSubject<boolean>(false);
-    public uploadProgress = new BehaviorSubject<{ uploaded: number; total: number }>({ uploaded: 0, total: 0 });
-    public messages = new BehaviorSubject<string[]>([]);
+    private readonly _isUploading = new BehaviorSubject<boolean>(false);
+    private readonly _uploadProgress = new BehaviorSubject<{ uploaded: number; total: number }>({ uploaded: 0, total: 0 });
+    private readonly _messages = new BehaviorSubject<string[]>([]);
 
-    // Track the active upload so abort can be called from anywhere (e.g. on navigation)
-    public activeUploadId: string | null = null;
-    public activeObjectKey: string | null = null;
+    public readonly isUploading$ = this._isUploading.asObservable();
+    public readonly uploadProgress$ = this._uploadProgress.asObservable();
+    public readonly messages$ = this._messages.asObservable();
 
+    private activeUploadId: string | null = null;
+    private activeObjectKey: string | null = null;
+
+    get isUploadingNow(): boolean {
+        return this._isUploading.value;
+    }
 
 
     public async initUpload(file: File): Promise<InitUploadRes> {
-        if (this.isUploading.value) {
+        if (this._isUploading.value) {
             this.toastService.error({ text: "An upload is already in progress. Please wait for it to finish before starting a new one." });
             throw new Error("Upload already in progress");
         }
-        this.isUploading.next(true);
-        this.messages.next([...this.messages.value, "Initializing upload..."]);
+        this._isUploading.next(true);
+        this._messages.next([...this._messages.value, "Initializing upload..."]);
 
         const req: InitUploadReq = { fileName: file.name, contentType: file.type };
 
@@ -53,17 +59,16 @@ export class UploadService {
             );
             this.activeUploadId = res.uploadId;
             this.activeObjectKey = res.objectKey;
-            this.messages.next([...this.messages.value, "Upload initialized. Uploading file parts..."]);
+            this._messages.next([...this._messages.value, "Upload initialized. Uploading file parts..."]);
             return res;
         } catch (err) {
             this.toastService.error({ text: "Failed to initialize upload." });
-            this.isUploading.next(false);
+            this._isUploading.next(false);
             throw err;
         }
     }
 
 
-    // Split file into CHUNK_SIZE blobs
     private chunkFile(file: File): Blob[] {
         const chunks: Blob[] = [];
         let start = 0;
@@ -74,7 +79,6 @@ export class UploadService {
         return chunks;
     }
 
-    // Fetch a presigned S3 URL for one part from BE
     private async getPresignedUrl(uploadId: string, objectKey: string, partNumber: number): Promise<string> {
         const params = new URLSearchParams({ uploadId, objectKey, partNumber: String(partNumber) });
         const res = await firstValueFrom(
@@ -83,8 +87,6 @@ export class UploadService {
         return res.url;
     }
 
-
-    // PUT one chunk directly to S3 via presigned URL, return its ETag
     private async uploadChunk(presignedUrl: string, chunk: Blob, partNumber: number): Promise<UploadPart> {
         const response = await fetch(presignedUrl, { method: 'PUT', body: chunk });
         if (!response.ok) throw new Error(`Part ${partNumber} upload failed: ${response.statusText}`);
@@ -94,20 +96,21 @@ export class UploadService {
     }
 
 
-    // Upload all parts in parallel, updating progress as each one completes
     public async uploadParts(file: File, uploadId: string, objectKey: string): Promise<UploadPart[]> {
         const chunks = this.chunkFile(file);
-        this.uploadProgress.next({ uploaded: 0, total: chunks.length });
+        const total = chunks.length;
+        let uploadedCount = 0;
+        this._uploadProgress.next({ uploaded: 0, total });
 
         const parts = await Promise.all(
             chunks.map(async (chunk, i) => {
                 const partNumber = i + 1;
                 const presignedUrl = await this.getPresignedUrl(uploadId, objectKey, partNumber);
                 const part = await this.uploadChunk(presignedUrl, chunk, partNumber);
-                const uploaded = this.uploadProgress.value.uploaded + 1;
-                this.uploadProgress.next({ uploaded, total: chunks.length });
-                const pct = Math.round((uploaded / chunks.length) * 100);
-                this.messages.next([...this.messages.value, `Uploaded ${pct}%`]);
+                uploadedCount++;
+                this._uploadProgress.next({ uploaded: uploadedCount, total });
+                const pct = Math.round((uploadedCount / total) * 100);
+                this._messages.next([...this._messages.value, `Uploaded ${pct}%`]);
                 return part;
             })
         );
@@ -116,29 +119,33 @@ export class UploadService {
     }
 
 
-
     public async completeUpload(uploadId: string, objectKey: string, parts: UploadPart[]): Promise<void> {
-        this.messages.next([...this.messages.value, "Completing upload..."]);
-
+        this._messages.next([...this._messages.value, "Completing upload..."]);
         try {
             await firstValueFrom(
                 this.http.post(`${this.apiUrl}/sources/complete-upload`, { uploadId, objectKey, parts })
             );
-            this.messages.next([...this.messages.value, "Upload complete!"]);
+            this._messages.next([...this._messages.value, "Upload complete!"]);
         } catch (err) {
             this.toastService.error({ text: "Failed to complete upload." });
             throw err;
         } finally {
-            this.isUploading.next(false);
+            this._isUploading.next(false);
             this.activeUploadId = null;
             this.activeObjectKey = null;
-            // Note: messages are intentionally kept so the user can read "Upload complete!"
         }
     }
 
 
+    public async tryAbort(): Promise<void> {
+        if (this.activeUploadId && this.activeObjectKey) {
+            await this.abortUpload(this.activeUploadId, this.activeObjectKey);
+        } else {
+            this.reset();
+        }
+    }
 
-    public async abortUpload(uploadId: string, objectKey: string): Promise<void> {
+    private async abortUpload(uploadId: string, objectKey: string): Promise<void> {
         try {
             const params = new URLSearchParams({ uploadId, objectKey });
             await firstValueFrom(
@@ -152,13 +159,10 @@ export class UploadService {
     }
 
     public reset(): void {
-        this.isUploading.next(false);
-        this.uploadProgress.next({ uploaded: 0, total: 0 });
-        this.messages.next([]);
+        this._isUploading.next(false);
+        this._uploadProgress.next({ uploaded: 0, total: 0 });
+        this._messages.next([]);
         this.activeUploadId = null;
         this.activeObjectKey = null;
     }
-
-
-
 }

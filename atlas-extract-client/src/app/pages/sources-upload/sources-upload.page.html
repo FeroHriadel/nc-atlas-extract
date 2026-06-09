@@ -28,7 +28,7 @@
                     </span>
                 </div>
             }
-            @for (message of uploadService.messages | async; track message) {
+            @for (message of messages$ | async; track message) {
                 <div class="text flex align-center gap-2 mb-1">
                     <nc-check-icon [size]="20"></nc-check-icon>
                     <span>{{message}}</span>

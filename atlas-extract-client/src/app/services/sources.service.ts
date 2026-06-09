@@ -15,10 +15,10 @@ import { CreateSourceReq } from "../types/CreateSourceReq";
 
 
 export class SourcesService {
-    private apiUrl = environment.apiUrl;
+    private readonly apiUrl = environment.apiUrl;
     private toast = inject(ToastService);
     private http = inject(HttpClient);
-    private sources = new BehaviorSubject<Source[]>([]);
+    private readonly sources = new BehaviorSubject<Source[]>([]);
     public sources$ = this.sources.asObservable();
 
 
@@ -30,8 +30,8 @@ export class SourcesService {
     getSources(): void {
         this.http.get<{sources: Source[]}>(`${this.apiUrl}/sources`).subscribe({
             next: data => this.sources.next(data.sources),
-            error: (er) => {
-                console.error('Error fetching sources:', er);
+            error: err => {
+                console.error('Error fetching sources:', err);
                 this.toast.error({text: 'Failed to load sources.'});
             }
         });
@@ -39,15 +39,13 @@ export class SourcesService {
 
     findSourceById(id: string): Source | undefined {
         const source = this.sources.getValue().find(s => s.id === id);
-        if (!source) {
-            this.toast.error({ text: 'Source not found.' });
-        }
+        if (!source) this.toast.error({ text: 'Source not found.' });
         return source;
     }
 
     async createSource(req: CreateSourceReq): Promise<Source> {
         try {
-            const res = await firstValueFrom( //firstValueFrom converts Observable to Promise and resolves with the first emitted value
+            const res = await firstValueFrom(
                 this.http.post<{ source: Source }>(`${this.apiUrl}/sources`, req)
             );
             return res.source;
@@ -58,17 +56,16 @@ export class SourcesService {
     }
 
     async updateSource(id: string, req: Partial<CreateSourceReq>): Promise<Source> {
-        const previous = this.sources.getValue(); // get current sources list snapshot
-        const original = previous.find(s => s.id === id)!;
-        const merged = { ...original, ...req };   // full object the backend requires
-        this.sources.next(previous.map(s => s.id === id ? merged : s)); //optimistically update the source in the list
+        const previous = this.sources.getValue();
+        const merged = { ...previous.find(s => s.id === id)!, ...req };
+        this.sources.next(previous.map(s => s.id === id ? merged : s));
         try {
             const res = await firstValueFrom(
                 this.http.put<{ source: Source }>(`${this.apiUrl}/sources/${id}`, merged)
             );
             return res.source;
         } catch (err) {
-            this.sources.next(previous); // revert optimistic update on failure
+            this.sources.next(previous);
             this.toast.error({ text: 'Failed to update source record.' });
             throw err;
         }
@@ -78,16 +75,13 @@ export class SourcesService {
         const previous = this.sources.getValue();
         this.sources.next(previous.filter(s => s.id !== id));
         try {
-            await firstValueFrom(
-                this.http.delete(`${this.apiUrl}/sources/${id}`)
-            );
+            await firstValueFrom(this.http.delete(`${this.apiUrl}/sources/${id}`));
         } catch (err) {
             this.sources.next(previous);
             this.toast.error({ text: 'Failed to delete source.' });
             throw err;
         }
     }
-
 
     async getSourceUrl(id: string): Promise<string> {
         try {

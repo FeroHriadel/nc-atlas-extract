@@ -1,0 +1,21 @@
+<app-container>
+    <nc-card class="p-4 mb-6">
+        <h1 class="page-title text-left">Extractions List</h1>
+        <p class="page-subtitle text-left">List of extractions made from Sources.</p>
+    </nc-card>
+
+    <nc-card class="p-4">
+        <h2 class="section-title-light mb-4">Extractions Table</h2>
+        <nc-virtualized-table
+            [data]="(tableData$ | async) ?? []"
+            [columnsConfig]="columnsConfig"
+            [controls]="true"
+        />
+    </nc-card>
+</app-container>
+
+<ng-template #statusCell let-row="row">
+    <nc-pill size="small" [style]="statusStyles[row.status] || statusStyles['pending']">
+        {{ row.status }}
+    </nc-pill>
+</ng-template>

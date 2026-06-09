@@ -1,11 +1,11 @@
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
+import { filter, take } from 'rxjs/operators';
 import { AppContainer } from "../../components/app-container/app-container.component";
 import { Card } from "../../ncss/cards/card/card.component";
 import { Source } from '../../types/Source';
 import { SourcesService } from '../../services/sources.service';
-import { ActivatedRoute } from '@angular/router';
-import { filter, take } from 'rxjs/operators';
-import { AsyncPipe } from '@angular/common';
 import { ExtractionService } from '../../services/extraction.service';
 import { PdfPreviewComponent } from '../../components/pdf-preview/pdf-preview.component';
 import { SamplePagesFormComponent } from '../../components/sample-pages-form/sample-pages-form.component';
@@ -25,18 +25,18 @@ import { InitExtractionFormComponent } from '../../components/init-extraction-fo
   styleUrl: './init-extraction.page.css',
 })
 export class InitExtractionPage implements OnInit {
-  private sourcesService = inject(SourcesService);
-  private route = inject(ActivatedRoute);
-  private cdr = inject(ChangeDetectorRef);
-  public extractionService = inject(ExtractionService);
+  private readonly sourcesService = inject(SourcesService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly cdr = inject(ChangeDetectorRef);
+  protected readonly extractionService = inject(ExtractionService);
 
-  public source: Source | null = null;
-  public sourceNotFound = false;
-  public sourceUrl: string | null = null;
-  public totalPages = 0;
-  public sampleText = '';
-  public sampleTextLoading = false;
-  public skipped = false;
+  protected source: Source | null = null;
+  protected sourceNotFound = false;
+  protected sourceUrl: string | null = null;
+  protected totalPages = 0;
+  protected sampleText = '';
+  protected sampleTextLoading = false;
+  protected skipped = false;
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -46,28 +46,27 @@ export class InitExtractionPage implements OnInit {
       take(1)
     ).subscribe(sources => {
       this.source = sources.find(s => s.id === id) ?? null;
-      if (this.source?.type === 'pdf') {
+      if (!this.source) { this.sourceNotFound = true; return; }
+      if (this.source.type === 'pdf') {
         this.sourcesService.getSourceUrl(this.source.id)
           .then(url => { this.sourceUrl = url; this.cdr.detectChanges(); })
           .catch(() => { this.sourceUrl = null; this.cdr.detectChanges(); });
       }
-      if (!this.source) this.sourceNotFound = true;
     });
   }
 
-  // pdf.js work happens outside Angular's zone, so the page's own change
-  // detector must be poked to refresh sibling components bound to this state
-  public onSampleTextChange(text: string): void {
+  // pdf.js callbacks run outside Angular's zone — manual detectChanges required
+  protected onSampleTextChange(text: string): void {
     this.sampleText = text;
     this.cdr.detectChanges();
   }
 
-  public onSampleTextLoadingChange(loading: boolean): void {
+  protected onSampleTextLoadingChange(loading: boolean): void {
     this.sampleTextLoading = loading;
     this.cdr.detectChanges();
   }
 
-  public onSkip(): void {
+  protected onSkip(): void {
     this.skipped = true;
   }
 }

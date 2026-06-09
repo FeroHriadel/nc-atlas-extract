@@ -19,7 +19,8 @@
 }
 
 .virtualized-table-header-table {
-  width: 100%;
+  min-width: 100%;
+  width: fit-content;
   display: block;
   height: 100%;
 }

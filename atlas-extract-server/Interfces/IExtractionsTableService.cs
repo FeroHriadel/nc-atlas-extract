@@ -10,4 +10,5 @@ public interface IExtractionsTableService
 {
     Task CreateExtractionAsync(Extraction extraction);
     Task<Extraction> GetExtractionAsync(string id);
+    Task<Extraction[]> GetExtractionsAsync();
 }

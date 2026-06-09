@@ -43,8 +43,8 @@
       </a>
     </li>
     <li>
-      <a class="block" routerLink="/extracted-data" [style]="{width: '100%'}">
-        <nc-button variant="outline" class="w-100 mb-1">Extracted Data</nc-button>
+      <a class="block" routerLink="/extractions" [style]="{width: '100%'}">
+        <nc-button variant="outline" class="w-100 mb-1">Extractions</nc-button>
       </a>
     </li>
   </ul>
@@ -52,5 +52,9 @@
 
 <!-- main content -->
 <div class="app-wrap">
-  <router-outlet></router-outlet>
+  @if (isLoadingPage()) {
+    <app-page-loader />
+  } @else {
+    <router-outlet></router-outlet>
+  }
 </div>
