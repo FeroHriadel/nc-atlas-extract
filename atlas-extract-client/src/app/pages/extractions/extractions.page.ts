@@ -1,9 +1,11 @@
 import { Component, inject, OnInit, AfterViewInit, ViewChild, TemplateRef, ChangeDetectorRef } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { Card } from '../../ncss/cards/card/card.component';
 import { AppContainer } from '../../components/app-container/app-container.component';
 import { Pill } from '../../ncss/pills/pill/pill.component';
+import { Button } from '../../ncss/buttons/button/button.component';
 import { VirtualizedTable, VirtualizedTableProps } from '../../ncss/tables/virtualized-table/virtualized-table';
 import { ExtractionService } from '../../services/extraction.service';
 import { Extraction } from '../../types/Extraction';
@@ -14,10 +16,11 @@ import { Extraction } from '../../types/Extraction';
   selector: 'app-extractions',
   templateUrl: './extractions.page.html',
   styleUrls: ['./extractions.page.css'],
-  imports: [AppContainer, Card, AsyncPipe, VirtualizedTable, Pill]
+  imports: [AppContainer, Card, AsyncPipe, VirtualizedTable, Pill, Button, RouterLink]
 })
 export class ExtractionsPage implements OnInit, AfterViewInit {
-    @ViewChild('statusCell') private statusCellTpl!: TemplateRef<any>;
+    @ViewChild('statusCell')   private statusCellTpl!:   TemplateRef<any>;
+    @ViewChild('viewDataCell') private viewDataCellTpl!: TemplateRef<any>;
 
     private readonly extractionService = inject(ExtractionService);
     private readonly cdr = inject(ChangeDetectorRef);
@@ -26,6 +29,7 @@ export class ExtractionsPage implements OnInit, AfterViewInit {
 
     protected readonly tableData$ = this.extractionService.extractionList$.pipe(
         map((list: Extraction[] | null) => (list ?? []).map(e => ({
+            id:          e.id,
             name:        e.friendlyName,
             status:      e.status,
             batches:     `${e.completedBatches}/${e.totalBatches} completed` + (e.failedBatches > 0 ? `, ${e.failedBatches} failed` : ''),
@@ -52,6 +56,7 @@ export class ExtractionsPage implements OnInit, AfterViewInit {
             { column: 'batches',     displayValue: 'Batches',      width: '200px' },
             { column: 'created',     displayValue: 'Created',      width: '150px' },
             { column: 'completedAt', displayValue: 'Completed At', width: '150px' },
+            { column: 'viewData',    displayValue: 'View Data',    width: '130px', template: this.viewDataCellTpl },
         ];
         this.cdr.detectChanges();
     }

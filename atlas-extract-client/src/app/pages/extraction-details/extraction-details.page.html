@@ -1,0 +1,80 @@
+<app-container>
+    <!-- title -->
+    <nc-card class="p-4 mb-6">
+        <h1 class="page-title">Extraction Details</h1>
+        <p class="page-subtitle">View extraction data</p>
+    </nc-card>
+
+    <!-- extraction info -->
+    <nc-card class="p-4 mb-6">
+        <h2 class="section-title-light mb-4">Extraction Data</h2>
+        @if (extraction) {
+            <dl class="info-grid">
+                <dt>Name</dt>
+                <dd>{{ extraction.friendlyName }}</dd>
+
+                <dt>Status</dt>
+                <dd>
+                    <nc-pill size="small" [style]="statusStyles[extraction.status] || statusStyles['pending']">
+                        {{ extraction.status }}
+                    </nc-pill>
+                </dd>
+
+                <dt>Language</dt>
+                <dd>{{ extraction.sourceLanguage }}</dd>
+
+                <dt>Topic</dt>
+                <dd>{{ extraction.sourceTopic }}</dd>
+
+                <dt>Structure</dt>
+                <dd>{{ extraction.structureDescription }}</dd>
+
+                <dt>Length</dt>
+                <dd>{{ extraction.descriptionLength }}</dd>
+
+                <dt>Batches</dt>
+                <dd>{{ extraction.completedBatches }}/{{ extraction.totalBatches }} completed
+                    @if (extraction.failedBatches > 0) {
+                        , {{ extraction.failedBatches }} failed
+                    }
+                </dd>
+
+                <dt>Created</dt>
+                <dd>{{ extraction.createdAt | date:'medium' }}</dd>
+
+                @if (extraction.completedAt) {
+                    <dt>Completed</dt>
+                    <dd>{{ extraction.completedAt | date:'medium' }}</dd>
+                }
+
+                @if (extraction.ignore) {
+                    <dt>Ignore</dt>
+                    <dd>{{ extraction.ignore }}</dd>
+                }
+
+                @if (extraction.additionalInstructions) {
+                    <dt>Notes</dt>
+                    <dd>{{ extraction.additionalInstructions }}</dd>
+                }
+            </dl>
+        } @else {
+            <p class="page-subtitle">Loading extraction info...</p>
+        }
+    </nc-card>
+
+    <!-- json results -->
+    <nc-card class="p-4 results-card">
+        <h2 class="section-title-light mb-4">Extracted Items</h2>
+        @if (isLoadingJson) {
+            <p class="page-subtitle">Loading results...</p>
+        } @else if (jsonError) {
+            <p class="page-subtitle">{{ jsonError }}</p>
+        } @else {
+            <nc-virtualized-table
+                [data]="tableData"
+                [columnsConfig]="columnsConfig"
+                [controls]="true"
+            />
+        }
+    </nc-card>
+</app-container>

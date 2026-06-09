@@ -49,15 +49,7 @@ export class VirtualizedTableFilterService {
     
     let result = data
       .filter(row => this.evaluateAllConditions(row, state.conditions))
-      .map(row => {
-        const filteredRow: any = {};
-        state.columnsFilter.forEach(columnKey => {
-          if (columnKey in row) {
-            filteredRow[columnKey] = row[columnKey];
-          }
-        });
-        return filteredRow;
-      });
+      .map(row => ({ ...row }));
 
     // Apply sorting
     if (state.sortColumn && state.sortDirection) {

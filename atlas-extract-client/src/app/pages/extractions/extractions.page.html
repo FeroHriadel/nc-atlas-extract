@@ -19,3 +19,11 @@
         {{ row.status }}
     </nc-pill>
 </ng-template>
+
+<ng-template #viewDataCell let-row="row">
+    @if (row.status === 'completed') {
+        <a [routerLink]="['/extraction-details', row.id]">
+            <nc-button size="small">Details</nc-button>
+        </a>
+    }
+</ng-template>

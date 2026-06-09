@@ -158,6 +158,41 @@ public class ExtractionController(
 
 
 
+    // GET PRESIGNED DOWNLOAD URLS FOR BATCH RESULT JSON FILES => GET /api/extraction/{id}/json
+    [HttpGet("{id}/json")]
+    public async Task<IActionResult> GetExtractionJsonUrls(string id)
+    {
+        Extraction extraction;
+        try { extraction = await extractionsTableService.GetExtractionAsync(id); }
+        catch (KeyNotFoundException) { return NotFound(new ErrorRes { StatusCode = 404, Message = $"Extraction {id} not found." }); }
+
+        try
+        {
+            var batches = new List<ExtractionBatchUrlRes>();
+            for (int i = 0; i < extraction.Batches.Length; i++)
+            {
+                var batch = extraction.Batches[i];
+                if (batch.S3ResultKey is null) continue;
+                var url = await s3Service.GetPresignedDownloadUrl(batch.S3ResultKey);
+                batches.Add(new ExtractionBatchUrlRes
+                {
+                    BatchIndex = i,
+                    StartPage  = batch.StartPage,
+                    EndPage    = batch.EndPage,
+                    Url        = url,
+                });
+            }
+            return Ok(new ExtractionJsonRes { ExtractionId = id, Batches = batches });
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error generating JSON URLs for extraction {ExtractionId}", id);
+            return StatusCode(500, new ErrorRes { StatusCode = 500, Message = "An error occurred while generating download URLs." });
+        }
+    }
+
+
+
     // GET ALL EXTRACTIONS => GET /api/extractions
     [HttpGet("extractions")]
     public async Task<IActionResult> GetExtractions()

@@ -8,6 +8,7 @@ import { ToastService } from '../ncss/services/toast.service';
 import { ExtractStartReq } from '../types/ExtractionStartReq';
 import { ExtractStartRes } from '../types/ExtractionStartRes';
 import { Extraction } from '../types/Extraction';
+import { ExtractionJsonRes } from '../types/ExtractionJsonRes';
 
 
 
@@ -41,6 +42,11 @@ export class ExtractionService {
     public extractionListLoading$ = this.extractionListLoading.asObservable();
     private extractionList: BehaviorSubject<Extraction[] | null> = new BehaviorSubject<Extraction[] | null>(null);
     public extractionList$ = this.extractionList.asObservable();
+
+    private extractionJsonLoading: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    public extractionJsonLoading$ = this.extractionJsonLoading.asObservable();
+    private extractionJson: BehaviorSubject<ExtractionJsonRes | null> = new BehaviorSubject<ExtractionJsonRes | null>(null);
+    public extractionJson$ = this.extractionJson.asObservable();
 
 
 
@@ -88,6 +94,7 @@ export class ExtractionService {
     }
 
     public getExtraction(extractionId: string): void{
+        this.extraction.next(null);
         this.extractionLoading.next(true);
         this.http.get<Extraction>(`${this.apiUrl}/extraction/${extractionId}`)
             .subscribe({
@@ -100,6 +107,24 @@ export class ExtractionService {
                 },
                 complete: () => {
                     this.extractionLoading.next(false);
+                }
+            });
+    }
+
+    public getExtractionJson(extractionId: string): void {
+        this.extractionJson.next(null);
+        this.extractionJsonLoading.next(true);
+        this.http.get<ExtractionJsonRes>(`${this.apiUrl}/extraction/${extractionId}/json`)
+            .subscribe({
+                next: (res: ExtractionJsonRes) => {
+                    this.extractionJson.next(res);
+                },
+                error: (err) => {
+                    this.toastService.error({ text: 'Failed to get extraction results', duration: 3000 });
+                    console.error('Error getting extraction JSON:', err);
+                },
+                complete: () => {
+                    this.extractionJsonLoading.next(false);
                 }
             });
     }

@@ -34,5 +34,9 @@ export const routes: Routes = [
         path: 'extractions',
         loadComponent: () => import('./pages/extractions/extractions.page').then(m => m.ExtractionsPage)
     },
+    {
+        path: 'extraction-details/:extractionId',
+        loadComponent: () => import('./pages/extraction-details/extraction-details.page').then(m => m.ExtractionDetailsPage)
+    },
     { path: '**', redirectTo: '' }
 ];
