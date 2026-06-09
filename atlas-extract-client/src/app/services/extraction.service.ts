@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ExtractSampleReq } from '../types/ExtractSampleReq';
 import { ExtractSampleRes } from '../types/ExtractSampleRes';
@@ -109,6 +109,18 @@ export class ExtractionService {
                     this.extractionLoading.next(false);
                 }
             });
+    }
+
+    async deleteExtraction(id: string): Promise<void> {
+        const previous = this.extractionList.getValue();
+        this.extractionList.next((previous ?? []).filter(e => e.id !== id));
+        try {
+            await firstValueFrom(this.http.delete(`${this.apiUrl}/extraction/${id}`));
+        } catch (err) {
+            this.extractionList.next(previous);
+            this.toastService.error({ text: 'Failed to delete extraction', duration: 3000 });
+            throw err;
+        }
     }
 
     public getExtractionJson(extractionId: string): void {

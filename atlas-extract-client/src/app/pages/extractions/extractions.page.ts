@@ -49,6 +49,15 @@ export class ExtractionsPage implements OnInit, AfterViewInit {
         this.extractionService.getExtractionList();
     }
 
+    protected async onDeleteExtraction(id: string): Promise<void> {
+        if (!confirm('Delete this extraction and all its S3 result files? This cannot be undone.')) return;
+        try {
+            await this.extractionService.deleteExtraction(id);
+        } catch {
+            // service handles rollback and error toast
+        }
+    }
+
     ngAfterViewInit(): void {
         this.columnsConfig = [
             { column: 'name',        displayValue: 'Name',         width: '300px' },
@@ -56,7 +65,7 @@ export class ExtractionsPage implements OnInit, AfterViewInit {
             { column: 'batches',     displayValue: 'Batches',      width: '200px' },
             { column: 'created',     displayValue: 'Created',      width: '150px' },
             { column: 'completedAt', displayValue: 'Completed At', width: '150px' },
-            { column: 'viewData',    displayValue: 'View Data',    width: '130px', template: this.viewDataCellTpl },
+            { column: 'actions',     displayValue: 'Actions',    width: '200px', template: this.viewDataCellTpl },
         ];
         this.cdr.detectChanges();
     }

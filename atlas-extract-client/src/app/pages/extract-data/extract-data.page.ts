@@ -21,4 +21,13 @@ export class ExtractDataPage implements OnInit {
   ngOnInit(): void {
     this.sourcesService.getSources();
   }
+
+  protected async onDeleteSource(id: string): Promise<void> {
+    if (!confirm('Delete this source? This cannot be undone.')) return;
+    try {
+      await this.sourcesService.deleteSource(id);
+    } catch {
+      // service handles rollback and error toast
+    }
+  }
 }

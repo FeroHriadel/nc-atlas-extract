@@ -158,6 +158,34 @@ public class ExtractionController(
 
 
 
+    // DELETE EXTRACTION => DELETE /api/extraction/{id}
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteExtractionAsync(string id)
+    {
+        Extraction extraction;
+        try { extraction = await extractionsTableService.GetExtractionAsync(id); }
+        catch (KeyNotFoundException) { return NotFound(new ErrorRes { StatusCode = 404, Message = $"Extraction {id} not found." }); }
+
+        try
+        {
+            // delete each batch result JSON from S3 (fire-and-forget errors — partial cleanup is acceptable)
+            var s3Deletions = extraction.Batches
+                .Where(b => b.S3ResultKey != null)
+                .Select(b => s3Service.DeleteSource(b.S3ResultKey!));
+            await Task.WhenAll(s3Deletions);
+
+            await extractionsTableService.DeleteExtractionAsync(id);
+            return Ok(new { message = $"Extraction {id} deleted." });
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error deleting extraction {ExtractionId}", id);
+            return StatusCode(500, new ErrorRes { StatusCode = 500, Message = "An error occurred while deleting the extraction." });
+        }
+    }
+
+
+
     // GET PRESIGNED DOWNLOAD URLS FOR BATCH RESULT JSON FILES => GET /api/extraction/{id}/json
     [HttpGet("{id}/json")]
     public async Task<IActionResult> GetExtractionJsonUrls(string id)

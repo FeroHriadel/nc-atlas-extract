@@ -9,9 +9,12 @@
     @for (source of (sources$ | async); track source.id) {
         <nc-card class="w-100 p-4 mb-4 flex justify-between align-center text">
             <h4 class="text-left">{{ source.friendlyName }}</h4>
-            <a [routerLink]="['/extract-data', source.id]">
-                <nc-button size="small">Extract Data</nc-button>
-            </a>
+            <div class="flex gap-2">
+                <nc-button size="small" variant="red" (click)="onDeleteSource(source.id)">Delete</nc-button>
+                <a [routerLink]="['/extract-data', source.id]">
+                    <nc-button size="small">Extract Data</nc-button>
+                </a>
+            </div>
         </nc-card>
     }
 

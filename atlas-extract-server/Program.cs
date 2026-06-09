@@ -25,6 +25,7 @@ if (app.Environment.IsDevelopment())
 
 // app configuration
 app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();

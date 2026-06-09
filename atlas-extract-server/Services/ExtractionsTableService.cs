@@ -40,6 +40,17 @@ public class ExtractionsTableService(IAmazonDynamoDB dynamo, IConfiguration conf
     }
 
 
+    public async Task DeleteExtractionAsync(string id)
+    {
+        await dynamo.DeleteItemAsync(new DeleteItemRequest
+        {
+            TableName = TableName,
+            Key = new Dictionary<string, AttributeValue> { ["id"] = new() { S = id } }
+        });
+    }
+
+
+
     public async Task<Extraction[]> GetExtractionsAsync()
     {
         var response = await dynamo.ScanAsync(new ScanRequest

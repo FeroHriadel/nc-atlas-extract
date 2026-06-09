@@ -39,6 +39,7 @@ public static class AppServiceExtensions
                 return new BadRequestObjectResult(new ErrorRes { StatusCode = 400, Message = string.Join(", ", errors) });
             };
         });
+        services.AddCognitoAuth(configuration);
         services.AddCors();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
