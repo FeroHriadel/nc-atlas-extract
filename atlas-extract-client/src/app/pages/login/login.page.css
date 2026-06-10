@@ -1,0 +1,25 @@
+.login-wrapper {
+    min-height: 100vh;
+    margin: auto;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    max-height: 600px;
+}
+
+.input-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.375rem;
+}
+
+.error-text {
+    color: var(--nc-color-error, #f87171);
+    font-size: 0.875rem;
+}

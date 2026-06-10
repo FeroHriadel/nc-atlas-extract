@@ -1,0 +1,67 @@
+<div class="login-wrapper">
+    <nc-card class="login-card p-6">
+
+        @if (challenge() === 'newPasswordRequired') {
+
+            <h1 class="page-title text-center mb-2">Set New Password</h1>
+            <p class="page-subtitle text-center mb-6">Your temporary password has expired. Please set a new one.</p>
+
+            <form (submit)="$event.preventDefault(); onSetNewPassword()">
+                <label class="input-label">New Password</label>
+                <nc-password
+                    class="mb-4 w-100"
+                    placeholder="New password"
+                    [value]="newPassword"
+                    [onChange]="v => newPassword = v"
+                    [required]="true"
+                />
+
+                @if (error) {
+                    <p class="error-text mb-4">{{ error }}</p>
+                }
+
+                <nc-button type="submit" width="100%" [disabled]="isLoading">
+                    {{ isLoading ? 'Setting password…' : 'Set Password' }}
+                </nc-button>
+            </form>
+
+        } @else {
+
+            <h1 class="page-title text-center mb-2">Atlas Extract</h1>
+            <p class="page-subtitle text-center mb-6">Sign in to your account</p>
+
+            <form (submit)="$event.preventDefault(); onSignIn()">
+                <label class="input-label" for="email">Email</label>
+                <input
+                    id="email"
+                    type="email"
+                    class="mb-4 w-100"
+                    placeholder="you@example.com"
+                    [value]="email"
+                    (input)="email = $any($event.target).value"
+                    required
+                    autocomplete="email"
+                />
+
+                <label class="input-label" for="password">Password</label>
+                <nc-password
+                    class="mb-4 w-100"
+                    placeholder="Password"
+                    [value]="password"
+                    [onChange]="v => password = v"
+                    [required]="true"
+                />
+
+                @if (error) {
+                    <p class="error-text mb-4">{{ error }}</p>
+                }
+
+                <nc-button type="submit" width="100%" [disabled]="isLoading">
+                    {{ isLoading ? 'Signing in…' : 'Sign In' }}
+                </nc-button>
+            </form>
+
+        }
+
+    </nc-card>
+</div>
