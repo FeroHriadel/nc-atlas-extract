@@ -1,4 +1,4 @@
-import { Component, HostListener, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
 
 
 
@@ -26,6 +26,8 @@ export class Checkbox implements OnInit {
     @Input() checked?: boolean = false;
     @Input() label?: string = '';
 
+    @Output() checkedChange = new EventEmitter<boolean>();
+
     public isChecked: boolean = false;
 
     ngOnInit() {
@@ -34,6 +36,7 @@ export class Checkbox implements OnInit {
 
     toggleChecked() {
         this.isChecked = !this.isChecked;
+        this.checkedChange.emit(this.isChecked);
         if (this.onChange) { this.onChange(); }
     }
 

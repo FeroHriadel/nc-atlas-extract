@@ -9,7 +9,7 @@
     <nc-card class="p-4 mb-6">
         <h2 class="section-title-light mb-4">Extraction Data</h2>
         @if (extraction) {
-            <dl class="info-grid">
+            <dl class="info-grid text">
                 <dt>Name</dt>
                 <dd>{{ extraction.friendlyName }}</dd>
 
@@ -19,6 +19,9 @@
                         {{ extraction.status }}
                     </nc-pill>
                 </dd>
+
+                <dt>Pages</dt>
+                <dd>{{ formatPageRanges(extraction.pages) }}</dd>
 
                 <dt>Language</dt>
                 <dd>{{ extraction.sourceLanguage }}</dd>
@@ -72,7 +75,7 @@
         } @else {
             <nc-virtualized-table
                 [data]="tableData"
-                [columnsConfig]="columnsConfig"
+                [columnsConfig]="resultColumnsConfig"
                 [controls]="true"
             />
         }

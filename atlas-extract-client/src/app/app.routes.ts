@@ -51,5 +51,15 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/extraction-details/extraction-details.page').then(m => m.ExtractionDetailsPage),
         canActivate: [authGuard]
     },
+    {
+        path: 'data-prep',
+        loadComponent: () => import('./pages/data-prep/data-prep.page').then(m => m.DataPrepPage),
+        canActivate: [authGuard]
+    },
+    {
+        path: 'data-prep/:extractionId',
+        loadComponent: () => import('./pages/data-prep-details/data-prep-details.page').then(m => m.DataPrepDetailsPage),
+        canActivate: [authGuard]
+    },
     { path: '**', redirectTo: '' }
 ];

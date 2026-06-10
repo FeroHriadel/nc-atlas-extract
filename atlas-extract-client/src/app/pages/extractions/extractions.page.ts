@@ -8,7 +8,7 @@ import { Pill } from '../../ncss/pills/pill/pill.component';
 import { Button } from '../../ncss/buttons/button/button.component';
 import { VirtualizedTable, VirtualizedTableProps } from '../../ncss/tables/virtualized-table/virtualized-table';
 import { ExtractionService } from '../../services/extraction.service';
-import { Extraction } from '../../types/Extraction';
+import { Extraction, PageRange } from '../../types/Extraction';
 
 
 
@@ -31,6 +31,7 @@ export class ExtractionsPage implements OnInit, AfterViewInit {
         map((list: Extraction[] | null) => (list ?? []).map(e => ({
             id:          e.id,
             name:        e.friendlyName,
+            pages:       this.formatPageRanges(e.pages),
             status:      e.status,
             batches:     `${e.completedBatches}/${e.totalBatches} completed` + (e.failedBatches > 0 ? `, ${e.failedBatches} failed` : ''),
             created:     new Date(e.createdAt).toLocaleDateString(),
@@ -49,6 +50,12 @@ export class ExtractionsPage implements OnInit, AfterViewInit {
         this.extractionService.getExtractionList();
     }
 
+    private formatPageRanges(pages: PageRange[]): string {
+        return pages
+            .map(p => p.startPage === p.endPage ? `${p.startPage}` : `${p.startPage}-${p.endPage}`)
+            .join(', ');
+    }
+
     protected async onDeleteExtraction(id: string): Promise<void> {
         if (!confirm('Delete this extraction and all its S3 result files? This cannot be undone.')) return;
         try {
@@ -61,6 +68,7 @@ export class ExtractionsPage implements OnInit, AfterViewInit {
     ngAfterViewInit(): void {
         this.columnsConfig = [
             { column: 'name',        displayValue: 'Name',         width: '300px' },
+            { column: 'pages',       displayValue: 'Pages',        width: '150px' },
             { column: 'status',      displayValue: 'Status',       width: '150px', template: this.statusCellTpl },
             { column: 'batches',     displayValue: 'Batches',      width: '200px' },
             { column: 'created',     displayValue: 'Created',      width: '150px' },

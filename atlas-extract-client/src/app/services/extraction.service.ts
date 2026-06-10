@@ -8,7 +8,8 @@ import { ToastService } from '../ncss/services/toast.service';
 import { ExtractStartReq } from '../types/ExtractionStartReq';
 import { ExtractStartRes } from '../types/ExtractionStartRes';
 import { Extraction } from '../types/Extraction';
-import { ExtractionJsonRes } from '../types/ExtractionJsonRes';
+import { ExtractionJsonRes, ExtractionBatchResult } from '../types/ExtractionJsonRes';
+import { ExtractedItem } from '../types/ExtractedItem';
 
 
 
@@ -43,10 +44,12 @@ export class ExtractionService {
     private extractionList: BehaviorSubject<Extraction[] | null> = new BehaviorSubject<Extraction[] | null>(null);
     public extractionList$ = this.extractionList.asObservable();
 
-    private extractionJsonLoading: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-    public extractionJsonLoading$ = this.extractionJsonLoading.asObservable();
-    private extractionJson: BehaviorSubject<ExtractionJsonRes | null> = new BehaviorSubject<ExtractionJsonRes | null>(null);
-    public extractionJson$ = this.extractionJson.asObservable();
+    private extractionJsonsLoading: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    public extractionJsonsLoading$ = this.extractionJsonsLoading.asObservable();
+    private extractionJsonsErr: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
+    public extractionJsonsErr$ = this.extractionJsonsErr.asObservable();
+    private extractionJsons: BehaviorSubject<ExtractionBatchResult[] | null> = new BehaviorSubject<ExtractionBatchResult[] | null>(null);
+    public extractionJsons$ = this.extractionJsons.asObservable();
 
 
 
@@ -123,22 +126,34 @@ export class ExtractionService {
         }
     }
 
-    public getExtractionJson(extractionId: string): void {
-        this.extractionJson.next(null);
-        this.extractionJsonLoading.next(true);
-        this.http.get<ExtractionJsonRes>(`${this.apiUrl}/extraction/${extractionId}/json`)
-            .subscribe({
-                next: (res: ExtractionJsonRes) => {
-                    this.extractionJson.next(res);
-                },
-                error: (err) => {
-                    this.toastService.error({ text: 'Failed to get extraction results', duration: 3000 });
-                    console.error('Error getting extraction JSON:', err);
-                },
-                complete: () => {
-                    this.extractionJsonLoading.next(false);
-                }
-            });
+    public async getExtractionJsons(extractionId: string): Promise<void> {
+        this.extractionJsons.next(null);
+        this.extractionJsonsErr.next(null);
+        this.extractionJsonsLoading.next(true);
+        try {
+            const res = await firstValueFrom(this.http.get<ExtractionJsonRes>(`${this.apiUrl}/extraction/${extractionId}/json`));
+            const extraction = this.extraction.getValue();
+
+            const results: ExtractionBatchResult[] = [];
+            for (const batch of res.batches) {
+                const response = await fetch(batch.url);
+                const { summary: items }: { summary: ExtractedItem[] } = await response.json();
+                results.push({
+                    batchIndex:  batch.batchIndex,
+                    startPage:   batch.startPage,
+                    endPage:     batch.endPage,
+                    s3ResultKey: extraction?.batches[batch.batchIndex]?.s3ResultKey ?? `batch ${batch.batchIndex}`,
+                    items,
+                });
+            }
+            this.extractionJsons.next(results);
+        } catch (err) {
+            this.toastService.error({ text: 'Failed to get extraction results', duration: 3000 });
+            this.extractionJsonsErr.next('Failed to load extraction results');
+            console.error('Error getting extraction JSON:', err);
+        } finally {
+            this.extractionJsonsLoading.next(false);
+        }
     }
 
     public getExtractionList(): void {

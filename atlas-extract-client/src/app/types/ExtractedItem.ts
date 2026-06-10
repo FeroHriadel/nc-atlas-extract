@@ -3,4 +3,5 @@ export interface ExtractedItem {
     description: string;
     category: string;
     tags: string[];
+    gps?: any;
 }

@@ -1,0 +1,25 @@
+<app-container>
+    <!-- title -->
+    <nc-card class="p-4 mb-6">
+        <h1 class="page-title text-left">Data Prep</h1>
+        <p class="page-subtitle text-left mb-4">Extracted data only contain the basic information (saving tokens). Add more fields to completed extractions here.</p>
+    </nc-card>
+
+    @for (extraction of (extractionList$ | async); track extraction.id) {
+        <nc-card class="p-4 mb-4 flex justify-between align-center">
+            <span class="extraction-info text">
+                {{extraction.friendlyName}}
+                <br>
+                <small>{{extraction.createdAt | date:'short'}}</small>
+                <br>
+                <small>Pages: {{ formatPageRanges(extraction.pages) }}</small>
+            </span>
+
+            <span class="extraction-actions">
+                <a routerLink="/data-prep/{{extraction.id}}">
+                    <nc-button variant="dark" size="small">Enrich</nc-button>
+                </a>
+            </span>
+        </nc-card>
+    }
+</app-container>

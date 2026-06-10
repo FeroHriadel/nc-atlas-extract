@@ -4,9 +4,8 @@ import { DatePipe } from "@angular/common";
 import { ActivatedRoute } from "@angular/router";
 import { filter, take } from "rxjs/operators";
 import { ExtractionService } from "../../services/extraction.service";
-import { Extraction } from "../../types/Extraction";
-import { ExtractedItem } from "../../types/ExtractedItem";
-import { ExtractionJsonRes } from "../../types/ExtractionJsonRes";
+import { Extraction, PageRange } from "../../types/Extraction";
+import { ExtractionBatchResult } from "../../types/ExtractionJsonRes";
 import { AppContainer } from "../../components/app-container/app-container.component";
 import { Card } from "../../ncss/cards/card/card.component";
 import { Pill } from "../../ncss/pills/pill/pill.component";
@@ -31,8 +30,9 @@ export class ExtractionDetailsPage implements OnInit {
     protected jsonError: string | null = null;
     protected tableData: Record<string, unknown>[] = [];
 
-    protected readonly columnsConfig: VirtualizedTableProps['columnsConfig'] = [
-        { column: 'batch',       displayValue: 'Batch',       width: '110px' },
+    protected readonly resultColumnsConfig: VirtualizedTableProps['columnsConfig'] = [
+        { column: 'pages',       displayValue: 'Pages',       width: '110px' },
+        { column: 's3Key',       displayValue: 'S3 Key',      width: '260px' },
         { column: 'title',       displayValue: 'Title',       width: '220px' },
         { column: 'description', displayValue: 'Description', width: '380px' },
         { column: 'category',    displayValue: 'Category',    width: '140px' },
@@ -57,42 +57,45 @@ export class ExtractionDetailsPage implements OnInit {
         ).subscribe(extraction => {
             this.extraction = extraction;
             this.cdr.detectChanges();
+            this.extractionService.getExtractionJsons(extractionId);
         });
 
-        this.extractionService.extractionJson$.pipe(
-            filter((res): res is ExtractionJsonRes => !!res),
+        this.extractionService.extractionJsonsLoading$.pipe(
+            takeUntilDestroyed(this.destroyRef)
+        ).subscribe(loading => {
+            this.isLoadingJson = loading;
+            this.cdr.detectChanges();
+        });
+
+        this.extractionService.extractionJsonsErr$.pipe(
+            takeUntilDestroyed(this.destroyRef)
+        ).subscribe(err => {
+            this.jsonError = err;
+            this.cdr.detectChanges();
+        });
+
+        this.extractionService.extractionJsons$.pipe(
+            filter((results): results is ExtractionBatchResult[] => !!results),
             take(1),
             takeUntilDestroyed(this.destroyRef)
-        ).subscribe(async res => {
-            this.isLoadingJson = true;
+        ).subscribe(results => {
+            this.tableData = results.flatMap(r => r.items.map(item => ({
+                pages:       `p.${r.startPage}–${r.endPage}`,
+                s3Key:       r.s3ResultKey,
+                title:       item.title,
+                description: item.description,
+                category:    item.category,
+                tags:        item.tags.join(', '),
+            })));
             this.cdr.detectChanges();
-            try {
-                const rows: Record<string, unknown>[] = [];
-                for (const batch of res.batches) {
-                    const response = await fetch(batch.url);
-                    const { summary: items }: { summary: ExtractedItem[] } = await response.json();
-                    const batchLabel = `p.${batch.startPage}–${batch.endPage}`;
-                    for (const item of items) {
-                        rows.push({
-                            batch:       batchLabel,
-                            title:       item.title,
-                            description: item.description,
-                            category:    item.category,
-                            tags:        item.tags.join(', '),
-                        });
-                    }
-                }
-                this.tableData = rows;
-            } catch (err) {
-                console.error('Failed to load extraction results:', err);
-                this.jsonError = 'Failed to load extraction results';
-            } finally {
-                this.isLoadingJson = false;
-                this.cdr.detectChanges();
-            }
         });
 
         this.extractionService.getExtraction(extractionId);
-        this.extractionService.getExtractionJson(extractionId);
+    }
+
+    protected formatPageRanges(pages: PageRange[]): string {
+        return pages
+            .map(p => p.startPage === p.endPage ? `${p.startPage}` : `${p.startPage}-${p.endPage}`)
+            .join(', ');
     }
 }

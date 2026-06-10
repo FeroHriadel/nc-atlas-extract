@@ -1,0 +1,63 @@
+<app-container>
+    <nc-card class="p-4 mb-6">
+        <h1 class="page-title text-left">Add Data to Extraction</h1>
+        <p class="page-subtitle text-left">Add data to items extracted from a source</p>
+    </nc-card>
+
+    @if (isLoading$ | async)
+    {
+        <p class="text-center text">Loading...</p>
+    }
+    @else
+    {
+        <div class="w-100 flex gap-6">
+            <nc-card class="p-4 max-w-[280px]">
+                <h2 class="section-title-light mb-4">Choose Data to Add</h2>
+                <form class="w-100" (submit)="onEnrichSubmit($event)" [id]="formId">
+                    <nc-checkbox
+                        name="gps"
+                        label="Add GPS Coordinates"
+                        [(checked)]="gpsChecked"
+                        class="mb-4"
+                    />
+                    @if (gpsChecked) {
+                        <span class="flex flex-col gap-1 w-100">
+                            <label for="country">Country the gps coords are for (full name)</label>
+                            <input 
+                                type="text" 
+                                name="country" 
+                                id="country"
+                                placeholder="What country are the items from?"
+                                class="mb-4 w-100"
+                            />
+                        </span>
+                    }
+                    <div>
+                        <nc-button type="submit" width="100%">Add Data</nc-button>
+                    </div>
+                </form>
+            </nc-card>
+
+            <nc-card class="p-4 flex-1">
+                <h2 class="section-title-light mb-4">Preview of Added Data</h2>
+                @if (editableJsons) {
+                    @for (json of editableJsons; track json.batchIndex) {
+                        @for (item of json.items; track item.title) {
+                            <nc-card class="mb-4 p-4 text" [id]="item.title">
+                                <p>
+                                    <b>Title:</b> {{ item.title }} <br>
+                                    <b>Description:</b> {{ item.description.substring(0, 10) }}... <br>
+                                    <b>Category:</b> {{ item.category }} <br>
+                                    <b>Tags:</b> {{ item.tags.join(', ') }} <br>
+                                    @if (item.gps) {
+                                        <b>GPS:</b> {{ item.gps | json}}
+                                    }
+                                </p>
+                            </nc-card>
+                        }   
+                    } 
+                }
+            </nc-card>
+        </div>
+    }
+</app-container>
