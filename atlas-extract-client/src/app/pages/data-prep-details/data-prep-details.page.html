@@ -10,54 +10,62 @@
     }
     @else
     {
-        <div class="w-100 flex gap-6">
-            <nc-card class="p-4 max-w-[280px]">
-                <h2 class="section-title-light mb-4">Choose Data to Add</h2>
-                <form class="w-100" (submit)="onEnrichSubmit($event)" [id]="formId">
-                    <nc-checkbox
-                        name="gps"
-                        label="Add GPS Coordinates"
-                        [(checked)]="gpsChecked"
-                        class="mb-4"
-                    />
-                    @if (gpsChecked) {
-                        <span class="flex flex-col gap-1 w-100">
-                            <label for="country">Country the gps coords are for (full name)</label>
-                            <input 
-                                type="text" 
-                                name="country" 
-                                id="country"
-                                placeholder="What country are the items from?"
-                                class="mb-4 w-100"
-                            />
-                        </span>
-                    }
-                    <div>
-                        <nc-button type="submit" width="100%">Add Data</nc-button>
-                    </div>
-                </form>
-            </nc-card>
-
-            <nc-card class="p-4 flex-1">
-                <h2 class="section-title-light mb-4">Preview of Added Data</h2>
-                @if (editableJsons) {
-                    @for (json of editableJsons; track json.batchIndex) {
-                        @for (item of json.items; track item.title) {
-                            <nc-card class="mb-4 p-4 text" [id]="item.title">
-                                <p>
-                                    <b>Title:</b> {{ item.title }} <br>
-                                    <b>Description:</b> {{ item.description.substring(0, 10) }}... <br>
-                                    <b>Category:</b> {{ item.category }} <br>
-                                    <b>Tags:</b> {{ item.tags.join(', ') }} <br>
-                                    @if (item.gps) {
-                                        <b>GPS:</b> {{ item.gps | json}}
-                                    }
-                                </p>
-                            </nc-card>
-                        }   
-                    } 
+        <nc-card class="p-4 pb-6 mb-4">
+            <h2 class="section-title-light mb-4">Choose Data to Add</h2>
+            <form class="max-w-[500px]" (submit)="onEnrichSubmit($event)" [id]="formId">
+                <nc-checkbox
+                    name="gps"
+                    label="Add GPS Coordinates"
+                    [(checked)]="gpsChecked"
+                    class="mb-2 mr-4"
+                />
+                <nc-checkbox
+                    name="generate-images"
+                    label="Generate Images"
+                    class="mb-4"
+                    [(checked)]="imagesChecked"
+                />
+                @if (gpsChecked) {
+                    <span class="flex flex-col gap-1 w-100">
+                        <label for="country">Country the gps coords are for (full name)</label>
+                        <input 
+                            type="text" 
+                            name="country" 
+                            id="country"
+                            placeholder="What country are the items from?"
+                            class="mb-4 w-100"
+                        />
+                    </span>
                 }
-            </nc-card>
-        </div>
+                <div>
+                    <nc-button type="submit" width="100%">Add Data</nc-button>
+                </div>
+            </form>
+        </nc-card>
+
+        <nc-card class="p-4 flex-1">
+            <h2 class="section-title-light mb-4">Preview of Added Data</h2>
+            @if (editableJsons) {
+                @for (json of editableJsons; track json.batchIndex) {
+                    @for (item of json.items; track item.title) {
+                        <nc-card class="mb-4 p-4 text" [id]="item.title">
+                            <p>
+                                <b>Title:</b> {{ item.title }} <br>
+                                <b>Description:</b> {{ item.description }} <br>
+                                <b>Category:</b> {{ item.category }} <br>
+                                <b>Tags:</b> {{ item.tags.join(', ') }} <br>
+                                @if (item.location) {
+                                    <b>Location:</b> <br>
+                                    <span class="ml-2"><b>Country: </b>{{item.location.country}}</span><br>
+                                    <span class="ml-2"><b>State: </b>{{item.location.state}}</span><br>
+                                    <span class="ml-2"><b>County: </b>{{item.location.county}}</span><br>
+                                    <span class="ml-2"><b>Coordinates: </b>{{item.location.coordinates[0]}}, {{item.location.coordinates[1]}}</span>
+                                }
+                            </p>
+                        </nc-card>
+                    }   
+                } 
+            }
+        </nc-card>
     }
 </app-container>

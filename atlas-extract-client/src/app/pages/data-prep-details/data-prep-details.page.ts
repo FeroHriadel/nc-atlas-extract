@@ -34,6 +34,7 @@ export class DataPrepDetailsPage implements OnInit {
     public readonly isLoading$ = this.extractionService.extractionJsonsLoading$;
     private extractionId: string | null = null;
     public gpsChecked = true;
+    public imagesChecked = true;
     public readonly formId = 'data-prep-form';
     public editableJsons: ExtractionBatchResult[] | null = null;
     public loading = false;
@@ -73,7 +74,7 @@ export class DataPrepDetailsPage implements OnInit {
 
     private async addGpsToItem(item: ExtractionBatchResult['items'][0], country: string): Promise<ExtractionBatchResult['items'][0]> {
         const gpsData = await this.gpsService.getGpsFromTownName(item.title, country);
-        if (gpsData) item.gps = gpsData;
+        if (gpsData) item.location = gpsData;
         return item;
     }
 
@@ -106,7 +107,7 @@ export class DataPrepDetailsPage implements OnInit {
 
         // for demo purposes, we will only enrich the first 3 items
         const country = formValues['country'] as string;
-        const maxItems = 3;
+        const maxItems = this.editableJsons.reduce((acc, batch) => acc + batch.items.length, 0); //change to 3 for testing
         let processed = 0;
         for (const batch of this.editableJsons) {
             for (const item of batch.items) {

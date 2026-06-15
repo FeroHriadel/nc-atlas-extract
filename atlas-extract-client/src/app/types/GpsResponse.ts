@@ -2,7 +2,7 @@ export interface GpsResult {
     county: string;
     state: string;
     country: string;
-    coordinates: number[];
+    coordinates: [number, number];
 }
 
 export interface GpsResponse {
@@ -29,7 +29,7 @@ export interface GpsResponse {
         };
         geometry: {
             type: string;
-            coordinates: number[];
+            coordinates: [number, number];
         };
     }[];
 }

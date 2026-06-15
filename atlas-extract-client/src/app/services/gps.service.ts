@@ -33,9 +33,4 @@ export class GpsService {
             return null;
         }
     }
-
-    public async addGpsToItem(item: ExtractedItem, country: string): Promise<ExtractedItem> {
-        const gps = await this.getGpsFromTownName(item.title, country);
-        return { ...item, gps };
-    }
 }
