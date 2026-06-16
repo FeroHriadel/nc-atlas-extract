@@ -3,8 +3,11 @@ import { Construct } from 'constructs';
 import { SourcesBucket } from './s3/sourcesBucket';
 import { SourcesTable } from './dynamoDb/sourcesTable';
 import { ExtractionsTable } from './dynamoDb/extractionsTable';
+import { EnrichmentsTable } from './dynamoDb/enrichmentsTable';
 import { ExtractionQueue } from './sqs/extractionQueue';
 import { ExtractionWorker } from './lambda/extractionWorker';
+import { EnrichmentQueue } from './sqs/enrichmentQueue';
+import { EnrichmentWorker } from './lambda/enrichmentWorker';
 import { AuthPool } from './cognito/authPool';
 
 
@@ -13,7 +16,9 @@ export class AtlasExtractInfraStack extends cdk.Stack {
   private sourcesBucket: SourcesBucket;
   private sourcesTable: SourcesTable;
   private extractionsTable: ExtractionsTable;
+  private enrichmentsTable: EnrichmentsTable;
   private extractionQueue: ExtractionQueue;
+  private enrichmentQueue: EnrichmentQueue;
 
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -24,8 +29,11 @@ export class AtlasExtractInfraStack extends cdk.Stack {
     this.createSourcesBucket();
     this.createSourcesTable();
     this.createExtractionsTable();
+    this.createEnrichmentsTable();
     this.createExtractionQueue();
     this.createExtractionWorker();
+    this.createEnrichmentQueue();
+    this.createEnrichmentWorker();
     this.createAuthPool();
   }
 
@@ -41,6 +49,10 @@ export class AtlasExtractInfraStack extends cdk.Stack {
     this.extractionsTable = new ExtractionsTable(this, 'ExtractionsTable');
   }
 
+  private createEnrichmentsTable() {
+    this.enrichmentsTable = new EnrichmentsTable(this, 'EnrichmentsTable');
+  }
+
   private createExtractionQueue() {
     this.extractionQueue = new ExtractionQueue(this, 'ExtractionQueue');
   }
@@ -49,6 +61,19 @@ export class AtlasExtractInfraStack extends cdk.Stack {
     new ExtractionWorker(this, 'ExtractionWorker', {
       queue: this.extractionQueue.queue,
       extractionsTable: this.extractionsTable.table,
+      sourcesBucket: this.sourcesBucket.bucket,
+    });
+  }
+
+  private createEnrichmentQueue() {
+    this.enrichmentQueue = new EnrichmentQueue(this, 'EnrichmentQueue');
+  }
+
+  private createEnrichmentWorker() {
+    new EnrichmentWorker(this, 'EnrichmentWorker', {
+      queue: this.enrichmentQueue.queue,
+      dlq: this.enrichmentQueue.dlq,
+      enrichmentsTable: this.enrichmentsTable.table,
       sourcesBucket: this.sourcesBucket.bucket,
     });
   }

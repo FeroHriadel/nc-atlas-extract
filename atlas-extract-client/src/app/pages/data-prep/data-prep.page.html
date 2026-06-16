@@ -13,6 +13,20 @@
                 <small>{{extraction.createdAt | date:'short'}}</small>
                 <br>
                 <small>Pages: {{ formatPageRanges(extraction.pages) }}</small>
+                @if (enrichmentStatuses[extraction.id]) {
+                    <br>
+                    <small
+                        [style.color]="
+                            enrichmentStatuses[extraction.id] === 'completed'  ? '#22c55e' :
+                            enrichmentStatuses[extraction.id] === 'processing' ? '#3b82f6' : '#ef4444'
+                        "
+                    >
+                        {{
+                            enrichmentStatuses[extraction.id] === 'completed'  ? 'enriched' :
+                            enrichmentStatuses[extraction.id] === 'processing' ? 'processing' : 'failed'
+                        }}
+                    </small>
+                }
             </span>
 
             <span class="extraction-actions">

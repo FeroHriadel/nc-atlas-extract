@@ -22,7 +22,9 @@ public static class AppServiceExtensions
         services.AddScoped<IS3Service, S3Service>();
         services.AddScoped<ISourcesTableService, SourcesTableService>();
         services.AddScoped<IExtractionsTableService, ExtractionsTableService>();
+        services.AddScoped<IEnrichmentsTableService, EnrichmentsTableService>();
         services.AddScoped<IQueueService, QueueService>();
+        services.AddScoped<IEnrichmentQueueService, EnrichmentQueueService>();
         services.AddScoped<IPdfTextService, PdfTextService>();
         services.AddScoped<IRequestCheckService, RequestCheckService>();
         services.AddScoped<IExtractionService, ExtractService>();

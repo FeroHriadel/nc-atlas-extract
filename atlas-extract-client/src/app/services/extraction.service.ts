@@ -10,6 +10,7 @@ import { ExtractStartRes } from '../types/ExtractionStartRes';
 import { Extraction } from '../types/Extraction';
 import { ExtractionJsonRes, ExtractionBatchResult } from '../types/ExtractionJsonRes';
 import { ExtractedItem } from '../types/ExtractedItem';
+import { Enrichment, EnrichedItem, EnrichmentStartReq } from '../types/Enrichment';
 
 
 
@@ -154,6 +155,24 @@ export class ExtractionService {
         } finally {
             this.extractionJsonsLoading.next(false);
         }
+    }
+
+    public async startEnrichment(extractionId: string, req: EnrichmentStartReq): Promise<Enrichment> {
+        return firstValueFrom(
+            this.http.post<Enrichment>(`${this.apiUrl}/extraction/${extractionId}/enrich`, req)
+        );
+    }
+
+    public async getEnrichmentStatus(extractionId: string): Promise<Enrichment | null> {
+        return firstValueFrom(
+            this.http.get<Enrichment | null>(`${this.apiUrl}/extraction/${extractionId}/enrichment-status`)
+        );
+    }
+
+    public async getEnrichedItems(extractionId: string): Promise<EnrichedItem[]> {
+        return firstValueFrom(
+            this.http.get<EnrichedItem[]>(`${this.apiUrl}/extraction/${extractionId}/enriched-items`)
+        );
     }
 
     public getExtractionList(): void {
