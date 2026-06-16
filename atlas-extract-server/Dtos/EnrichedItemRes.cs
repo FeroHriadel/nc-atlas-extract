@@ -11,6 +11,8 @@ public class EnrichedItemRes
     public EnrichedItemLocation? Location { get; set; }
     public string? Image350Url { get; set; }
     public string? Image1024Url { get; set; }
+    public string? Image350S3Key { get; set; }
+    public string? Image1024S3Key { get; set; }
 }
 
 public class EnrichedItemLocation

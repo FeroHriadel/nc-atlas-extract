@@ -24,7 +24,8 @@ export class App {
   protected readonly logoUrl = 'logo.png';
   protected readonly navLinks: NavLink[] = [
     { label: 'Sources', link: '/sources' },
-    { label: 'Extract Data', link: '/extract-data' }
+    { label: 'Extractions', link: '/extractions' },
+    { label: 'Data Prep', link: '/data-prep' },
   ];
   protected currentTheme = toSignal(this.themeService.theme$, { initialValue: this.themeService.getTheme() });
   protected isLoadingPage = signal(false);

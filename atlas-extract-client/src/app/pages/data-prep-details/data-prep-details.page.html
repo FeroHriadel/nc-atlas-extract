@@ -71,7 +71,10 @@
 
         @if (enrichedItems) {
             <nc-card class="p-4 mb-4">
-                <h2 class="section-title-light mb-6">Enriched Items</h2>
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="section-title-light">Enriched Items</h2>
+                    <nc-button variant="outline" (click)="downloadEnrichedItems()">Download JSON</nc-button>
+                </div>
                 @for (item of enrichedItems; track item.title) {
                     <nc-card class="mb-4 p-4 text">
                         @if (item.status === 'failed') {

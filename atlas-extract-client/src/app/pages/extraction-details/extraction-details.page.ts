@@ -10,6 +10,7 @@ import { AppContainer } from "../../components/app-container/app-container.compo
 import { Card } from "../../ncss/cards/card/card.component";
 import { Pill } from "../../ncss/pills/pill/pill.component";
 import { VirtualizedTable, VirtualizedTableProps } from "../../ncss/tables/virtualized-table/virtualized-table";
+import { Button } from "../../ncss/buttons/button/button.component";
 
 
 
@@ -17,7 +18,7 @@ import { VirtualizedTable, VirtualizedTableProps } from "../../ncss/tables/virtu
     selector: 'app-extraction-details',
     templateUrl: './extraction-details.page.html',
     styleUrl: './extraction-details.page.css',
-    imports: [AppContainer, Card, Pill, VirtualizedTable, DatePipe]
+    imports: [AppContainer, Card, Pill, VirtualizedTable, DatePipe, Button]
 })
 export class ExtractionDetailsPage implements OnInit {
     private readonly route = inject(ActivatedRoute);
@@ -29,6 +30,7 @@ export class ExtractionDetailsPage implements OnInit {
     protected isLoadingJson = false;
     protected jsonError: string | null = null;
     protected tableData: Record<string, unknown>[] = [];
+    private batchResults: ExtractionBatchResult[] = [];
 
     protected readonly resultColumnsConfig: VirtualizedTableProps['columnsConfig'] = [
         { column: 'pages',       displayValue: 'Pages',       width: '110px' },
@@ -79,6 +81,7 @@ export class ExtractionDetailsPage implements OnInit {
             take(1),
             takeUntilDestroyed(this.destroyRef)
         ).subscribe(results => {
+            this.batchResults = results;
             this.tableData = results.flatMap(r => r.items.map(item => ({
                 pages:       `p.${r.startPage}–${r.endPage}`,
                 s3Key:       r.s3ResultKey,
@@ -91,6 +94,17 @@ export class ExtractionDetailsPage implements OnInit {
         });
 
         this.extractionService.getExtraction(extractionId);
+    }
+
+    protected downloadJsons(): void {
+        const items = this.batchResults.flatMap(r => r.items);
+        const blob = new Blob([JSON.stringify(items, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${this.extraction?.friendlyName ?? 'extraction'}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
     }
 
     protected formatPageRanges(pages: PageRange[]): string {

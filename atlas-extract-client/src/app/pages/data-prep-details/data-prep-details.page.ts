@@ -108,6 +108,22 @@ export class DataPrepDetailsPage implements OnInit, OnDestroy {
         return true;
     }
 
+    public downloadEnrichedItems(): void {
+        if (!this.enrichedItems) return;
+        const data = this.enrichedItems
+            .filter(item => item.status === 'completed')
+            .map(({ title, description, category, tags, location, image350S3Key, image1024S3Key }) => ({
+                title, description, category, tags, location, image350S3Key, image1024S3Key,
+            }));
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `enrichment-${this.extractionId}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
     public async onEnrichSubmit(e: Event): Promise<void> {
         e.preventDefault();
         if (this.submitting || this.isProcessing) return;

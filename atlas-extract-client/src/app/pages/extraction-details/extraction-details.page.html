@@ -78,6 +78,11 @@
                 [columnsConfig]="resultColumnsConfig"
                 [controls]="true"
             />
+            @if (tableData.length) {
+                <div class="mt-4 flex justify-end">
+                    <nc-button (click)="downloadJsons()" variant="outline">Download JSON</nc-button>
+                </div>
+            }
         }
     </nc-card>
 </app-container>

@@ -113,7 +113,7 @@ http://localhost:4200/extractions
 http://localhost:4200/extraction-details/extractionId
 - shows Extraction metadata in Extraction Data section (from Server from DynamoDb/ExtractionsTable)
 - shows table with: Pages, S3 Key, Title, Description, Category, Tags for each extracted item (from Server from s3 via presigned url)
-User can download the JSON(s) from S3 and e.g.: use it to populate their DB with !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!TO DO !!!
+User can download all extracted items as a single JSON file via the Download JSON button at the bottom of the results table
 
 #### Data Enrichment - List
 http://localhost:4200/data-prep
@@ -127,7 +127,7 @@ http://localhost:4200/data-prep/extractionId
 - On submiting the form the extraction data is shown in cards with an indicator of: pending | processing | failed | completed
 - Completed item card shows GPS and Image
 - Failed item card shows (hopefully) error with reason
-- User can download the enriched data from browser !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!TO DO !!!
+- User can download completed enriched items as a JSON file via the Download JSON button in the Enriched Items section header
 
 Flow:
 * Client sends `{ gpsEnabled, imagesEnabled, country }` to `POST /api/extraction/{id}/enrich`

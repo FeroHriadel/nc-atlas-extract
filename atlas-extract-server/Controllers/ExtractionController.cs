@@ -357,14 +357,16 @@ public class ExtractionController(
 
                 results.Add(new EnrichedItemRes
                 {
-                    Title        = item.Title,
-                    Status       = item.Status,
-                    Description  = stored?.Description,
-                    Category     = stored?.Category,
-                    Tags         = stored?.Tags,
-                    Location     = stored?.Location,
-                    Image350Url  = image350Url,
-                    Image1024Url = image1024Url,
+                    Title          = item.Title,
+                    Status         = item.Status,
+                    Description    = stored?.Description,
+                    Category       = stored?.Category,
+                    Tags           = stored?.Tags,
+                    Location       = stored?.Location,
+                    Image350Url    = image350Url,
+                    Image1024Url   = image1024Url,
+                    Image350S3Key  = enrichment.ImagesEnabled ? $"{item.S3Folder}/350.png"  : null,
+                    Image1024S3Key = enrichment.ImagesEnabled ? $"{item.S3Folder}/1024.png" : null,
                 });
             }
 

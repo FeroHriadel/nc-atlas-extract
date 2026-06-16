@@ -42,4 +42,6 @@ export interface EnrichedItem {
     location?: EnrichedItemLocation;
     image350Url?: string;
     image1024Url?: string;
+    image350S3Key?: string;
+    image1024S3Key?: string;
 }
