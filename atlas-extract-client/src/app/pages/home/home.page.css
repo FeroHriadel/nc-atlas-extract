@@ -39,3 +39,24 @@
         flex-direction: column;
     }
 }
+
+.stats-grid {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.stats-grid > * {
+    flex: 1;
+}
+
+.chart-wrap {
+    position: relative;
+    height: 280px;
+}
+
+@media (max-width: 1300px) {
+    .stats-grid {
+        flex-direction: column;
+    }
+}

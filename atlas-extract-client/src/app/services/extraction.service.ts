@@ -11,6 +11,7 @@ import { Extraction } from '../types/Extraction';
 import { ExtractionJsonRes, ExtractionBatchResult } from '../types/ExtractionJsonRes';
 import { ExtractedItem } from '../types/ExtractedItem';
 import { Enrichment, EnrichedItem, EnrichmentStartReq } from '../types/Enrichment';
+import { StatsRes } from '../types/Stats';
 
 
 
@@ -173,6 +174,10 @@ export class ExtractionService {
         return firstValueFrom(
             this.http.get<EnrichedItem[]>(`${this.apiUrl}/extraction/${extractionId}/enriched-items`)
         );
+    }
+
+    public getStats(): Promise<StatsRes> {
+        return firstValueFrom(this.http.get<StatsRes>(`${this.apiUrl}/stats`));
     }
 
     public getExtractionList(): void {

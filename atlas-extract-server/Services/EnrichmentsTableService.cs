@@ -28,6 +28,15 @@ public class EnrichmentsTableService(IAmazonDynamoDB dynamo, IConfiguration conf
 
 
 
+    public async Task<Enrichment[]> GetAllEnrichmentsAsync()
+    {
+        var response = await dynamo.ScanAsync(new ScanRequest { TableName = TableName });
+        if (response.Items == null || response.Items.Count == 0) return [];
+        return [.. response.Items.Select(MapToEnrichment)];
+    }
+
+
+
     public async Task PutEnrichmentAsync(Enrichment enrichment)
     {
         await dynamo.PutItemAsync(new PutItemRequest

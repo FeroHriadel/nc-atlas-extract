@@ -71,6 +71,15 @@ export const environment = {
 ## FLOW
 - All api calls require cognito bearer token in headers
 
+#### Statistics
+http://localhost:4200
+- On load the home page calls `GET /api/stats`
+- Server scans dynamoDB/ExtractionsTable for all extractions. For each completed extraction it downloads all batch result JSONs from S3 in parallel and counts the items in each `summary` array; date is taken from `completedAt`.
+- Server scans dynamoDB/EnrichmentsTable for all enrichments. Completed enrichment items with an `s3Folder` (images enabled) are counted as generated images; the date is parsed from the folder name prefix (`enrichments/{yyyy-MM-dd}-slug/...`). Failed enrichments are counted using `completedAt`.
+- Server returns `{ thisMonth: DailyStats[], overall: OverallStats }` where `thisMonth` has one entry per day from day 1 to today, and `overall` has all-time totals.
+- Client renders two Chart.js charts: a line chart (this month, per-day x-axis) and a bar chart (overall totals). Both show 4 series: extracted items, images generated, failed extractions, failed enrichments.
+
+
 #### Upload Source
 http://localhost:4200/sources/upload
 - only pdf supported for now (as of Jun 2026)

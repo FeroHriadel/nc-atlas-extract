@@ -52,4 +52,34 @@
         </nc-card>
     </div>
 
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <nc-card class="p-4">
+            <h2 class="section-title-light mb-4">This Month</h2>
+            @if (statsLoading) {
+                <p class="page-subtitle">Loading...</p>
+            } @else if (statsError) {
+                <p class="page-subtitle">Failed to load stats.</p>
+            } @else {
+                <div class="chart-wrap">
+                    <canvas id="line-chart"></canvas>
+                </div>
+            }
+        </nc-card>
+
+        <nc-card class="p-4">
+            <h2 class="section-title-light mb-4">Overall</h2>
+            @if (statsLoading) {
+                <p class="page-subtitle">Loading...</p>
+            } @else if (statsError) {
+                <p class="page-subtitle">Failed to load stats.</p>
+            } @else {
+                <div class="chart-wrap">
+                    <canvas id="bar-chart"></canvas>
+                </div>
+            }
+        </nc-card>
+    </div>
+
 </app-container>
