@@ -1,0 +1,102 @@
+<app-container>
+
+    <nc-card class="p-4 mb-6">
+        <h1 class="page-title text-left">Help</h1>
+        <p class="page-subtitle text-left">What is ATLAS Extract and how to use it</p>
+    </nc-card>
+
+    <nc-card class="p-4 mb-4">
+        <h2 class="section-title-light mb-4">Getting an account</h2>
+        <p class="text">
+            Access to ATLAS Extract is by invitation only. You cannot sign up on your own — please contact the
+            administrator to have an account created for you. Once your account is ready you will receive your
+            login credentials and can sign in from the login page.
+        </p>
+    </nc-card>
+
+    <nc-card class="p-4 mb-4">
+        <h2 class="section-title-light mb-4">What does the app do?</h2>
+        <p class="text mb-3">
+            ATLAS Extract is a tool for turning guide books (PDFs) into structured, machine-readable data.
+            You upload a guide book, describe the information you want to pull out of it, and the app uses
+            AI to read every page and extract individual entries — things like sights, places of interest,
+            or any other items described in the book — each with a title, description, category, and tags.
+        </p>
+        <p class="text">
+            The result is a clean JSON file you can download and use however you like — import it into a
+            database, feed it into another tool, or process it further.
+        </p>
+    </nc-card>
+
+    <nc-card class="p-4 mb-4">
+        <h2 class="section-title-light mb-4">Step by step</h2>
+
+        <div class="mb-5">
+            <h3 class="section-title-light mb-2">1. Upload a source</h3>
+            <p class="text">
+                Go to <strong>Upload Source</strong> and upload a PDF guide book. Give it a friendly name so you can
+                identify it later. Only PDF files are supported.
+            </p>
+        </div>
+
+        <div class="mb-5">
+            <h3 class="section-title-light mb-2">2. Extract data</h3>
+            <p class="text mb-2">
+                Go to <strong>Extract Data</strong>, find your source and click Extract. On the extraction page you can:
+            </p>
+            <ul class="text" style="list-style: disc; padding-left: 1.4rem; line-height: 2;">
+                <li>Preview the PDF directly in the browser.</li>
+                <li>Extract a sample of the text so you can see how the AI will read it.</li>
+                <li>Describe the structure — tell the system what language the book is in, what topic it covers,
+                    how long descriptions should be, and what fields each entry should have. The better your
+                    description, the better the output.</li>
+                <li>Run a sample extraction on a small page range to check the results before committing to the
+                    full document.</li>
+                <li>Start the full extraction. The app splits the book into page ranges, sends each one to the AI,
+                    and saves the results. You can watch each batch complete in real time.</li>
+            </ul>
+        </div>
+
+        <div class="mb-5">
+            <h3 class="section-title-light mb-2">3. Review extractions</h3>
+            <p class="text">
+                Go to <strong>Extractions</strong> to see all your past and in-progress extraction runs.
+                Click <em>Details</em> on any completed extraction to browse the extracted entries in a table
+                and download the full JSON.
+            </p>
+        </div>
+
+        <div class="mb-5">
+            <h3 class="section-title-light mb-2">4. Enrich the data (optional)</h3>
+            <p class="text mb-2">
+                Go to <strong>Enrich Data</strong> to add extra information to your extracted entries:
+            </p>
+            <ul class="text" style="list-style: disc; padding-left: 1.4rem; line-height: 2;">
+                <li><strong>GPS coordinates</strong> — the app looks up each entry by name and country and
+                    attaches geographic coordinates (latitude, longitude) along with country, state and county.</li>
+                <li><strong>AI-generated images</strong> — the app generates a photorealistic image for each
+                    entry using its title and description. Both a full-size (1024 px) and a thumbnail (350 px)
+                    version are saved.</li>
+            </ul>
+            <p class="text mt-2">
+                Enrichment runs in the background. You can watch the status of each entry update in real time.
+                Once complete, download the enriched data as JSON — it includes all the original fields plus
+                GPS and image storage paths.
+            </p>
+        </div>
+    </nc-card>
+
+    <nc-card class="p-4 mb-4">
+        <h2 class="section-title-light mb-4">A few things to keep in mind</h2>
+        <ul class="text" style="list-style: disc; padding-left: 1.4rem; line-height: 2;">
+            <li>Extraction and enrichment happen asynchronously in the cloud — closing the browser tab is fine,
+                the job keeps running.</li>
+            <li>A running enrichment cannot be re-triggered. Once it finishes you can run it again if needed.</li>
+            <li>Image generation requires an OpenAI key configured by the administrator. If images are not
+                available, the checkbox will still appear but results may fail.</li>
+            <li>GPS coordinates come from a geocoding service and are best-effort — accuracy depends on how
+                well-known the location is.</li>
+        </ul>
+    </nc-card>
+
+</app-container>

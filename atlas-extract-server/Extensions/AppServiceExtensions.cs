@@ -1,3 +1,4 @@
+using Amazon.CognitoIdentityProvider;
 using Amazon.DynamoDBv2;
 using Amazon.S3;
 using Amazon.SQS;
@@ -16,6 +17,7 @@ public static class AppServiceExtensions
 {
     public static IServiceCollection AddAppServices(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddAWSService<IAmazonCognitoIdentityProvider>();
         services.AddAWSService<IAmazonS3>(); // AWSService gets credentials from ~/.aws/credentials locally, IAM role in production
         services.AddAWSService<IAmazonDynamoDB>();
         services.AddAWSService<IAmazonSQS>();

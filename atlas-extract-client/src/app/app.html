@@ -45,6 +45,14 @@
         <nc-button variant="outline" class="w-100 mb-1">Enrich Data</nc-button>
       </a>
     </li>
+    <li>
+      <a class="block" routerLink="/help" [style]="{width: '100%'}">
+        <nc-button variant="dark" class="w-100 mb-1">Help</nc-button>
+      </a>
+    </li>
+    <li>
+      <nc-button variant="red" class="w-100" (click)="signOut()">Sign Out</nc-button>
+    </li>
   </ul>
 </nc-card>
 
