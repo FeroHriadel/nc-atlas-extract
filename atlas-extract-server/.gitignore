@@ -2,6 +2,9 @@
 bin/
 obj/
 
+# Angular FE assets (populated by CI pipeline, not committed)
+wwwroot/
+
 # Rider
 .idea/
 

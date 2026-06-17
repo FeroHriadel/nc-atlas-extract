@@ -36,9 +36,11 @@ export class DeploymentStack extends cdk.Stack {
         const sg             = this.createSecurityGroup(vpc);
         const role           = this.createInstanceRole(props, artifactBucket);
         this.instance        = this.createInstance(vpc, sg, role);
+        const hostedZone     = this.lookupHostedZone();
         const eip            = this.createEip(this.instance);
-        const distribution   = this.createDistribution(eip, props.certificate);
-        this.createDnsRecord(distribution);
+        const originDomain   = this.createOriginRecord(hostedZone, eip);
+        const distribution   = this.createDistribution(originDomain, props.certificate);
+        this.createDnsRecord(hostedZone, distribution);
         this.createGithubDeploymentRole(artifactBucket);
     }
 
@@ -166,10 +168,23 @@ SVCEOF`,
         return eip;
     }
 
-    private createDistribution(eip: ec2.CfnEIP, certificate: acm.ICertificate): cloudfront.Distribution {
+    private lookupHostedZone(): route53.IHostedZone {
+        return route53.HostedZone.fromLookup(this, 'HostedZone', { domainName: 'nclabs.eu' });
+    }
+
+    private createOriginRecord(hostedZone: route53.IHostedZone, eip: ec2.CfnEIP): string {
+        new route53.ARecord(this, 'OriginRecord', {
+            zone: hostedZone,
+            recordName: 'origin.atlas-extract',
+            target: route53.RecordTarget.fromIpAddresses(eip.ref),
+        });
+        return 'origin.atlas-extract.nclabs.eu';
+    }
+
+    private createDistribution(originDomain: string, certificate: acm.ICertificate): cloudfront.Distribution {
         const distribution = new cloudfront.Distribution(this, 'Distribution', {
             defaultBehavior: {
-                origin: new origins.HttpOrigin(eip.ref, {
+                origin: new origins.HttpOrigin(originDomain, {
                     protocolPolicy: cloudfront.OriginProtocolPolicy.HTTP_ONLY,
                     httpPort: 80,
                 }),
@@ -226,10 +241,7 @@ SVCEOF`,
         new cdk.CfnOutput(this, 'ArtifactBucketName',    { value: artifactBucket.bucketName });
     }
 
-    private createDnsRecord(distribution: cloudfront.Distribution): void {
-        const hostedZone = route53.HostedZone.fromLookup(this, 'HostedZone', {
-            domainName: 'nclabs.eu',
-        });
+    private createDnsRecord(hostedZone: route53.IHostedZone, distribution: cloudfront.Distribution): void {
         new route53.ARecord(this, 'AppDnsRecord', {
             zone: hostedZone,
             recordName: 'atlas-extract',

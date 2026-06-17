@@ -32,7 +32,7 @@ QUEUE_NAME=nc-atlas-extract-queue
 ```
 * deploy microservices with: `cdk deploy AtlasExtractInfraStack-prod`. It will print UserPoolId and UserPoolClientId => copy them for step 3
 * Put UserPoolId and UserPoolClientId from previous step to environment.prod.ts & appsettings.Production.json, then commit to github
-* Deploy Certificate & Deployment Stacks with: `cdk deploy CertificateStack DeploymetStack`.
+* Deploy Certificate & Deployment Stacks. If you don't have cdk bootstraped in us-east-1 (certificte must be in us-east-1) run: `cdk bootstrap aws://472693607173/us-east-1`. Then continue with: `cdk deploy CertificateStack DeploymetStack`.
 * DeploymentStack outputs will print AWS_DEPLY_ROLE_ARN, AWS_ARTIFACT_BUCKET, AWS_EC2_INSTANCE_ID. Set them as hithub secrets.
-* Go to AWS Secrets Manager: prod-nc-atlas-extract-api-keys / and set ANTHROPIC_API_KEY and OPENAI_API_KEY as json.
+* Go to AWS Secrets Manager: prod-nc-atlas-extract-api-keys / and set ANTHROPIC_API_KEY and OPENAI_API_KEY as json but in the plaintext option: `{"ANTHROPIC_API_KEY":"sk-ant-...","OPENAI_API_KEY":"sk-proj-..."}`
 * push to master - the pipeline runs and deploys the app for the first time. Github will know to run an action because of the .github/workflows/deploy.yml where we specified build steps.

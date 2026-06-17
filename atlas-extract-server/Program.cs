@@ -15,6 +15,9 @@ var app = builder.Build();
 // middleware
 app.UseMiddleware<ExceptionMiddleware>();
 
+// serve Angular app (wwwroot/ is populated by the CI pipeline)
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 // Swagger
 if (app.Environment.IsDevelopment())
@@ -28,4 +31,5 @@ app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader())
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapFallbackToFile("index.html");
 app.Run();
