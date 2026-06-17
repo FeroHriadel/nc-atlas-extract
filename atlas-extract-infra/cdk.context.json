@@ -1,0 +1,15 @@
+{
+  "hosted-zone:account=472693607173:domainName=nclabs.eu:region=us-east-1": {
+    "Id": "/hostedzone/Z04239083PCNJJ7O16BHT",
+    "Name": "nclabs.eu."
+  },
+  "availability-zones:account=472693607173:region=eu-central-1": [
+    "eu-central-1a",
+    "eu-central-1b",
+    "eu-central-1c"
+  ],
+  "hosted-zone:account=472693607173:domainName=nclabs.eu:region=eu-central-1": {
+    "Id": "/hostedzone/Z04239083PCNJJ7O16BHT",
+    "Name": "nclabs.eu."
+  }
+}
