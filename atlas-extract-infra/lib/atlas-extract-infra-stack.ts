@@ -9,16 +9,24 @@ import { ExtractionWorker } from './lambda/extractionWorker';
 import { EnrichmentQueue } from './sqs/enrichmentQueue';
 import { EnrichmentWorker } from './lambda/enrichmentWorker';
 import { AuthPool } from './cognito/authPool';
+import { ApiKeysSecret } from './secretsManager/apiKeysSecret';
+import * as dotenv from 'dotenv';
+dotenv.config();
+
+
+
+const env = process.env.ENVIRONEMNT;
 
 
 
 export class AtlasExtractInfraStack extends cdk.Stack {
-  private sourcesBucket: SourcesBucket;
-  private sourcesTable: SourcesTable;
-  private extractionsTable: ExtractionsTable;
-  private enrichmentsTable: EnrichmentsTable;
-  private extractionQueue: ExtractionQueue;
-  private enrichmentQueue: EnrichmentQueue;
+  public sourcesBucket: SourcesBucket;
+  public sourcesTable: SourcesTable;
+  public extractionsTable: ExtractionsTable;
+  public enrichmentsTable: EnrichmentsTable;
+  public extractionQueue: ExtractionQueue;
+  public enrichmentQueue: EnrichmentQueue;
+  public apiKeysSecret?: ApiKeysSecret;
 
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -26,6 +34,7 @@ export class AtlasExtractInfraStack extends cdk.Stack {
   }
 
   private init() {
+    if (env !== 'dev') this.createApiKeysSecret();
     this.createSourcesBucket();
     this.createSourcesTable();
     this.createExtractionsTable();
@@ -57,11 +66,16 @@ export class AtlasExtractInfraStack extends cdk.Stack {
     this.extractionQueue = new ExtractionQueue(this, 'ExtractionQueue');
   }
 
+  private createApiKeysSecret() {
+    this.apiKeysSecret = new ApiKeysSecret(this, 'ApiKeysSecret');
+  }
+
   private createExtractionWorker() {
     new ExtractionWorker(this, 'ExtractionWorker', {
       queue: this.extractionQueue.queue,
       extractionsTable: this.extractionsTable.table,
       sourcesBucket: this.sourcesBucket.bucket,
+      apiKeysSecret: this.apiKeysSecret?.secret,
     });
   }
 
@@ -75,6 +89,7 @@ export class AtlasExtractInfraStack extends cdk.Stack {
       dlq: this.enrichmentQueue.dlq,
       enrichmentsTable: this.enrichmentsTable.table,
       sourcesBucket: this.sourcesBucket.bucket,
+      apiKeysSecret: this.apiKeysSecret?.secret,
     });
   }
 

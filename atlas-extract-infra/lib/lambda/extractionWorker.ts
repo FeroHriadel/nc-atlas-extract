@@ -6,6 +6,7 @@ import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
+import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 dotenv.config();
@@ -20,6 +21,7 @@ interface ExtractionWorkerProps {
     queue: sqs.Queue;
     extractionsTable: dynamodb.Table;
     sourcesBucket: s3.Bucket;
+    apiKeysSecret?: secretsmanager.ISecret;
 }
 
 
@@ -43,7 +45,10 @@ export class ExtractionWorker extends Construct {
             environment: {
                 EXTRACTIONS_TABLE_NAME: props.extractionsTable.tableName,
                 SOURCES_BUCKET_NAME: props.sourcesBucket.bucketName,
-                ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY ?? '',
+                ...(env === 'dev'
+                    ? { ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY ?? '' }
+                    : { API_KEYS_SECRET_ARN: props.apiKeysSecret!.secretArn }
+                ),
             },
         });
 
@@ -56,5 +61,6 @@ export class ExtractionWorker extends Construct {
         props.extractionsTable.grantReadWriteData(this.fn);
         props.sourcesBucket.grantReadWrite(this.fn);
         props.queue.grantConsumeMessages(this.fn);
+        if (env !== 'dev') props.apiKeysSecret!.grantRead(this.fn);
     }
 }

@@ -6,6 +6,7 @@ import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
+import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 dotenv.config();
@@ -21,6 +22,7 @@ interface EnrichmentWorkerProps {
     dlq: sqs.Queue;
     enrichmentsTable: dynamodb.Table;
     sourcesBucket: s3.Bucket;
+    apiKeysSecret?: secretsmanager.ISecret;
 }
 
 
@@ -45,7 +47,10 @@ export class EnrichmentWorker extends Construct {
             environment: {
                 ENRICHMENTS_TABLE_NAME: props.enrichmentsTable.tableName,
                 SOURCES_BUCKET_NAME:    props.sourcesBucket.bucketName,
-                OPENAI_API_KEY:         process.env.OPENAI_API_KEY ?? '',
+                ...(env === 'dev'
+                    ? { OPENAI_API_KEY: process.env.OPENAI_API_KEY ?? '' }
+                    : { API_KEYS_SECRET_ARN: props.apiKeysSecret!.secretArn }
+                ),
             },
         });
 
@@ -57,6 +62,7 @@ export class EnrichmentWorker extends Construct {
         props.enrichmentsTable.grantReadWriteData(this.fn);
         props.sourcesBucket.grantReadWrite(this.fn);
         props.queue.grantConsumeMessages(this.fn);
+        if (env !== 'dev') props.apiKeysSecret!.grantRead(this.fn);
     }
 
     private createDlqProcessorLambda(props: EnrichmentWorkerProps) {

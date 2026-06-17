@@ -2,15 +2,29 @@ import { SQSEvent } from 'aws-lambda';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, GetCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 
 
 
 const dynamo = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 const s3 = new S3Client({});
+const secretsClient = new SecretsManagerClient({});
 
 const TABLE_NAME = process.env.EXTRACTIONS_TABLE_NAME!;
 const BUCKET_NAME = process.env.SOURCES_BUCKET_NAME!;
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY!;
+
+let cachedAnthropicApiKey: string | undefined;
+
+async function getAnthropicApiKey(): Promise<string> {
+    if (cachedAnthropicApiKey) return cachedAnthropicApiKey;
+    if (process.env.ANTHROPIC_API_KEY) {
+        cachedAnthropicApiKey = process.env.ANTHROPIC_API_KEY;
+        return cachedAnthropicApiKey;
+    }
+    const res = await secretsClient.send(new GetSecretValueCommand({ SecretId: process.env.API_KEYS_SECRET_ARN! }));
+    cachedAnthropicApiKey = JSON.parse(res.SecretString!).ANTHROPIC_API_KEY;
+    return cachedAnthropicApiKey!;
+}
 
 const GENERAL_INSTRUCTIONS = `
     YOUR ROLE:
@@ -165,7 +179,7 @@ async function callClaude(userPrompt: string): Promise<ClaudeResult> {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
-            'x-api-key': ANTHROPIC_API_KEY,
+            'x-api-key': await getAnthropicApiKey(),
             'anthropic-version': '2023-06-01',
             'content-type': 'application/json',
         },

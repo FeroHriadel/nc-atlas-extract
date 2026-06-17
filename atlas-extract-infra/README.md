@@ -1,14 +1,38 @@
-# Welcome to your CDK TypeScript project
+# ATLAS-EXTRACT-INFRA(structure)
 
-This is a blank project for CDK development with TypeScript.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
-## Useful commands
+### DEV DEPLOYMENT
+- dev is intended only to provide basic infrastructure for locally run BE & FE. That is: DynamoDB tables, S3, SQS and Lambda workers.
+- to deploy dev infrastructure add .env with:
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `npx cdk deploy`  deploy this stack to your default AWS account/region
-* `npx cdk diff`    compare deployed stack with current state
-* `npx cdk synth`   emits the synthesized CloudFormation template
+```.env
+AWS_ACCOUNT_ID=47...
+AWS_REGION=eu-central-1
+ENVIRONEMNT=dev //MUST BE CALLED "dev" !
+ANTHROPIC_API_KEY=sk-ant-...
+QUEUE_NAME=nc-atlas-extract-queue
+OPENAI_API_KEY=sk-proj-...
+```
+- then run `cdk deploy`
+
+
+
+### PROD
+- will deploy BE & FE on EC2 and create all relevant resources. Apart from S3, lambda, sqs, dynamodb also ACM certificate, cloudfront, R53 record, a Secret in Secrets Manager, IAM role for github, Elastic IP... It will also create a deployment pipeline (github actions)
+
+- deployment steps:
+* add .env with:
+```.env
+AWS_ACCOUNT_ID=47...
+AWS_REGION=eu-central-1
+ENVIRONEMNT=prod
+QUEUE_NAME=nc-atlas-extract-queue
+// don't add ANTROPHIC & OPENAI keys! => they will be in SecretsMnager !
+```
+* deploy microservices with: `cdk deploy AtlasExtractInfraStack-prod`. It will print UserPoolId and UserPoolClientId => copy them for step 3
+* Put UserPoolId and UserPoolClientId from previous step to environment.prod.ts & appsettings.Production.json, then commit to github
+* Deploy Certificate & Deployment Stacks with: `cdk deploy CertificateStack DeploymetStack`.
+* DeploymentStack outputs will print AWS_DEPLY_ROLE_ARN, AWS_ARTIFACT_BUCKET, AWS_EC2_INSTANCE_ID. Set them as hithub secrets.
+* Go to AWS Secrets Manager: prod-nc-atlas-extract-api-keys / and set ANTHROPIC_API_KEY and OPENAI_API_KEY as json.
+* push to master - the pipeline runs and deploys the app for the first time. Github will know to run an action because of the .github/workflows/deploy.yml where we specified build steps.

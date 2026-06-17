@@ -2,16 +2,30 @@ import { SQSEvent } from 'aws-lambda';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 import { Jimp } from 'jimp';
 
 
 
 const dynamo = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 const s3 = new S3Client({});
+const secretsClient = new SecretsManagerClient({});
 
 const ENRICHMENTS_TABLE = process.env.ENRICHMENTS_TABLE_NAME!;
 const BUCKET_NAME = process.env.SOURCES_BUCKET_NAME!;
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY!;
+
+let cachedOpenAiApiKey: string | undefined;
+
+async function getOpenAiApiKey(): Promise<string> {
+    if (cachedOpenAiApiKey) return cachedOpenAiApiKey;
+    if (process.env.OPENAI_API_KEY) {
+        cachedOpenAiApiKey = process.env.OPENAI_API_KEY;
+        return cachedOpenAiApiKey;
+    }
+    const res = await secretsClient.send(new GetSecretValueCommand({ SecretId: process.env.API_KEYS_SECRET_ARN! }));
+    cachedOpenAiApiKey = JSON.parse(res.SecretString!).OPENAI_API_KEY;
+    return cachedOpenAiApiKey!;
+}
 
 
 
@@ -115,7 +129,7 @@ async function generateImageB64(title: string, description: string, category: st
         const res = await fetch('https://api.openai.com/v1/images/generations', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                'Authorization': `Bearer ${await getOpenAiApiKey()}`,
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ model: 'gpt-image-1', prompt, n: 1, size: '1024x1024' }),
