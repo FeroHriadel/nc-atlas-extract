@@ -9,6 +9,7 @@ import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as route53 from 'aws-cdk-lib/aws-route53';
+import * as route53Targets from 'aws-cdk-lib/aws-route53-targets';
 import * as cr from 'aws-cdk-lib/custom-resources';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
@@ -41,11 +42,10 @@ export class DeploymentStack extends cdk.Stack {
         this.instance        = this.createInstance(vpc, sg, role);
         const hostedZone     = this.lookupHostedZone();
         const eip            = this.createEip(this.instance);
-        const originDomain   = this.createOriginRecord(hostedZone, eip); //so cf can point to the eip (it won't work with the public ip directly - it needs a domain name)
-        const distribution   = this.createDistribution(originDomain, props.certificate);
+        const originDomain   = this.createOriginRecord(hostedZone, eip); // CF rejects raw IPs as origin — needs a domain name
         const fallbackBucket = this.createFallbackBucket();
-        const healthCheck    = this.createHealthCheck(distribution);
-        this.createFailoverDnsRecords(hostedZone, distribution, fallbackBucket, healthCheck);
+        const distribution   = this.createDistribution(originDomain, props.certificate, fallbackBucket);
+        this.createDnsRecord(hostedZone, distribution);
         this.createGithubDeploymentRole(artifactBucket);
     }
 
@@ -187,7 +187,42 @@ SVCEOF`,
         return 'origin.atlas-extract.nclabs.eu';
     }
 
-    private createDistribution(originDomain: string, certificate: acm.ICertificate): cloudfront.Distribution {
+    private createFallbackBucket(): s3.Bucket {
+        const bucket = new s3.Bucket(this, 'FallbackBucket', {
+            bucketName: 'atlas-extract.nclabs.eu',
+            websiteIndexDocument: 'maintenance.html',
+            blockPublicAccess: new s3.BlockPublicAccess({
+                blockPublicAcls: true,
+                ignorePublicAcls: true,
+                blockPublicPolicy: false,
+                restrictPublicBuckets: false,
+            }),
+            removalPolicy: cdk.RemovalPolicy.DESTROY,
+            autoDeleteObjects: true,
+        });
+
+        bucket.addToResourcePolicy(new iam.PolicyStatement({
+            actions: ['s3:GetObject'],
+            resources: [bucket.arnForObjects('*')],
+            principals: [new iam.AnyPrincipal()],
+        }));
+
+        new s3deploy.BucketDeployment(this, 'FallbackDeploy', {
+            sources: [s3deploy.Source.asset(path.join(__dirname, '../../static'))],
+            destinationBucket: bucket,
+        });
+
+        return bucket;
+    }
+
+    private createDistribution(originDomain: string, certificate: acm.ICertificate, fallbackBucket: s3.Bucket): cloudfront.Distribution {
+        // CloudFront fetches maintenance.html from S3 via HTTP internally — viewers always get HTTPS
+        const maintenanceOrigin = new origins.HttpOrigin(fallbackBucket.bucketWebsiteDomainName, {
+            protocolPolicy: cloudfront.OriginProtocolPolicy.HTTP_ONLY,
+            connectionAttempts: 1,
+            connectionTimeout: cdk.Duration.seconds(3),
+        });
+
         const distribution = new cloudfront.Distribution(this, 'Distribution', {
             defaultBehavior: {
                 origin: new origins.HttpOrigin(originDomain, {
@@ -199,11 +234,34 @@ SVCEOF`,
                 cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
                 originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
             },
+            additionalBehaviors: {
+                '/maintenance.html': {
+                    origin: maintenanceOrigin,
+                    viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+                    cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
+                },
+            },
+            // When EC2 is down CloudFront gets 502/503/504 — serve the maintenance page instead
+            errorResponses: [
+                { httpStatus: 502, responseHttpStatus: 200, responsePagePath: '/maintenance.html', ttl: cdk.Duration.seconds(10) },
+                { httpStatus: 503, responseHttpStatus: 200, responsePagePath: '/maintenance.html', ttl: cdk.Duration.seconds(10) },
+                { httpStatus: 504, responseHttpStatus: 200, responsePagePath: '/maintenance.html', ttl: cdk.Duration.seconds(10) },
+            ],
             domainNames: ['atlas-extract.nclabs.eu'],
             certificate,
         });
         new cdk.CfnOutput(this, 'DistributionDomain', { value: distribution.distributionDomainName });
         return distribution;
+    }
+
+    private createDnsRecord(hostedZone: route53.IHostedZone, distribution: cloudfront.Distribution): void {
+        new route53.ARecord(this, 'AppDnsRecord', {
+            zone: hostedZone,
+            recordName: 'atlas-extract',
+            target: route53.RecordTarget.fromAlias(
+                new route53Targets.CloudFrontTarget(distribution)
+            ),
+        });
     }
 
     private createGithubDeploymentRole(artifactBucket: s3.Bucket): void {
@@ -245,82 +303,5 @@ SVCEOF`,
 
         new cdk.CfnOutput(this, 'GithubActionsRoleArn',  { value: githubRole.roleArn });
         new cdk.CfnOutput(this, 'ArtifactBucketName',    { value: artifactBucket.bucketName });
-    }
-
-    private createFallbackBucket(): s3.Bucket {
-        const bucket = new s3.Bucket(this, 'FallbackBucket', {
-            bucketName: 'atlas-extract.nclabs.eu',
-            websiteIndexDocument: 'index.html',
-            blockPublicAccess: new s3.BlockPublicAccess({
-                blockPublicAcls: true,
-                ignorePublicAcls: true,
-                blockPublicPolicy: false,
-                restrictPublicBuckets: false,
-            }),
-            removalPolicy: cdk.RemovalPolicy.DESTROY,
-            autoDeleteObjects: true,
-        });
-
-        bucket.addToResourcePolicy(new iam.PolicyStatement({
-            actions: ['s3:GetObject'],
-            resources: [bucket.arnForObjects('*')],
-            principals: [new iam.AnyPrincipal()],
-        }));
-
-        new s3deploy.BucketDeployment(this, 'FallbackDeploy', {
-            sources: [s3deploy.Source.asset(path.join(__dirname, '../../static'))],
-            destinationBucket: bucket,
-        });
-
-        return bucket;
-    }
-
-    private createHealthCheck(distribution: cloudfront.Distribution): route53.CfnHealthCheck {
-        return new route53.CfnHealthCheck(this, 'HealthCheck', {
-            healthCheckConfig: {
-                type: 'HTTPS',
-                fullyQualifiedDomainName: distribution.distributionDomainName,
-                port: 443,
-                requestInterval: 30,
-                failureThreshold: 3,
-                resourcePath: '/',
-            },
-        });
-    }
-
-    private createFailoverDnsRecords(
-        hostedZone: route53.IHostedZone,
-        distribution: cloudfront.Distribution,
-        fallbackBucket: s3.Bucket,
-        healthCheck: route53.CfnHealthCheck,
-    ): void {
-        // Primary: CloudFront — fails over when health check detects EC2 is down
-        new route53.CfnRecordSet(this, 'PrimaryRecord', {
-            hostedZoneId: hostedZone.hostedZoneId,
-            name: 'atlas-extract.nclabs.eu.',
-            type: 'A',
-            setIdentifier: 'primary',
-            failover: 'PRIMARY',
-            healthCheckId: healthCheck.attrHealthCheckId,
-            aliasTarget: {
-                dnsName: distribution.distributionDomainName,
-                hostedZoneId: 'Z2FDTNDATAQYW2', // CloudFront global hosted zone ID
-                evaluateTargetHealth: false,
-            },
-        });
-
-        // Secondary: S3 static page shown while EC2 is offline
-        new route53.CfnRecordSet(this, 'FallbackRecord', {
-            hostedZoneId: hostedZone.hostedZoneId,
-            name: 'atlas-extract.nclabs.eu.',
-            type: 'A',
-            setIdentifier: 'fallback',
-            failover: 'SECONDARY',
-            aliasTarget: {
-                dnsName: fallbackBucket.bucketWebsiteDomainName,
-                hostedZoneId: 'Z21DNDUVLTQW6Q', // S3 website eu-central-1
-                evaluateTargetHealth: false,
-            },
-        });
     }
 }
