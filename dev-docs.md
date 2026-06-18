@@ -18,7 +18,7 @@ QUEUE_NAME=nc-atlas-extract-queue // Extraction queue name
 OPENAI_API_KEY=sk-proj-h6... // OpenAI key for images generation (not necessary if you don't want to generate images)
 ```
 
-- run: `cdk deploy`
+- run: `cdk deploy AtlasExtractInfraStack-dev`
 
 
 

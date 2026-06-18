@@ -1,5 +1,7 @@
 # ATLAS-EXTRACT-INFRA(structure)
 
+![Diagram](./diagram.png)
+
 
 
 ### DEV DEPLOYMENT
@@ -18,7 +20,7 @@ OPENAI_API_KEY=sk-proj-...
 
 
 
-### PROD
+### PROD DEPLOYMENT
 - will deploy BE & FE on EC2 and create all relevant resources. Apart from S3, lambda, sqs, dynamodb also ACM certificate, cloudfront, R53 record, a Secret in Secrets Manager, IAM role for github, Elastic IP... It will also create a deployment pipeline (github actions)
 
 - deployment steps:
