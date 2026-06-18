@@ -11,6 +11,7 @@ import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as route53Targets from 'aws-cdk-lib/aws-route53-targets';
 import * as cr from 'aws-cdk-lib/custom-resources';
+import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 
 
 
@@ -22,6 +23,7 @@ interface DeploymentStackProps extends cdk.StackProps {
     enrichmentQueue: sqs.IQueue;
     sourcesBucket: s3.IBucket;
     certificate: acm.ICertificate;
+    apiKeysSecret?: secretsmanager.ISecret;
 }
 
 
@@ -110,6 +112,7 @@ export class DeploymentStack extends cdk.Stack {
         props.enrichmentQueue.grantSendMessages(role);
         props.sourcesBucket.grantReadWrite(role);
         artifactBucket.grantRead(role);
+        props.apiKeysSecret?.grantRead(role);
 
         return role;
     }

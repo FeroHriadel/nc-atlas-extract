@@ -73,7 +73,10 @@ export class DescribeStructureFormComponent implements AfterViewInit {
 
     this.extractionService.extractSampleErr$
       .pipe(filter(v => !!v), take(1))
-      .subscribe(() => { this.submitting = false; });
+      .subscribe(() => {
+        this.submitting = false;
+        this.cdr.detectChanges();
+      });
   }
 
   public saveDescription(): void {

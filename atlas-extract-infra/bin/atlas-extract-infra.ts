@@ -36,5 +36,6 @@ if (env !== 'dev') {
     enrichmentQueue:  infraStack.enrichmentQueue.queue,
     sourcesBucket:    infraStack.sourcesBucket.bucket,
     certificate:      certStack.certificate,
+    apiKeysSecret:    infraStack.apiKeysSecret?.secret,
   });
 }

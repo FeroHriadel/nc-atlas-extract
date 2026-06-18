@@ -45,7 +45,7 @@ public class SourcesController(
                 Url = req.Url,
                 ISBN = req.ISBN,
                 ObjectKey = req.ObjectKey,
-                CreatedBy = "developer",
+                CreatedBy = User.Claims.FirstOrDefault(c => c.Type == "username")?.Value ?? "unknown",
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
             };

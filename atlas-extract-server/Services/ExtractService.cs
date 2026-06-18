@@ -1,6 +1,8 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Amazon.SecretsManager;
+using Amazon.SecretsManager.Model;
 using App.Dtos;
 using App.Interfaces;
 
@@ -12,9 +14,11 @@ namespace App.Services;
 
 public class ExtractService(IConfiguration configuration) : IExtractionService
 {
+    private readonly string? _apiKeyFromConfig = configuration["Anthropic:ApiKey"];
+    private readonly string? _secretName = configuration["SecretsManager:ApiKeysSecretName"];
+    private static string? _cachedKey;
+    private static readonly SemaphoreSlim _keyLock = new(1, 1);
 
-    private readonly string apiKey = configuration["Anthropic:ApiKey"]
-        ?? throw new InvalidOperationException("Anthropic:ApiKey is not configured.");
     private readonly string generalInstructions = """
         YOUR ROLE:
         You are an assistant who summarizes info from text about sights and places of interest in a json.
@@ -50,9 +54,36 @@ public class ExtractService(IConfiguration configuration) : IExtractionService
 
     private static readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
 
+    private async Task<string> GetApiKey()
+    {
+        if (!string.IsNullOrEmpty(_apiKeyFromConfig)) return _apiKeyFromConfig;
+        if (_cachedKey != null) return _cachedKey;
+
+        await _keyLock.WaitAsync();
+        try
+        {
+            if (_cachedKey != null) return _cachedKey;
+
+            if (string.IsNullOrEmpty(_secretName))
+                throw new InvalidOperationException("Anthropic:ApiKey is not configured and SecretsManager:ApiKeysSecretName is not set.");
+
+            using var client = new AmazonSecretsManagerClient();
+            var response = await client.GetSecretValueAsync(new GetSecretValueRequest { SecretId = _secretName });
+            var doc = JsonDocument.Parse(response.SecretString);
+            _cachedKey = doc.RootElement.GetProperty("ANTHROPIC_API_KEY").GetString()
+                ?? throw new InvalidOperationException("ANTHROPIC_API_KEY not found in secret.");
+            return _cachedKey;
+        }
+        finally
+        {
+            _keyLock.Release();
+        }
+    }
+
 
     public async Task<ExtractRes> Extract(ExtractReq req)
     {
+        var apiKey = await GetApiKey();
         var userPrompt = BuildPrompt(req);
 
         using var http = new HttpClient();
