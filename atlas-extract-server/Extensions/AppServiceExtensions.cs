@@ -1,5 +1,6 @@
 using Amazon.CognitoIdentityProvider;
 using Amazon.DynamoDBv2;
+using Amazon.Lambda;
 using Amazon.S3;
 using Amazon.SQS;
 using App.Dtos;
@@ -21,6 +22,7 @@ public static class AppServiceExtensions
         services.AddAWSService<IAmazonS3>(); // AWSService gets credentials from ~/.aws/credentials locally, IAM role in production
         services.AddAWSService<IAmazonDynamoDB>();
         services.AddAWSService<IAmazonSQS>();
+        services.AddAWSService<IAmazonLambda>();
         services.AddScoped<IS3Service, S3Service>();
         services.AddScoped<ISourcesTableService, SourcesTableService>();
         services.AddScoped<IExtractionsTableService, ExtractionsTableService>();
@@ -30,6 +32,7 @@ public static class AppServiceExtensions
         services.AddScoped<IPdfTextService, PdfTextService>();
         services.AddScoped<IRequestCheckService, RequestCheckService>();
         services.AddScoped<IExtractionService, ExtractService>();
+        services.AddScoped<IImageGenService, ImageGenService>();
         services.AddControllers() // so it responds with camelCase json instead of PascalCase
             .AddJsonOptions(o => o.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase);
         services.Configure<ApiBehaviorOptions>(options => // respond with {error: string} on model validation errors

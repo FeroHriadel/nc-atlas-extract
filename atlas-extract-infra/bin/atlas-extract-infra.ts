@@ -37,5 +37,6 @@ if (env !== 'dev') {
     sourcesBucket:    infraStack.sourcesBucket.bucket,
     certificate:      certStack.certificate,
     apiKeysSecret:    infraStack.apiKeysSecret?.secret,
+    imageGenFunction: infraStack.imageGenWorker.fn,
   });
 }

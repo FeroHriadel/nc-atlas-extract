@@ -65,5 +65,10 @@ export const routes: Routes = [
         loadComponent: () => import('./pages/data-prep-details/data-prep-details.page').then(m => m.DataPrepDetailsPage),
         canActivate: [authGuard]
     },
+    {
+        path: 'createimage',
+        loadComponent: () => import('./pages/create-image/create-image.page').then(m => m.CreateImagePage),
+        canActivate: [authGuard]
+    },
     { path: '**', redirectTo: '' }
 ];

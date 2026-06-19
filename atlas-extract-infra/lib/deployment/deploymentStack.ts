@@ -13,6 +13,7 @@ import * as route53Targets from 'aws-cdk-lib/aws-route53-targets';
 import * as cr from 'aws-cdk-lib/custom-resources';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as path from 'path';
 
 
@@ -26,6 +27,7 @@ interface DeploymentStackProps extends cdk.StackProps {
     sourcesBucket: s3.IBucket;
     certificate: acm.ICertificate;
     apiKeysSecret?: secretsmanager.ISecret;
+    imageGenFunction: lambda.IFunction;
 }
 
 
@@ -116,6 +118,7 @@ export class DeploymentStack extends cdk.Stack {
         props.sourcesBucket.grantReadWrite(role);
         artifactBucket.grantRead(role);
         props.apiKeysSecret?.grantRead(role);
+        props.imageGenFunction.grantInvoke(role);
 
         return role;
     }

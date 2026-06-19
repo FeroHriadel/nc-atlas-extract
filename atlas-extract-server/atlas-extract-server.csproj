@@ -12,6 +12,7 @@
     <PackageReference Include="AWSSDK.CognitoIdentityProvider" Version="4.0.9.7" />
     <PackageReference Include="AWSSDK.DynamoDBv2" Version="4.0.18.4" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.3.40" />
+    <PackageReference Include="AWSSDK.Lambda" Version="4.0.18" />
     <PackageReference Include="AWSSDK.S3" Version="4.0.23.3" />
     <PackageReference Include="AWSSDK.SecretsManager" Version="4.0.5.6" />
     <PackageReference Include="AWSSDK.SQS" Version="4.0.2.33" />

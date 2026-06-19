@@ -8,6 +8,7 @@ import { ExtractionQueue } from './sqs/extractionQueue';
 import { ExtractionWorker } from './lambda/extractionWorker';
 import { EnrichmentQueue } from './sqs/enrichmentQueue';
 import { EnrichmentWorker } from './lambda/enrichmentWorker';
+import { ImageGenWorker } from './lambda/imageGenWorker';
 import { AuthPool } from './cognito/authPool';
 import { ApiKeysSecret } from './secretsManager/apiKeysSecret';
 import * as dotenv from 'dotenv';
@@ -27,6 +28,7 @@ export class AtlasExtractInfraStack extends cdk.Stack {
   public extractionQueue: ExtractionQueue;
   public enrichmentQueue: EnrichmentQueue;
   public apiKeysSecret?: ApiKeysSecret;
+  public imageGenWorker: ImageGenWorker;
 
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -43,6 +45,7 @@ export class AtlasExtractInfraStack extends cdk.Stack {
     this.createExtractionWorker();
     this.createEnrichmentQueue();
     this.createEnrichmentWorker();
+    this.createImageGenWorker();
     this.createAuthPool();
   }
 
@@ -89,6 +92,12 @@ export class AtlasExtractInfraStack extends cdk.Stack {
       dlq: this.enrichmentQueue.dlq,
       enrichmentsTable: this.enrichmentsTable.table,
       sourcesBucket: this.sourcesBucket.bucket,
+      apiKeysSecret: this.apiKeysSecret?.secret,
+    });
+  }
+
+  private createImageGenWorker() {
+    this.imageGenWorker = new ImageGenWorker(this, 'ImageGenWorker', {
       apiKeysSecret: this.apiKeysSecret?.secret,
     });
   }

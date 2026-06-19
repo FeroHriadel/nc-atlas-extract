@@ -1,0 +1,6 @@
+.generated-image {
+    width: 350px;
+    height: 350px;
+    object-fit: cover;
+    border-radius: 8px;
+}
