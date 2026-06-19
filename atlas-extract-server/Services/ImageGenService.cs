@@ -1,4 +1,3 @@
-using System.Text;
 using System.Text.Json;
 using Amazon.Lambda;
 using Amazon.Lambda.Model;
@@ -11,41 +10,66 @@ namespace App.Services;
 
 
 
-public class ImageGenService(IAmazonLambda lambdaClient, IConfiguration configuration) : IImageGenService
+public class ImageGenService(
+    IAmazonLambda lambdaClient,
+    IImageJobsTableService imageJobsTableService,
+    IS3Service s3Service,
+    IConfiguration configuration
+) : IImageGenService
 {
     private readonly string functionName = configuration["Lambda:ImageGenFunctionName"]
         ?? throw new InvalidOperationException("Lambda:ImageGenFunctionName is not configured.");
 
-    private static readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
-
-    public async Task<CreateImageRes> GenerateImage(CreateImageReq req)
+    public async Task<string> StartImageGeneration(CreateImageReq req)
     {
+        var jobId = Guid.NewGuid().ToString();
+
+        await imageJobsTableService.PutImageJobAsync(new ImageJob
+        {
+            JobId = jobId,
+            Status = "processing",
+            CreatedAt = DateTime.UtcNow,
+        });
+
         var payload = JsonSerializer.Serialize(new
         {
+            jobId,
             title = req.Title,
             description = req.Description,
             category = req.Category,
             tags = req.Tags,
         });
 
-        var response = await lambdaClient.InvokeAsync(new InvokeRequest
+        // Fire-and-forget — the lambda updates the job record itself when it finishes.
+        // This keeps the HTTP response fast so CloudFront's origin timeout never comes into play.
+        await lambdaClient.InvokeAsync(new InvokeRequest
         {
             FunctionName = functionName,
-            InvocationType = InvocationType.RequestResponse,
+            InvocationType = InvocationType.Event,
             Payload = payload,
         });
 
-        using var reader = new StreamReader(response.Payload);
-        var responseBody = await reader.ReadToEndAsync();
-
-        if (!string.IsNullOrEmpty(response.FunctionError))
-            throw new InvalidOperationException($"Image generation lambda failed: {responseBody}");
-
-        var result = JsonSerializer.Deserialize<LambdaImageRes>(responseBody, _jsonOptions)
-            ?? throw new InvalidOperationException("Image generation lambda returned an empty response.");
-
-        return new CreateImageRes { Image = result.Image };
+        return jobId;
     }
 
-    private record LambdaImageRes(string Image);
+    public async Task<ImageJobStatusRes> GetJobStatus(string jobId)
+    {
+        var job = await imageJobsTableService.GetImageJobAsync(jobId)
+            ?? throw new KeyNotFoundException($"Image job {jobId} not found.");
+
+        if (job.Status != "completed")
+        {
+            return new ImageJobStatusRes { Status = job.Status, ErrorMessage = job.ErrorMessage };
+        }
+
+        var image1024Url = await s3Service.GetPresignedDownloadUrl(job.Image1024Key!);
+        var image350Url = await s3Service.GetPresignedDownloadUrl(job.Image350Key!);
+
+        return new ImageJobStatusRes
+        {
+            Status = job.Status,
+            Image1024Url = image1024Url,
+            Image350Url = image350Url,
+        };
+    }
 }

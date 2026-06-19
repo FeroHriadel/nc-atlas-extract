@@ -6,5 +6,6 @@ namespace App.Interfaces;
 
 public interface IImageGenService
 {
-    Task<CreateImageRes> GenerateImage(CreateImageReq req);
+    Task<string> StartImageGeneration(CreateImageReq req);
+    Task<ImageJobStatusRes> GetJobStatus(string jobId);
 }

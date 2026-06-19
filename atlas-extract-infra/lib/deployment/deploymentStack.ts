@@ -28,6 +28,7 @@ interface DeploymentStackProps extends cdk.StackProps {
     certificate: acm.ICertificate;
     apiKeysSecret?: secretsmanager.ISecret;
     imageGenFunction: lambda.IFunction;
+    imageJobsTable: dynamodb.ITable;
 }
 
 
@@ -119,6 +120,7 @@ export class DeploymentStack extends cdk.Stack {
         artifactBucket.grantRead(role);
         props.apiKeysSecret?.grantRead(role);
         props.imageGenFunction.grantInvoke(role);
+        props.imageJobsTable.grantReadWriteData(role);
 
         return role;
     }

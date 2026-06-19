@@ -38,5 +38,6 @@ if (env !== 'dev') {
     certificate:      certStack.certificate,
     apiKeysSecret:    infraStack.apiKeysSecret?.secret,
     imageGenFunction: infraStack.imageGenWorker.fn,
+    imageJobsTable:   infraStack.imageJobsTable.table,
   });
 }

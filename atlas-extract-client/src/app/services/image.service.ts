@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { CreateImageReq } from '../types/CreateImageReq';
-import { CreateImageRes } from '../types/CreateImageRes';
+import { ImageJobStatusRes } from '../types/ImageJobStatusRes';
 
 
 
@@ -18,7 +18,11 @@ export class ImageService {
 
     constructor(private http: HttpClient) {}
 
-    public createImage(req: CreateImageReq): Promise<CreateImageRes> {
-        return firstValueFrom(this.http.post<CreateImageRes>(`${this.apiUrl}/images/create`, req));
+    public createImage(req: CreateImageReq): Promise<{ jobId: string }> {
+        return firstValueFrom(this.http.post<{ jobId: string }>(`${this.apiUrl}/images/create`, req));
+    }
+
+    public getImageJobStatus(jobId: string): Promise<ImageJobStatusRes> {
+        return firstValueFrom(this.http.get<ImageJobStatusRes>(`${this.apiUrl}/images/${jobId}/status`));
     }
 }

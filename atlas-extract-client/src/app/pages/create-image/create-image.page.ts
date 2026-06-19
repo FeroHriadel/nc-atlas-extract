@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, inject } from '@angular/core';
 import { AppContainer } from '../../components/app-container/app-container.component';
 import { Card } from '../../ncss/cards/card/card.component';
 import { Button } from '../../ncss/buttons/button/button.component';
@@ -13,7 +13,7 @@ import { CreateImageReq } from '../../types/CreateImageReq';
   templateUrl: './create-image.page.html',
   styleUrl: './create-image.page.css',
 })
-export class CreateImagePage {
+export class CreateImagePage implements OnDestroy {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly formService = inject(FormService);
   private readonly toast = inject(ToastService);
@@ -21,8 +21,13 @@ export class CreateImagePage {
 
   public readonly formId = 'create-image-form';
   protected submitting = false;
-  protected image1024B64: string | null = null;
-  protected image350B64: string | null = null;
+  protected image1024Url: string | null = null;
+  protected image350Url: string | null = null;
+  private pollInterval: ReturnType<typeof setInterval> | null = null;
+
+  ngOnDestroy(): void {
+    this.stopPolling();
+  }
 
   private checkPayload(payload: CreateImageReq): string | null {
     const errors: string[] = [];
@@ -50,49 +55,73 @@ export class CreateImagePage {
     }
 
     this.submitting = true;
-    this.image1024B64 = null;
-    this.image350B64 = null;
+    this.image1024Url = null;
+    this.image350Url = null;
 
     try {
-      const res = await this.imageService.createImage(payload);
-      this.image1024B64 = res.image;
-      this.image350B64 = await this.makeThumbnailB64(res.image);
+      const { jobId } = await this.imageService.createImage(payload);
+      this.startPolling(jobId);
     } catch (err) {
-      this.toast.error({ text: 'Failed to generate image' });
-      console.error('Error generating image:', err);
-    } finally {
       this.submitting = false;
+      this.toast.error({ text: 'Failed to start image generation' });
+      console.error('Error starting image generation:', err);
       this.cdr.detectChanges();
     }
   }
 
-  private makeThumbnailB64(base64: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = 350;
-        canvas.height = 350;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) { reject(new Error('Canvas not supported')); return; }
-        ctx.drawImage(img, 0, 0, 350, 350);
-        resolve(canvas.toDataURL('image/png').split(',')[1]);
-      };
-      img.onerror = () => reject(new Error('Failed to load generated image'));
-      img.src = `data:image/png;base64,${base64}`;
-    });
+  private startPolling(jobId: string): void {
+    if (this.pollInterval) return;
+    this.pollInterval = setInterval(async () => {
+      try {
+        const status = await this.imageService.getImageJobStatus(jobId);
+        if (status.status === 'completed') {
+          this.stopPolling();
+          this.submitting = false;
+          this.image1024Url = status.image1024Url ?? null;
+          this.image350Url = status.image350Url ?? null;
+          this.cdr.detectChanges();
+        } else if (status.status === 'failed') {
+          this.stopPolling();
+          this.submitting = false;
+          this.toast.error({ text: 'Image generation failed' });
+          this.cdr.detectChanges();
+        }
+      } catch (err) {
+        this.stopPolling();
+        this.submitting = false;
+        this.toast.error({ text: 'Failed to check image generation status' });
+        console.error('Error polling image job status:', err);
+        this.cdr.detectChanges();
+      }
+    }, 3000);
   }
 
-  protected downloadImage(base64: string, filename: string): void {
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-    const blob = new Blob([bytes], { type: 'image/png' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
+  private stopPolling(): void {
+    if (this.pollInterval) {
+      clearInterval(this.pollInterval);
+      this.pollInterval = null;
+    }
+  }
+
+  // <img> loads/errors outside Angular's tracked context — force a refresh so the page doesn't
+  // need an unrelated click to repaint once the browser finishes fetching the image bytes
+  protected onImageLoad(): void {
+    this.cdr.detectChanges();
+  }
+
+  protected async downloadImage(url: string, filename: string): Promise<void> {
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = objectUrl;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(objectUrl);
+    } catch (err) {
+      this.toast.error({ text: 'Failed to download image' });
+      console.error('Error downloading image:', err);
+    }
   }
 }

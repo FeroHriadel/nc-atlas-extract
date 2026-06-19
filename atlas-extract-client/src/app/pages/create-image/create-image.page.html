@@ -5,71 +5,77 @@
         <p class="page-subtitle text-left">Describe a place and generate an AI image for it.</p>
     </nc-card>
 
-    <nc-card class="p-4">
-        <form
-            [id]="formId"
-            class="create-image-form flex flex-col"
-            (submit)="createImage($event)"
-            [style]="submitting ? {opacity: '0.4', pointerEvents: 'none'} : {}"
-        >
-            <span>
-                <label for="title" class="mb-1">Title</label>
-                <input
-                    name="title"
-                    id="title"
-                    placeholder="E.g.: Charles Bridge"
-                    class="mb-4 w-100"
-                />
-            </span>
-            <span>
-                <label for="description" class="mb-1">Description</label>
-                <textarea
-                    name="description"
-                    id="description"
-                    placeholder="A short description of the place"
-                    class="mb-4 w-100"
-                ></textarea>
-            </span>
-            <span>
-                <label for="category" class="mb-1">Category</label>
-                <input
-                    name="category"
-                    id="category"
-                    placeholder="E.g.: bridge, town, cemetery, mountain..."
-                    class="mb-4 w-100"
-                />
-            </span>
-            <span>
-                <label for="tags" class="mb-1">Tags</label>
-                <input
-                    name="tags"
-                    id="tags"
-                    placeholder="Comma-separated, e.g.: medieval, river, landmark"
-                    class="mb-4 w-100"
-                />
-            </span>
+    <div class="create-image-layout">
+        <nc-card class="p-4 form-col">
+            <form
+                [id]="formId"
+                class="create-image-form flex flex-col"
+                (submit)="createImage($event)"
+                [style]="submitting ? {opacity: '0.4', pointerEvents: 'none'} : {}"
+            >
+                <span>
+                    <label for="title" class="mb-1">Title</label>
+                    <input
+                        name="title"
+                        id="title"
+                        placeholder="E.g.: Charles Bridge"
+                        class="mb-4 w-100"
+                    />
+                </span>
+                <span>
+                    <label for="description" class="mb-1">Description</label>
+                    <textarea
+                        name="description"
+                        id="description"
+                        placeholder="A short description of the place"
+                        class="mb-4 w-100"
+                    ></textarea>
+                </span>
+                <span>
+                    <label for="category" class="mb-1">Category</label>
+                    <input
+                        name="category"
+                        id="category"
+                        placeholder="E.g.: bridge, town, cemetery, mountain..."
+                        class="mb-4 w-100"
+                    />
+                </span>
+                <span>
+                    <label for="tags" class="mb-1">Tags</label>
+                    <input
+                        name="tags"
+                        id="tags"
+                        placeholder="Comma-separated, e.g.: medieval, river, landmark"
+                        class="mb-4 w-100"
+                    />
+                </span>
 
-            <nc-button type="submit" variant="dark" class="w-100">
-                {{ submitting ? 'Generating... (this might take a bit)' : 'Create Image' }}
-            </nc-button>
-        </form>
-    </nc-card>
-
-    @if (image1024B64) {
-        <nc-card class="p-4 mt-6">
-            <div class="image-preview flex flex-col flex-center">
-                <img [src]="'data:image/png;base64,' + image1024B64" alt="Generated image" class="generated-image mb-4" />
-                <div class="flex gap-2">
-                    <nc-button type="button" variant="outline" (click)="downloadImage(image1024B64, 'image-1024.png')">
-                        Download 1024x1024
-                    </nc-button>
-                    @if (image350B64) {
-                        <nc-button type="button" variant="outline" (click)="downloadImage(image350B64, 'image-350.png')">
-                            Download 350x350
-                        </nc-button>
-                    }
-                </div>
-            </div>
+                <nc-button type="submit" variant="dark" class="w-100">
+                    {{ submitting ? 'Generating... (this might take a bit)' : 'Create Image' }}
+                </nc-button>
+            </form>
         </nc-card>
-    }
+
+        <nc-card class="p-4 result-col">
+            @if (image1024Url) {
+                <div class="image-preview flex flex-col flex-center">
+                    <img [src]="image1024Url" alt="Generated image" class="generated-image mb-4" (load)="onImageLoad()" (error)="onImageLoad()" />
+                    <div class="flex gap-2">
+                        <nc-button type="button" variant="outline" (click)="downloadImage(image1024Url, 'image-1024.png')">
+                            Download 1024x1024
+                        </nc-button>
+                        @if (image350Url) {
+                            <nc-button type="button" variant="outline" (click)="downloadImage(image350Url, 'image-350.png')">
+                                Download 350x350
+                            </nc-button>
+                        }
+                    </div>
+                </div>
+            } @else if (submitting) {
+                <p class="text-center">Generating image... (this might take up to a minute)</p>
+            } @else {
+                <p class="text-center page-subtitle">The generated image will appear here.</p>
+            }
+        </nc-card>
+    </div>
 </app-container>

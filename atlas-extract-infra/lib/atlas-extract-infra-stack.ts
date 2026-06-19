@@ -4,6 +4,7 @@ import { SourcesBucket } from './s3/sourcesBucket';
 import { SourcesTable } from './dynamoDb/sourcesTable';
 import { ExtractionsTable } from './dynamoDb/extractionsTable';
 import { EnrichmentsTable } from './dynamoDb/enrichmentsTable';
+import { ImageJobsTable } from './dynamoDb/imageJobsTable';
 import { ExtractionQueue } from './sqs/extractionQueue';
 import { ExtractionWorker } from './lambda/extractionWorker';
 import { EnrichmentQueue } from './sqs/enrichmentQueue';
@@ -28,6 +29,7 @@ export class AtlasExtractInfraStack extends cdk.Stack {
   public extractionQueue: ExtractionQueue;
   public enrichmentQueue: EnrichmentQueue;
   public apiKeysSecret?: ApiKeysSecret;
+  public imageJobsTable: ImageJobsTable;
   public imageGenWorker: ImageGenWorker;
 
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -45,6 +47,7 @@ export class AtlasExtractInfraStack extends cdk.Stack {
     this.createExtractionWorker();
     this.createEnrichmentQueue();
     this.createEnrichmentWorker();
+    this.createImageJobsTable();
     this.createImageGenWorker();
     this.createAuthPool();
   }
@@ -96,8 +99,14 @@ export class AtlasExtractInfraStack extends cdk.Stack {
     });
   }
 
+  private createImageJobsTable() {
+    this.imageJobsTable = new ImageJobsTable(this, 'ImageJobsTable');
+  }
+
   private createImageGenWorker() {
     this.imageGenWorker = new ImageGenWorker(this, 'ImageGenWorker', {
+      imageJobsTable: this.imageJobsTable.table,
+      sourcesBucket: this.sourcesBucket.bucket,
       apiKeysSecret: this.apiKeysSecret?.secret,
     });
   }

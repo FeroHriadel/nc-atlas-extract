@@ -1,6 +1,23 @@
+.create-image-layout {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.form-col,
+.result-col {
+    flex: 1;
+    min-width: 0;
+}
+
 .generated-image {
     width: 350px;
     height: 350px;
     object-fit: cover;
     border-radius: 8px;
+}
+
+@media (max-width: 700px) {
+    .create-image-layout {
+        flex-direction: column;
+    }
 }

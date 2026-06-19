@@ -32,6 +32,7 @@ public static class AppServiceExtensions
         services.AddScoped<IPdfTextService, PdfTextService>();
         services.AddScoped<IRequestCheckService, RequestCheckService>();
         services.AddScoped<IExtractionService, ExtractService>();
+        services.AddScoped<IImageJobsTableService, ImageJobsTableService>();
         services.AddScoped<IImageGenService, ImageGenService>();
         services.AddControllers() // so it responds with camelCase json instead of PascalCase
             .AddJsonOptions(o => o.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase);

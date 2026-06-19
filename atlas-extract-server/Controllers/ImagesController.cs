@@ -14,7 +14,7 @@ public class ImagesController(
     ILogger<ImagesController> logger
 ) : BaseAppController
 {
-    // CREATE IMAGE => POST /api/images/create
+    // START IMAGE GENERATION => POST /api/images/create
     [HttpPost("create")]
     public async Task<IActionResult> CreateImage([FromBody] CreateImageReq req)
     {
@@ -30,13 +30,35 @@ public class ImagesController(
 
         try
         {
-            var res = await imageGenService.GenerateImage(req);
-            return Ok(res);
+            var jobId = await imageGenService.StartImageGeneration(req);
+            return Ok(new { jobId });
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error during image generation");
-            return StatusCode(500, new ErrorRes { StatusCode = 500, Message = "An error occurred while generating the image." });
+            logger.LogError(ex, "Error starting image generation");
+            return StatusCode(500, new ErrorRes { StatusCode = 500, Message = "An error occurred while starting image generation." });
+        }
+    }
+
+
+
+    // GET IMAGE JOB STATUS => GET /api/images/{jobId}/status
+    [HttpGet("{jobId}/status")]
+    public async Task<IActionResult> GetImageJobStatus(string jobId)
+    {
+        try
+        {
+            var res = await imageGenService.GetJobStatus(jobId);
+            return Ok(res);
+        }
+        catch (KeyNotFoundException)
+        {
+            return NotFound(new ErrorRes { StatusCode = 404, Message = $"Image job {jobId} not found." });
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error getting image job status");
+            return StatusCode(500, new ErrorRes { StatusCode = 500, Message = "An error occurred while checking image job status." });
         }
     }
 }
