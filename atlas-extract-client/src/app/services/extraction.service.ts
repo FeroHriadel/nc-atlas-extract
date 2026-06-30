@@ -176,6 +176,16 @@ export class ExtractionService {
         );
     }
 
+    public async getDownloadUrlByObjectKey(objectKey: string): Promise<string> {
+        const res = await firstValueFrom(
+            this.http.get<{ url: string }>(`${this.apiUrl}/extraction/download-url`, {
+                params: { objectKey }
+            })
+        );
+
+        return res.url;
+    }
+
     public getStats(): Promise<StatsRes> {
         return firstValueFrom(this.http.get<StatsRes>(`${this.apiUrl}/stats`));
     }

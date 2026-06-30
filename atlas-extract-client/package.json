@@ -19,6 +19,7 @@
     "@angular/router": "^21.2.0",
     "amazon-cognito-identity-js": "^6.3.16",
     "chart.js": "^4.5.1",
+    "jszip": "^3.10.1",
     "ng2-pdf-viewer": "^10.4.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"

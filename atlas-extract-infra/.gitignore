@@ -10,4 +10,4 @@ cdk.out
 # env
 .env
 .env.dev.local
-env.prod
+.env.prod

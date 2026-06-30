@@ -225,6 +225,27 @@ public class ExtractionController(
 
 
 
+    // GET PRESIGNED URL FOR ANY OBJECT KEY => GET /api/extraction/download-url?objectKey=...
+    [HttpGet("download-url")]
+    public async Task<IActionResult> GetDownloadUrlByObjectKey([FromQuery] string objectKey)
+    {
+        if (string.IsNullOrWhiteSpace(objectKey))
+            return BadRequest(new ErrorRes { StatusCode = 400, Message = "objectKey is required." });
+
+        try
+        {
+            var url = await s3Service.GetPresignedDownloadUrl(objectKey);
+            return Ok(new { url });
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error generating download URL for object key {ObjectKey}", objectKey);
+            return StatusCode(500, new ErrorRes { StatusCode = 500, Message = "An error occurred while generating download URL." });
+        }
+    }
+
+
+
     // START ENRICHMENT => POST /api/extraction/{id}/enrich
     [HttpPost("{id}/enrich")]
     public async Task<IActionResult> StartEnrichment(string id, [FromBody] EnrichmentStartReq req)
