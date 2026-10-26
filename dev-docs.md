@@ -148,7 +148,7 @@ Flow:
 * Lambda (enrichmentWorker) processes each SQS message independently:
   - Marks the item "processing" in dynamoDB/EnrichmentsTable
   - If gpsEnabled: queries photon.komoot.io geocoding API (`?q={title} {country}`) and extracts country, state, county, coordinates [lat, lon]
-  - If imagesEnabled: calls OpenAI `gpt-image-1` to generate a 1024×1024 image (retries up to 5× on rate-limit), resizes to 350×350 thumbnail via Jimp, uploads both to S3 at `{s3BaseKey}/1024.png` and `{s3BaseKey}/350.png`
+  - If imagesEnabled: calls OpenAI `gpt-image-2.5-flare` to generate a 1024×1024 image (retries up to 5× on rate-limit), resizes to 350×350 thumbnail via Jimp, uploads both to S3 at `{s3BaseKey}/1024.png` and `{s3BaseKey}/350.png`
   - Saves `{s3BaseKey}/item.json` to S3 containing `{ title, description, category, tags, location, image1024, image350 }`
   - Marks item "completed" (with s3Folder) or "failed" (with errorMessage) in dynamoDB
   - Once all items are settled (completedItems + failedItems >= totalItems), sets enrichment overall status to "completed" in dynamoDB

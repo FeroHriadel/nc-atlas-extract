@@ -78,7 +78,7 @@ async function generateImageB64(title: string, description: string, category: st
                 'Authorization': `Bearer ${await getOpenAiApiKey()}`,
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ model: 'gpt-image-1', prompt, n: 1, size: '1024x1024' }),
+            body: JSON.stringify({ model: 'gpt-image-2.5-flare', prompt, n: 1, size: '1024x1024' }),
         });
 
         if (res.status === 429) {
